@@ -54,7 +54,9 @@ jobs:
         run: npx --yes antora@^3.1.0 antora-playbook.yml
 
       - name: Login to Forgejo registry
-        run: echo "${{ secrets.FORGEJO_TOKEN }}" | docker login forge.vidocq.dev -u "${{ secrets.FORGEJO_USER }}" --password-stdin
+        # Forgejo Actions interdit le préfixe FORGEJO_ sur les secrets utilisateur :
+        # on utilise REGISTRY_USER / REGISTRY_TOKEN (cf. README, section Déploiement).
+        run: echo "${{ secrets.REGISTRY_TOKEN }}" | docker login forge.vidocq.dev -u "${{ secrets.REGISTRY_USER }}" --password-stdin
 
       - name: Compute tags
         id: tags

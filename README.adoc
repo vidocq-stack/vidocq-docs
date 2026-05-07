@@ -108,18 +108,21 @@ Sur Forgejo, *Settings → Applications → Generate Token* :
 * Nom : `vidocq-docs-ci` (ou ce qu'on veut)
 * Scopes : `write:package`, `read:package`
 
-Le token est utilisé par le workflow Forgejo Actions (secret `FORGEJO_TOKEN`) et
-par Portainer pour pull l'image (cf. étape suivante). Côté secrets de repo :
+Le token est utilisé par le workflow Forgejo Actions (secret `REGISTRY_TOKEN`)
+et par Portainer pour pull l'image (cf. étape suivante). Côté secrets de repo :
 
 [cols="1,2"]
 |===
 | Secret | Valeur
 
-| `FORGEJO_USER`             | utilisateur ou bot avec `write:package`
-| `FORGEJO_TOKEN`            | token généré ci-dessus
+| `REGISTRY_USER`             | utilisateur ou bot avec `write:package`
+| `REGISTRY_TOKEN`            | token généré ci-dessus
 | `PORTAINER_WEBHOOK_STAGING` | URL de webhook Portainer (étape 3)
 | `PORTAINER_WEBHOOK_PROD`    | URL de webhook Portainer (étape 3)
 |===
+
+NOTE: Forgejo Actions **réserve le préfixe `FORGEJO_`** pour les secrets internes ;
+on utilise donc `REGISTRY_*` côté secrets utilisateur.
 
 === 2. Côté Portainer — déclarer la registry Forgejo
 
@@ -127,7 +130,7 @@ par Portainer pour pull l'image (cf. étape suivante). Côté secrets de repo :
 
 * URL : `forge.vidocq.dev`
 * Authentification : *Yes*
-* Username / Password : le couple `FORGEJO_USER` / `FORGEJO_TOKEN`
+* Username / Password : le couple `REGISTRY_USER` / `REGISTRY_TOKEN`
 
 C'est ce qui permet à Portainer de tirer les images privées.
 
