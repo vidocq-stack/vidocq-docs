@@ -20,51 +20,26 @@ jobs:
       volumes:
         - /var/run/docker.sock:/var/run/docker.sock
     steps:
-      - name: Checkout vidocq-docs
+      - name: Checkout
         uses: actions/checkout@v4
-        with:
-          path: vidocq-docs
-
-      # Pour le stage chappe-builder du Dockerfile : on a besoin du repo chappe
-      # comme sibling. En production on tag par version, en CI on prend HEAD main.
-      # Le ${{ github.token }} auto-injecté est limité au repo courant ; pour
-      # cloner un autre repo de l'organisation, on passe un token explicite
-      # (REGISTRY_TOKEN doit donc avoir aussi le scope `read:repository`).
-      - name: Checkout chappe (frère)
-        uses: actions/checkout@v4
-        with:
-          repository: vidocq/chappe
-          path: chappe
-          ref: main
-          token: ${{ secrets.REGISTRY_TOKEN }}
+        # Plus de checkout du repo frère vidocq/chappe : le Dockerfile pull
+        # désormais le fat-jar `chappe-cli-shaded` depuis repolite (cf. ADR-0003).
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 'lts/*'
 
-      - name: Setup JDK 25
-        uses: actions/setup-java@v4
-        with:
-          distribution: temurin
-          java-version: '25'
-
-      - name: Fetch Chappe version
-        working-directory: vidocq-docs
+      - name: Fetch Chappe version (pour le footer du UI bundle)
         run: node scripts/fetch-chappe-version.js
 
-      - name: Fetch fonts (best-effort)
-        working-directory: vidocq-docs
-        run: bash scripts/fetch-fonts.sh || echo "fallback system fonts"
-
       - name: Build UI bundle
-        working-directory: vidocq-docs/ui-bundle
+        working-directory: ui-bundle
         run: |
           npm ci
           npm run build
 
       - name: Build Antora site
-        working-directory: vidocq-docs
         run: npx --yes antora@^3.1.0 antora-playbook.yml
 
       - name: Login to Forgejo registry
@@ -91,12 +66,18 @@ jobs:
           fi
 
       - name: Build & push image
+        # Build args :
+        #   CHAPPE_VERSION : version Chappe à tirer depuis repolite
+        #   MAVEN_REPO_URL : si la version courante est SNAPSHOT, pointer sur
+        #                    /snapshots ; sur tag v* on pourrait basculer sur
+        #                    /releases, mais tant qu'on est en 0.x on reste
+        #                    sur snapshots.
         run: |
           set -eu
           IMG=forge.vidocq.dev/vidocq/vidocq-docs
-          # Le contexte est la racine pour permettre au Dockerfile d'accéder à ../chappe
           docker build \
-            -f vidocq-docs/Dockerfile \
+            --build-arg CHAPPE_VERSION="${CHAPPE_VERSION:-0.1.0-SNAPSHOT}" \
+            --build-arg MAVEN_REPO_URL="${MAVEN_REPO_URL:-https://repo.vidocq.dev/snapshots}" \
             -t "$IMG:${{ steps.tags.outputs.tag }}" \
             $( [ -n "${{ steps.tags.outputs.extra }}" ] && echo "-t $IMG:${{ steps.tags.outputs.extra }}" ) \
             .

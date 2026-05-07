@@ -9,16 +9,16 @@ Ce dépôt **n'héberge pas le contenu** des modules. Chaque module (`vidocq`, `
 * la *playbook* Antora (`antora-playbook.yml`) ;
 * le UI bundle XIXᵉ siècle (`ui-bundle/`) ;
 * la home (`content/home-{en,fr}/`) ;
-* le launcher Java pour Chappe (`server/`) ;
-* l'image Docker et le workflow Forgejo.
+* le `Dockerfile` qui tire `chappe-cli` depuis repolite (cf. link:docs/adr/0003-chappe-cli-from-repolite.md[ADR 0003]) ;
+* le workflow Forgejo Actions et les compose de déploiement Portainer (`deploy/`).
 
 toc::[]
 
 == Pré-requis
 
 * **Node LTS** (≥ 20) — pour Antora et le UI bundle.
-* **Java 25** + **Maven 4.0.0-rc-5** — pour le launcher Chappe (build Docker uniquement).
-* **Bash** + **curl** — pour `scripts/fetch-fonts.sh` (best-effort, fallback fonts système).
+* **Java 25** + **Maven** — uniquement pour le build Docker (le `chappe-fetcher` qui tire `chappe-cli` depuis repolite).
+* Accès à `https://repo.vidocq.dev/snapshots` (lecture) — d'où vient `chappe-cli`.
 * Accès aux **clones frères** des sept modules pour le build local :
 +
 [source,text]
@@ -69,14 +69,18 @@ npx antora@^3.1.0 antora-playbook-local.yml
 
 [source,bash]
 ----
-# Le contexte de build doit inclure ../chappe (sibling clone)
-cd ..    # remonter au workspace racine
-docker build -f vidocq-docs/Dockerfile -t vidocq-docs:test .
+docker build \
+  --build-arg CHAPPE_VERSION=0.1.0-SNAPSHOT \
+  --build-arg MAVEN_REPO_URL=https://repo.vidocq.dev/snapshots \
+  -t vidocq-docs:test .
 docker run --rm -p 8080:8080 vidocq-docs:test
 # → http://localhost:8080
 ----
 
-Variables d'environnement reconnues par le launcher (`server/src/main/java/io/vidocq/docs/ChappeDocsServer.java`) :
+Le contexte de build est uniquement ce repo : plus besoin de cloner `chappe`
+en frère, le `Dockerfile` tire `chappe-cli-shaded` depuis repolite (cf. link:docs/adr/0003-chappe-cli-from-repolite.md[ADR 0003]).
+
+Variables d'environnement reconnues par l'`entrypoint.sh` du container :
 
 [cols="1,3"]
 |===
@@ -85,8 +89,18 @@ Variables d'environnement reconnues par le launcher (`server/src/main/java/io/vi
 | `CHAPPE_DOCROOT` | Répertoire racine du site (défaut : `/var/www/vidocq-docs`)
 | `CHAPPE_PORT`    | Port d'écoute (défaut : `8080`)
 | `CHAPPE_BIND`    | Adresse de bind (défaut : `0.0.0.0`)
-| `CHAPPE_CACHE`   | `Cache-Control` (défaut : `max-age=3600, public`)
-| `STAGING`        | Si `true`, ajoute `X-Robots-Tag: noindex, nofollow`
+| `CHAPPE_GZIP`    | Active `--gzip` côté CLI (défaut : `true`)
+| `STAGING`        | Loggué pour info ; le header `X-Robots-Tag` sera injecté quand la CLI Chappe exposera `--header-if-env`
+|===
+
+Build args du `Dockerfile` :
+
+[cols="1,3"]
+|===
+| Build arg | Rôle
+
+| `CHAPPE_VERSION` | Coordonnée Maven de `chappe-cli` (défaut : `0.1.0-SNAPSHOT`)
+| `MAVEN_REPO_URL` | URL repolite (défaut : `https://repo.vidocq.dev/snapshots` ; pointer sur `/releases` pour un tag stable)
 |===
 
 == Déploiement (Portainer + Nginx Proxy Manager)
@@ -106,11 +120,10 @@ et lit `deploy/compose.staging.yml` ou `deploy/compose.prod.yml`.
 Sur Forgejo, *Settings → Applications → Generate Token* :
 
 * Nom : `vidocq-docs-ci` (ou ce qu'on veut)
-* Scopes : `write:package`, `read:package`, **`read:repository`**
+* Scopes : `write:package`, `read:package`
 
-Le scope `read:repository` est nécessaire parce que le workflow clone aussi
-le repo frère `vidocq/chappe` pour le stage `chappe-builder` du Dockerfile.
-Sans ce scope, le checkout échoue en `403 User permission denied`.
+Le scope `read:repository` n'est plus nécessaire depuis l'ADR 0003 (le
+Dockerfile ne clone plus `vidocq/chappe`, il tire `chappe-cli` depuis repolite).
 
 Le token est utilisé par le workflow Forgejo Actions (secret `REGISTRY_TOKEN`)
 et par Portainer pour pull l'image (cf. étape suivante). Côté secrets de repo :
@@ -235,12 +248,16 @@ container:
 Puis redémarrer le service runner. Sans ce mount, `docker build/push` du workflow
 échoueront en `Cannot connect to the Docker daemon`.
 
-==== `403 User permission denied` sur le checkout d'un repo frère
+==== Échec du `mvn dependency:copy` (stage `chappe-fetcher`)
 
-Le `${{ github.token }}` auto-injecté n'a accès qu'au repo courant. Le workflow
-passe explicitement `token: ${{ secrets.REGISTRY_TOKEN }}` pour `actions/checkout`
-sur `vidocq/chappe` ; ce token doit donc avoir le scope `read:repository` en
-plus de `write:package` / `read:package`.
+Le Dockerfile tire `chappe-cli-shaded` depuis `https://repo.vidocq.dev/snapshots`
+au build. Si le stage échoue :
+
+* vérifier que repolite est accessible depuis le runner (firewall, DNS) ;
+* vérifier qu'une version `chappe-cli:0.1.0-SNAPSHOT:jar:shaded` existe sur
+  repolite (côté chappe : `mvn -pl chappe-cli -am deploy`) ;
+* si repolite est privé en lecture, ajouter un `~/.m2/settings.xml` au stage
+  `chappe-fetcher` avec les creds (cf. ADR 0003).
 
 ==== `denied: requested access to the resource is denied` au push image
 
@@ -287,6 +304,7 @@ d'ajouter l'utilisateur comme `Write` membre de l'organisation.
 
 * link:docs/adr/0001-antora-multi-component.md[ADR 0001] — Antora multi-component.
 * link:docs/adr/0002-bilingual-fr-en.md[ADR 0002] — Bilingue FR canonique + EN.
+* link:docs/adr/0003-chappe-cli-from-repolite.md[ADR 0003] — `chappe-cli` tiré depuis repolite (Maven), suppression du stage `chappe-builder` et du launcher Java custom.
 
 == Licence
 
