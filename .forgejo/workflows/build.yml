@@ -10,15 +10,14 @@ jobs:
   build:
     runs-on: docker
     # Le label `docker` du runner Forgejo mappe par défaut sur `docker:dind`
-    # (alpine, pas de Node). Or actions/checkout, setup-node, setup-java sont
-    # des actions JS qui ont besoin de `node` dans le PATH. On surcharge donc
-    # le container du job avec une image standard Gitea/Forgejo qui embarque
-    # Node 20 + Docker CLI + bash. Le bind-mount `/var/run/docker.sock` permet
-    # aux étapes `docker build/push` de parler au démon de l'hôte.
+    # (alpine, pas de Node). On surcharge avec `catthehacker/ubuntu:act-22.04`
+    # (Node 20 + Docker CLI + bash). DOCKER_HOST pointe vers le sidecar dind
+    # de la stack runner (cf. forgejo-runner/runner-config.yaml côté hôte qui
+    # définit le réseau partagé `runner-net` et propage cette env var).
     container:
       image: catthehacker/ubuntu:act-22.04
-      volumes:
-        - /var/run/docker.sock:/var/run/docker.sock
+      env:
+        DOCKER_HOST: tcp://docker-in-docker:2375
     steps:
       - name: Checkout
         uses: actions/checkout@v4
