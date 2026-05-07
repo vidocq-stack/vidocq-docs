@@ -9,8 +9,12 @@
   },
   "scripts": {
     "prebuild": "node ../scripts/fetch-chappe-version.js",
-    "build": "gulp bundle",
-    "fetch-fonts": "bash ../scripts/fetch-fonts.sh"
+    "build": "gulp bundle"
+  },
+  "dependencies": {
+    "@fontsource/cormorant-garamond": "^5.0.0",
+    "@fontsource/eb-garamond": "^5.0.0",
+    "@fontsource/jetbrains-mono": "^5.0.0"
   },
   "devDependencies": {
     "autoprefixer": "^10.4.0",
@@ -18,7 +22,7 @@
     "gulp": "^5.0.0",
     "gulp-concat": "^2.6.1",
     "gulp-postcss": "^10.0.0",
-    "gulp-zip": "^6.0.0",
+    "gulp-zip": "^5.1.0",
     "postcss": "^8.4.0",
     "postcss-import": "^16.0.0"
   }

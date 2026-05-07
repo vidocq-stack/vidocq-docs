@@ -1,0 +1,2 @@
+# Placeholder. Loger ici les libs JS vendorées (highlight.js etc.) pour qu'elles
+# soient concaténées au début de build/ui/js/site.js.
