@@ -36,9 +36,22 @@ parent/
 
 == Build local
 
+Le plus court — un script pilote tout :
+
 [source,bash]
 ----
-# 1. Construit le UI bundle (CSS + JS + helpers + fonts + zip)
+bash scripts/build-local.sh                # UI bundle + Antora + fetch version Chappe + fetch fonts
+bash scripts/build-local.sh --skip-fonts   # idem, sans tenter de télécharger les WOFF2
+bash scripts/build-local.sh --ui-only      # juste le UI bundle
+bash scripts/build-local.sh --site-only    # juste Antora (UI déjà bâti)
+bash scripts/build-local.sh --serve        # build + serve sur http://localhost:8080
+----
+
+Ou à la main, étape par étape :
+
+[source,bash]
+----
+# 1. UI bundle (CSS + JS + helpers + fonts + zip)
 cd ui-bundle
 npm install
 node ../scripts/fetch-chappe-version.js   # met à jour src/data/versions.json
@@ -46,10 +59,10 @@ bash ../scripts/fetch-fonts.sh             # télécharge les WOFF2 (optionnel)
 npm run build
 cd ..
 
-# 2. Construit le site Antora à partir des clones frères
+# 2. Site Antora à partir des clones frères
 npx antora@^3.1.0 antora-playbook-local.yml
 
-# Le site est dans ./build/site
+# Sortie : ./build/site
 ----
 
 == Build Docker (avec Chappe)
