@@ -27,12 +27,16 @@ jobs:
 
       # Pour le stage chappe-builder du Dockerfile : on a besoin du repo chappe
       # comme sibling. En production on tag par version, en CI on prend HEAD main.
+      # Le ${{ github.token }} auto-injecté est limité au repo courant ; pour
+      # cloner un autre repo de l'organisation, on passe un token explicite
+      # (REGISTRY_TOKEN doit donc avoir aussi le scope `read:repository`).
       - name: Checkout chappe (frère)
         uses: actions/checkout@v4
         with:
           repository: vidocq/chappe
           path: chappe
           ref: main
+          token: ${{ secrets.REGISTRY_TOKEN }}
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
