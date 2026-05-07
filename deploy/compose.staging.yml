@@ -1,0 +1,40 @@
+# Stack staging — déployée par Portainer (Stack-from-Git).
+#
+# Hostname public attendu : staging-doc.vidocq.dev
+# Reverse-proxy : Nginx Proxy Manager (hors-stack), connecté au même
+#   réseau `reverseproxy_default`. Le container n'expose AUCUN port sur l'hôte.
+#
+# Variables d'env consommées (cf. deploy/.env.example, à régler dans Portainer
+# UI → Stack → Environment variables) :
+#   IMAGE_TAG      tag de l'image (défaut : snapshot)
+#   CONTAINER_NAME nom DNS interne, doit matcher le forward configuré dans NPM
+#                  (défaut : vidocq-docs-staging)
+
+services:
+  vidocq-docs:
+    image: forge.vidocq.dev/vidocq/vidocq-docs:${IMAGE_TAG:-snapshot}
+    container_name: ${CONTAINER_NAME:-vidocq-docs-staging}
+    restart: unless-stopped
+    environment:
+      CHAPPE_DOCROOT: /var/www/vidocq-docs
+      CHAPPE_PORT: "8080"
+      CHAPPE_BIND: "0.0.0.0"
+      CHAPPE_CACHE: "max-age=300, public"   # cache court en staging
+      STAGING: "true"                         # injecte X-Robots-Tag: noindex, nofollow
+    networks:
+      - reverseproxy
+    # Pas de `ports:` — NPM accède au container en interne via le réseau partagé.
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:8080/healthz"]
+      interval: 30s
+      timeout: 3s
+      start_period: 10s
+      retries: 3
+    labels:
+      io.vidocq.environment: staging
+      io.vidocq.component: docs
+
+networks:
+  reverseproxy:
+    external: true
+    name: reverseproxy_default

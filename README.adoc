@@ -89,6 +89,120 @@ Variables d'environnement reconnues par le launcher (`server/src/main/java/io/vi
 | `STAGING`        | Si `true`, ajoute `X-Robots-Tag: noindex, nofollow`
 |===
 
+== Déploiement (Portainer + Nginx Proxy Manager)
+
+L'image est buildée par le workflow Forgejo Actions (`.forgejo/workflows/build.yml`)
+et publiée sur la **container registry Forgejo** (intégrée à Forgejo ≥ 1.20) :
+
+* `forge.vidocq.dev/vidocq/vidocq-docs:snapshot` — écrasé à chaque push sur `main`
+* `forge.vidocq.dev/vidocq/vidocq-docs:latest`   — écrasé à chaque tag `v*`
+* `forge.vidocq.dev/vidocq/vidocq-docs:0.1.0`    — tag immutable par version
+
+Portainer consomme cette image via une **Stack-from-Git** qui pointe sur ce repo
+et lit `deploy/compose.staging.yml` ou `deploy/compose.prod.yml`.
+
+=== 1. Côté Forgejo — token registry
+
+Sur Forgejo, *Settings → Applications → Generate Token* :
+
+* Nom : `vidocq-docs-ci` (ou ce qu'on veut)
+* Scopes : `write:package`, `read:package`
+
+Le token est utilisé par le workflow Forgejo Actions (secret `FORGEJO_TOKEN`) et
+par Portainer pour pull l'image (cf. étape suivante). Côté secrets de repo :
+
+[cols="1,2"]
+|===
+| Secret | Valeur
+
+| `FORGEJO_USER`             | utilisateur ou bot avec `write:package`
+| `FORGEJO_TOKEN`            | token généré ci-dessus
+| `PORTAINER_WEBHOOK_STAGING` | URL de webhook Portainer (étape 3)
+| `PORTAINER_WEBHOOK_PROD`    | URL de webhook Portainer (étape 3)
+|===
+
+=== 2. Côté Portainer — déclarer la registry Forgejo
+
+*Settings → Registries → Add registry → Custom* :
+
+* URL : `forge.vidocq.dev`
+* Authentification : *Yes*
+* Username / Password : le couple `FORGEJO_USER` / `FORGEJO_TOKEN`
+
+C'est ce qui permet à Portainer de tirer les images privées.
+
+=== 3. Côté Portainer — créer la stack (staging et prod)
+
+*Stacks → Add stack → Repository* :
+
+[cols="1,2"]
+|===
+| Champ | Valeur
+
+| Repository URL          | `https://forge.vidocq.dev/vidocq/vidocq-docs`
+| Repository reference    | `refs/heads/main`
+| Compose path            | `deploy/compose.staging.yml` (ou `deploy/compose.prod.yml`)
+| Authentification        | token Forgejo si le repo est privé
+| GitOps updates          | *Polling*, intervalle `5m` (recommandé) **ou** *Webhook*
+| Environment variables   | `IMAGE_TAG=snapshot`, `CONTAINER_NAME=vidocq-docs-staging`
+|===
+
+Dans la même page, copier le **webhook URL** affiché par Portainer et le coller
+dans les secrets Forgejo (`PORTAINER_WEBHOOK_STAGING` ou `_PROD`). Le workflow
+poke ce webhook après chaque `docker push`, ce qui force Portainer à re-pull
+l'image et à `docker compose up -d`.
+
+=== 4. Côté Nginx Proxy Manager
+
+NPM tourne sur l'hôte et partage le réseau Docker `reverseproxy_default` avec
+le container `vidocq-docs`. Le compose attache le service à ce réseau **sans
+exposer de port sur l'hôte**.
+
+*Hosts → Proxy Hosts → Add Proxy Host* :
+
+[cols="1,2"]
+|===
+| Champ | Valeur staging / prod
+
+| Domain Names    | `staging-doc.vidocq.dev` / `doc.vidocq.dev`
+| Scheme          | `http`
+| Forward Hostname | `vidocq-docs-staging` / `vidocq-docs-prod` *(le `container_name` du compose)*
+| Forward Port    | `8080`
+| Block Common Exploits | activé
+| Websockets Support    | inactif (pas de WS à ce stade)
+| SSL → Force SSL       | activé (Let's Encrypt)
+|===
+
+NPM résout le `container_name` via le DNS Docker du réseau partagé.
+
+=== 5. Vérifier
+
+[source,bash]
+----
+# Healthcheck interne
+docker exec vidocq-docs-staging wget -qO- http://localhost:8080/healthz
+# → ok
+
+# Healthcheck externe (depuis n'importe où)
+curl -s https://staging-doc.vidocq.dev/healthz
+# → ok
+
+# Vérifier le X-Robots-Tag en staging
+curl -sI https://staging-doc.vidocq.dev/ | grep -i x-robots-tag
+# → X-Robots-Tag: noindex, nofollow
+----
+
+=== Rollback
+
+Trois niveaux, du plus rapide au plus propre :
+
+. **Tag immutable.** Sur la stack Portainer prod, surcharger
+  `IMAGE_TAG=0.1.0` (ou la version stable précédente) → *Update the stack*.
+. **Git revert.** `git revert <commit>` puis `git push`. Portainer redéploie
+  via polling ou webhook.
+. **Rebuild from tag.** Re-tagger un commit ancien (`git tag v0.0.x` puis push)
+  → le workflow rebuilde et republie `:latest`.
+
 == Ajouter un nouveau component
 
 . Dans le repo du module concerné, créer la structure :
