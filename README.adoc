@@ -1,0 +1,121 @@
+= vidocq-docs
+:toc: macro
+:source-highlighter: highlight.js
+
+Documentation Antora de l'écosystème **Vidocq** — multi-component, bilingue (FR canonique + EN), servie par xref:../chappe[Chappe].
+
+Ce dépôt **n'héberge pas le contenu** des modules. Chaque module (`vidocq`, `vauban`, `cassini`, `champollion`, `chappe`, `foy`, `mansart`) garde sa propre documentation dans son répertoire `docs/`. `vidocq-docs` ne contient que :
+
+* la *playbook* Antora (`antora-playbook.yml`) ;
+* le UI bundle XIXᵉ siècle (`ui-bundle/`) ;
+* la home (`content/home-{en,fr}/`) ;
+* le launcher Java pour Chappe (`server/`) ;
+* l'image Docker et le workflow Forgejo.
+
+toc::[]
+
+== Pré-requis
+
+* **Node LTS** (≥ 20) — pour Antora et le UI bundle.
+* **Java 25** + **Maven 4.0.0-rc-5** — pour le launcher Chappe (build Docker uniquement).
+* **Bash** + **curl** — pour `scripts/fetch-fonts.sh` (best-effort, fallback fonts système).
+* Accès aux **clones frères** des sept modules pour le build local :
++
+[source,text]
+----
+parent/
+├── vidocq-docs/         (ce repo)
+├── vidocq/
+├── vauban/
+├── cassini/
+├── champollion/
+├── chappe/
+├── foy/
+└── mansart/
+----
+
+== Build local
+
+[source,bash]
+----
+# 1. Construit le UI bundle (CSS + JS + helpers + fonts + zip)
+cd ui-bundle
+npm install
+node ../scripts/fetch-chappe-version.js   # met à jour src/data/versions.json
+bash ../scripts/fetch-fonts.sh             # télécharge les WOFF2 (optionnel)
+npm run build
+cd ..
+
+# 2. Construit le site Antora à partir des clones frères
+npx antora@^3.1.0 antora-playbook-local.yml
+
+# Le site est dans ./build/site
+----
+
+== Build Docker (avec Chappe)
+
+[source,bash]
+----
+# Le contexte de build doit inclure ../chappe (sibling clone)
+cd ..    # remonter au workspace racine
+docker build -f vidocq-docs/Dockerfile -t vidocq-docs:test .
+docker run --rm -p 8080:8080 vidocq-docs:test
+# → http://localhost:8080
+----
+
+Variables d'environnement reconnues par le launcher (`server/src/main/java/io/vidocq/docs/ChappeDocsServer.java`) :
+
+[cols="1,3"]
+|===
+| Variable | Rôle
+
+| `CHAPPE_DOCROOT` | Répertoire racine du site (défaut : `/var/www/vidocq-docs`)
+| `CHAPPE_PORT`    | Port d'écoute (défaut : `8080`)
+| `CHAPPE_BIND`    | Adresse de bind (défaut : `0.0.0.0`)
+| `CHAPPE_CACHE`   | `Cache-Control` (défaut : `max-age=3600, public`)
+| `STAGING`        | Si `true`, ajoute `X-Robots-Tag: noindex, nofollow`
+|===
+
+== Ajouter un nouveau component
+
+. Dans le repo du module concerné, créer la structure :
++
+[source,text]
+----
+<module>/docs/
+├── en/
+│   ├── antora.yml                 # name: <module>,    title: <Module>
+│   └── modules/ROOT/
+│       ├── nav.adoc
+│       └── pages/{index,getting-started,concepts,reference,migration}.adoc
+└── fr/
+    ├── antora.yml                 # name: <module>-fr, title: <Module>
+    └── modules/ROOT/
+        ├── nav.adoc
+        └── pages/{index,getting-started,concepts,reference,migration}.adoc
+----
+
+. Ajouter la source dans `vidocq-docs/antora-playbook.yml` (et `antora-playbook-local.yml` pour le build local).
+
+. Ajouter une référence depuis la home (`content/home-fr/modules/ROOT/pages/index.adoc` et `content/home-en/...`).
+
+== Contribuer à la doc d'un module existant
+
+**Pas ici.** La doc d'un module vit dans ce module. Une PR sur `vauban/docs/` (par exemple) sera automatiquement reprise au prochain build du site.
+
+== Convention bilingue
+
+* **Le français est canonique.** Tu écris d'abord en FR, puis tu traduis en EN.
+* Pas de mélange de langues dans une même page.
+* Les exemples de code, noms d'API, FQN sont **identiques** dans les deux langues — seul le texte autour change.
+* Les titres de pages sont traduits, mais les ancres Asciidoc (`[#getting-started]`) restent stables (anglais).
+* Le toggle FR/EN du UI bundle calcule l'URL homologue côté client : si on est sur `/vauban/page.html`, le toggle pointe vers `/vauban-fr/page.html`.
+
+== Décisions documentées
+
+* link:docs/adr/0001-antora-multi-component.md[ADR 0001] — Antora multi-component.
+* link:docs/adr/0002-bilingual-fr-en.md[ADR 0002] — Bilingue FR canonique + EN.
+
+== Licence
+
+Apache License 2.0 — voir link:LICENSE[`LICENSE`].

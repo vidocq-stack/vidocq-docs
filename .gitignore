@@ -1,0 +1,17 @@
+node_modules/
+build/
+public/
+.cache/
+*.zip
+*.log
+NOTES.md
+
+ui-bundle/build/
+ui-bundle/src/data/versions.json
+
+.DS_Store
+.idea/
+.vscode/
+*.iml
+*.ipr
+*.iws

@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="{{page.attributes.lang}}" data-theme="auto">
+  {{> head}}
+  <body class="article{{#if page.home}} is-home{{/if}}">
+    <div class="body">
+      {{> header}}
+      <main>
+        <aside class="nav">
+          {{> nav}}
+        </aside>
+        <article class="doc">
+          {{{page.contents}}}
+        </article>
+      </main>
+      {{> footer}}
+    </div>
+    <script src="{{{uiRootPath}}}/js/site.js"></script>
+  </body>
+</html>

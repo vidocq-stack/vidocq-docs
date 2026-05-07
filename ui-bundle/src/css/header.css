@@ -1,0 +1,52 @@
+.navbar {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: var(--c-bg);
+  border-bottom: 1px solid var(--c-rule);
+  padding: 0.6rem 1.5rem;
+}
+
+.navbar-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--c-text);
+  text-decoration: none;
+}
+
+.navbar-brand .monogram {
+  width: 1.8em;
+  height: 1.8em;
+  color: var(--c-link);
+}
+
+.navbar-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  max-width: 72rem;
+  margin: 0 auto;
+  gap: 1rem;
+}
+
+.navbar-tools {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 0.9rem;
+}
+
+.component-version-selector,
+.component-selector {
+  background: transparent;
+  border: 1px solid var(--c-rule);
+  border-radius: 2px;
+  color: var(--c-text);
+  font-family: inherit;
+  font-size: inherit;
+  padding: 0.2rem 0.4rem;
+}

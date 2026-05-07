@@ -1,0 +1,47 @@
+site:
+  title: Vidocq
+  start_page: home-fr::index.adoc
+  url: https://doc.vidocq.dev
+
+content:
+  sources:
+    - url: ssh://git@forge.vidocq.dev:55122/vidocq/vidocq.git
+      branches: [main]
+      start_paths: [docs/en, docs/fr]
+    - url: ssh://git@forge.vidocq.dev:55122/vidocq/vauban.git
+      branches: [main]
+      start_paths: [docs/en, docs/fr]
+    - url: ssh://git@forge.vidocq.dev:55122/vidocq/cassini.git
+      branches: [main]
+      start_paths: [docs/en, docs/fr]
+    - url: ssh://git@forge.vidocq.dev:55122/vidocq/champollion.git
+      branches: [main]
+      start_paths: [docs/en, docs/fr]
+    - url: ssh://git@forge.vidocq.dev:55122/vidocq/chappe.git
+      branches: [main]
+      start_paths: [docs/en, docs/fr]
+    - url: ssh://git@forge.vidocq.dev:55122/vidocq/foy.git
+      branches: [main]
+      start_paths: [docs/en, docs/fr]
+    - url: ssh://git@forge.vidocq.dev:55122/vidocq/mansart.git
+      branches: [main]
+      start_paths: [docs/en, docs/fr]
+    - url: .
+      branches: HEAD
+      start_paths: [content/home-en, content/home-fr]
+
+# Quand les premières releases sortent, ajouter aux branches : tags: ['v*']
+
+ui:
+  bundle:
+    url: ./ui-bundle/build/ui-bundle.zip
+    snapshot: true
+
+asciidoc:
+  attributes:
+    experimental: ''
+    idprefix: ''
+    idseparator: '-'
+    source-highlighter: highlight.js
+    chappe-version: '@'
+    primary-language: fr

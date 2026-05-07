@@ -1,0 +1,26 @@
+/* Filets décoratifs : ──◇── monochrome ocre */
+hr.ornament {
+  border: 0;
+  text-align: center;
+  margin: 2rem auto;
+  height: 1em;
+  position: relative;
+  color: var(--c-accent);
+  background: none;
+}
+
+hr.ornament::before {
+  content: "·  —  ◊  —  ·";
+  display: inline-block;
+  font-family: var(--font-display);
+  letter-spacing: 0.4em;
+  color: var(--c-accent);
+  font-size: 1rem;
+}
+
+/* Monogramme V utilisable inline */
+.monogram {
+  display: inline-block;
+  vertical-align: middle;
+  fill: currentColor;
+}

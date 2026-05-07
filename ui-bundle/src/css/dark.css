@@ -1,0 +1,19 @@
+/* Le mode sombre est piloté par les variables --c-* dans vars.css.
+   Ce fichier ne contient que les ajustements spécifiques. */
+
+[data-theme="dark"] pre {
+  background: color-mix(in srgb, var(--dark-paper) 80%, var(--dark-cream));
+}
+
+[data-theme="dark"] code {
+  background: color-mix(in srgb, var(--dark-paper) 75%, var(--dark-cream));
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) pre {
+    background: color-mix(in srgb, var(--dark-paper) 80%, var(--dark-cream));
+  }
+  :root:not([data-theme="light"]) code {
+    background: color-mix(in srgb, var(--dark-paper) 75%, var(--dark-cream));
+  }
+}

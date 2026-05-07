@@ -1,0 +1,75 @@
+:root {
+  /* Palette parchemin / encre / bordeaux / ocre */
+  --ink:        #1a1410;
+  --ink-soft:   #3a2e22;
+  --paper:      #faf6ed;
+  --paper-warm: #f4ecd8;
+  --cream:      #ede4cc;
+  --burgundy:   #7a1e1e;
+  --burgundy-soft: #9a3a3a;
+  --ochre:      #a07020;
+  --ochre-soft: #b88848;
+  --rule:       #c9b896;
+
+  /* Mode sombre = encre claire sur parchemin assombri */
+  --dark-ink:    #e8dcc4;
+  --dark-paper:  #1a1410;
+  --dark-cream:  #2a201a;
+  --dark-burgundy: #c47a7a;
+  --dark-ochre: #d4a868;
+  --dark-rule:  #5a4830;
+
+  /* Typographie */
+  --font-serif: "EB Garamond", "Adobe Garamond Pro", Garamond, "Cormorant Garamond",
+    Georgia, "Times New Roman", Times, serif;
+  --font-display: "Cormorant Garamond", "EB Garamond", "Playfair Display",
+    Georgia, "Times New Roman", serif;
+  --font-mono: "JetBrains Mono", "IBM Plex Mono", "SFMono-Regular",
+    "Menlo", "Consolas", "Liberation Mono", monospace;
+
+  --content-max: 38rem;
+  --content-line: 1.7;
+
+  /* Couleurs sémantiques (mode clair par défaut) */
+  --c-bg:        var(--paper);
+  --c-bg-warm:   var(--paper-warm);
+  --c-bg-card:   var(--cream);
+  --c-text:      var(--ink);
+  --c-text-soft: var(--ink-soft);
+  --c-link:      var(--burgundy);
+  --c-link-hover: var(--burgundy-soft);
+  --c-rule:      var(--rule);
+  --c-accent:    var(--ochre);
+  --c-accent-soft: var(--ochre-soft);
+  --c-warning:   var(--burgundy);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --c-bg:        var(--dark-paper);
+    --c-bg-warm:   var(--dark-cream);
+    --c-bg-card:   var(--dark-cream);
+    --c-text:      var(--dark-ink);
+    --c-text-soft: color-mix(in srgb, var(--dark-ink) 80%, var(--dark-paper));
+    --c-link:      var(--dark-burgundy);
+    --c-link-hover: color-mix(in srgb, var(--dark-burgundy) 70%, white);
+    --c-rule:      var(--dark-rule);
+    --c-accent:    var(--dark-ochre);
+    --c-accent-soft: color-mix(in srgb, var(--dark-ochre) 70%, white);
+    --c-warning:   var(--dark-burgundy);
+  }
+}
+
+[data-theme="dark"] {
+  --c-bg:        var(--dark-paper);
+  --c-bg-warm:   var(--dark-cream);
+  --c-bg-card:   var(--dark-cream);
+  --c-text:      var(--dark-ink);
+  --c-text-soft: color-mix(in srgb, var(--dark-ink) 80%, var(--dark-paper));
+  --c-link:      var(--dark-burgundy);
+  --c-link-hover: color-mix(in srgb, var(--dark-burgundy) 70%, white);
+  --c-rule:      var(--dark-rule);
+  --c-accent:    var(--dark-ochre);
+  --c-accent-soft: color-mix(in srgb, var(--dark-ochre) 70%, white);
+  --c-warning:   var(--dark-burgundy);
+}

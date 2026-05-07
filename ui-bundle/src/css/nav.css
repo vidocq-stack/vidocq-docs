@@ -1,0 +1,75 @@
+.nav {
+  font-family: var(--font-serif);
+  font-size: 0.95rem;
+  line-height: 1.5;
+  border-right: 1px solid var(--c-rule);
+  padding-right: 1.5rem;
+  height: fit-content;
+  position: sticky;
+  top: 4rem;
+}
+
+@media (max-width: 800px) {
+  .nav {
+    border-right: 0;
+    border-bottom: 1px solid var(--c-rule);
+    padding-right: 0;
+    padding-bottom: 1rem;
+    position: static;
+  }
+}
+
+.nav h3 {
+  font-family: var(--font-display);
+  font-size: 1rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--c-text-soft);
+  margin: 1.5rem 0 0.5rem;
+}
+
+.nav ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.nav ul ul {
+  padding-left: 1rem;
+  border-left: 1px solid var(--c-rule);
+  margin-left: 0.5rem;
+}
+
+.nav li {
+  margin: 0.2rem 0;
+}
+
+.nav a {
+  text-decoration: none;
+  color: var(--c-text);
+  display: block;
+  padding: 0.15rem 0.3rem;
+  border-radius: 2px;
+}
+
+.nav a:hover,
+.nav a.is-current-page {
+  color: var(--c-link);
+  background: var(--c-bg-warm);
+}
+
+.nav a.is-current-page::before {
+  content: "❦";
+  margin-right: 0.4em;
+  color: var(--c-accent);
+  font-size: 0.85em;
+}
+
+/* Numérotation chiffres romains pour les sections supérieures */
+.nav > ul {
+  counter-reset: roman;
+}
+
+.nav > ul > li {
+  counter-increment: roman;
+}

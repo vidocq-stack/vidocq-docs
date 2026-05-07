@@ -1,0 +1,110 @@
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-display);
+  font-weight: 600;
+  line-height: 1.2;
+  margin: 2.5rem 0 1rem;
+  color: var(--c-text);
+  font-feature-settings: "liga", "smcp"; /* ligatures + petites capitales */
+  letter-spacing: 0.005em;
+}
+
+h1 {
+  font-size: 2.4rem;
+  font-weight: 700;
+  margin-top: 0;
+  letter-spacing: 0;
+}
+
+h2 {
+  font-size: 1.7rem;
+  border-bottom: 1px solid var(--c-rule);
+  padding-bottom: 0.4rem;
+}
+
+h3 { font-size: 1.3rem; }
+h4 { font-size: 1.1rem; }
+h5 { font-size: 1rem; text-transform: uppercase; letter-spacing: 0.08em; }
+h6 { font-size: 0.9rem; color: var(--c-text-soft); }
+
+p {
+  margin: 0 0 1.2rem;
+  hyphens: auto;
+  text-align: left;
+}
+
+.lead {
+  font-size: 1.15rem;
+  font-style: italic;
+  color: var(--c-text-soft);
+  margin: 0.5rem 0 2rem;
+  border-left: 3px solid var(--c-rule);
+  padding-left: 1rem;
+}
+
+/* Lettrine sur le premier paragraphe d'un index */
+.doc.is-index .paragraph:first-of-type p::first-letter,
+.doc article > p:first-of-type::first-letter {
+  font-family: var(--font-display);
+  font-weight: 700;
+  float: left;
+  font-size: 4em;
+  line-height: 0.9;
+  padding: 0.05em 0.1em 0 0;
+  color: var(--c-link);
+}
+
+blockquote {
+  border-left: 3px solid var(--c-accent);
+  margin: 1.5rem 0;
+  padding: 0.2rem 1.2rem;
+  color: var(--c-text-soft);
+  font-style: italic;
+}
+
+ul, ol {
+  margin: 0 0 1.2rem;
+  padding-left: 1.5rem;
+}
+
+li { margin-bottom: 0.4rem; }
+
+dl { margin: 0 0 1.2rem; }
+dt { font-weight: 600; margin-top: 0.8rem; }
+dd { margin: 0 0 0.4rem 1.5rem; }
+
+table {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 1.5rem 0;
+  font-size: 0.95rem;
+}
+
+th, td {
+  border: 1px solid var(--c-rule);
+  padding: 0.5rem 0.75rem;
+  text-align: left;
+  vertical-align: top;
+}
+
+th {
+  background: var(--c-bg-warm);
+  font-family: var(--font-display);
+  font-weight: 600;
+}
+
+caption {
+  font-style: italic;
+  color: var(--c-text-soft);
+  margin-bottom: 0.5rem;
+  text-align: left;
+}
+
+small {
+  font-size: 0.85em;
+  color: var(--c-text-soft);
+}
+
+abbr[title] {
+  text-decoration: underline dotted;
+  cursor: help;
+}

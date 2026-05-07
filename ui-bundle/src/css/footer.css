@@ -1,0 +1,37 @@
+.footer {
+  border-top: 1px solid var(--c-rule);
+  padding: 1.5rem;
+  text-align: center;
+  font-size: 0.9rem;
+  color: var(--c-text-soft);
+  background: var(--c-bg-warm);
+}
+
+.footer-inner {
+  max-width: 72rem;
+  margin: 0 auto;
+}
+
+.footer-mast {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  vertical-align: middle;
+  color: var(--c-accent);
+}
+
+.footer-mast svg {
+  width: 1.5em;
+  height: 1.5em;
+}
+
+.footer .snapshot-mark {
+  color: var(--c-accent);
+  cursor: help;
+  font-weight: 700;
+}
+
+.footer hr.ornament {
+  margin: 0 auto 1rem;
+  max-width: 12rem;
+}

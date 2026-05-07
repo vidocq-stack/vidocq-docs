@@ -1,0 +1,39 @@
+# Configuration de Chappe pour servir vidocq-docs.
+#
+# IMPORTANT : ce fichier décrit les directives **cibles** que Chappe devrait à
+# terme savoir lire en mode CLI standalone (`chappe serve --config ...`).
+# Aujourd'hui, le launcher `vidocq-docs-server` (server/src/main/java/io/vidocq/docs/ChappeDocsServer.java)
+# lit les variables d'environnement listées plus bas.
+#
+# Une fois la CLI Chappe livrée (cf. NOTES.md / issues à ouvrir),
+# l'`ENTRYPOINT` du Dockerfile pourra être basculé sur cette config.
+
+server:
+  port: 8080
+  bind: 0.0.0.0
+
+static:
+  root: /var/www/vidocq-docs
+  fallback: /404.html
+  index-files: [index.html, index.htm]
+  cache-control: "max-age=3600, public"
+  gzip: true            # négocié via Accept-Encoding (à venir côté Chappe)
+
+headers:
+  always:
+    X-Content-Type-Options: "nosniff"
+    Referrer-Policy: "strict-origin-when-cross-origin"
+    Permissions-Policy: "interest-cohort=()"
+  staging:               # appliqué si l'env var STAGING=true
+    X-Robots-Tag: "noindex, nofollow"
+
+logging:
+  level: INFO
+  access-log: false      # logguer chaque requête : false par défaut
+
+# Variables d'environnement consommées par le launcher actuel :
+#   CHAPPE_DOCROOT  → static.root
+#   CHAPPE_PORT     → server.port
+#   CHAPPE_BIND     → server.bind
+#   CHAPPE_CACHE    → static.cache-control
+#   STAGING         → headers.staging

@@ -1,0 +1,45 @@
+site:
+  title: Vidocq
+  start_page: home-fr::index.adoc
+  url: https://staging-doc.vidocq.dev
+
+content:
+  sources:
+    - url: ../vidocq
+      branches: HEAD
+      start_paths: [docs/en, docs/fr]
+    - url: ../vauban
+      branches: HEAD
+      start_paths: [docs/en, docs/fr]
+    - url: ../cassini
+      branches: HEAD
+      start_paths: [docs/en, docs/fr]
+    - url: ../champollion
+      branches: HEAD
+      start_paths: [docs/en, docs/fr]
+    - url: ../chappe
+      branches: HEAD
+      start_paths: [docs/en, docs/fr]
+    - url: ../foy
+      branches: HEAD
+      start_paths: [docs/en, docs/fr]
+    - url: ../mansart
+      branches: HEAD
+      start_paths: [docs/en, docs/fr]
+    - url: .
+      branches: HEAD
+      start_paths: [content/home-en, content/home-fr]
+
+ui:
+  bundle:
+    url: ./ui-bundle/build/ui-bundle.zip
+    snapshot: true
+
+asciidoc:
+  attributes:
+    experimental: ''
+    idprefix: ''
+    idseparator: '-'
+    source-highlighter: highlight.js
+    chappe-version: '@'
+    primary-language: fr

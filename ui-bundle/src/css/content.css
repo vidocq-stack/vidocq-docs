@@ -1,0 +1,37 @@
+.doc .paragraph,
+.doc .ulist,
+.doc .olist,
+.doc .dlist,
+.doc .listingblock,
+.doc .literalblock,
+.doc .imageblock,
+.doc .quoteblock,
+.doc .verseblock,
+.doc .tabel,
+.doc .videoblock {
+  margin-bottom: 1.4rem;
+}
+
+.doc .title {
+  font-family: var(--font-display);
+  font-style: italic;
+  color: var(--c-text-soft);
+  margin: 0 0 0.4rem;
+  font-size: 0.95rem;
+}
+
+/* Card grid sur la home pour les composants */
+.doc .openblock.cards .ulist > ul {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr));
+  gap: 1rem;
+  list-style: none;
+  padding: 0;
+}
+
+.doc .openblock.cards li {
+  background: var(--c-bg-card);
+  border: 1px solid var(--c-rule);
+  padding: 1rem;
+  border-radius: 2px;
+}

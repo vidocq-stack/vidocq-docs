@@ -1,0 +1,10 @@
+@media print {
+  :root { font-size: 11pt; }
+  body { background: white; color: black; }
+  .navbar, .nav, .footer, .lang-toggle, .theme-toggle { display: none !important; }
+  .body main { display: block; padding: 0; max-width: none; }
+  .doc { max-width: none; }
+  a { color: inherit; text-decoration: underline; }
+  pre, .listingblock { page-break-inside: avoid; border: 1px solid #999; }
+  h1, h2, h3 { page-break-after: avoid; }
+}

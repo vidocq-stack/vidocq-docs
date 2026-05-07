@@ -1,0 +1,72 @@
+= Vidocq
+:description: Suite de runtimes Jakarta EE / MicroProfile, Java 25, JPMS-natif, peu de dépendances.
+
+[.lead]
+Vidocq est une suite de runtimes Jakarta EE et MicroProfile écrite en Java 25 pur, JPMS-natif, fondée sur la génération de code statique (Class-File API + APT) et les virtual threads.
+
+== Pourquoi un nouveau runtime ?
+
+Trois raisons :
+
+. **Souveraineté technique.** Le monde Jakarta repose largement sur quelques fondations historiques (Tomcat, Jetty, Netty, Hibernate, Yasson, ArC, RESTEasy). Travail remarquable, dépendances accumulées. Vidocq prend le pari de tout réimplémenter sur Java 25 pur, en s'appuyant sur ce que la JDK propose désormais : virtual threads, scoped values, Class-File API, JPMS strict.
+
+. **Génération à la compilation.** Pas de réflexion à chaud, pas de proxy dynamique, pas d'ASM, pas de Byte Buddy. Tout ce qu'on peut calculer à `compile-time` est calculé à `compile-time`. Au démarrage, on instancie. Compatible AOT (GraalVM `native-image`, Project Leyden CDS).
+
+. **Inspiration historique sobre.** Chaque composant rend hommage à une figure française de la fin XVIIIᵉ / début XIXᵉ siècle dont la méthode résume l'esprit du module. C'est un parti-pris esthétique, pas un pastiche.
+
+== Les composants
+
+[cols="1,3"]
+|===
+| Composant | Rôle
+
+| xref:vidocq::index.adoc[Vidocq]
+| Serveur d'application MicroProfile, orchestrateur d'extensions
+
+| xref:vauban::index.adoc[Vauban]
+| Container CDI 4.1 Lite, build-time, JPMS-natif
+
+| xref:cassini::index.adoc[Cassini]
+| Implémentation Jakarta REST 4.0 / JAX-RS
+
+| xref:champollion::index.adoc[Champollion]
+| Implémentation Jakarta JSON-P 2.1 + JSON-B 3.0
+
+| xref:chappe::index.adoc[Chappe]
+| Serveur HTTP/1.1 + HTTP/2, virtual threads, zéro dépendance
+
+| xref:foy::index.adoc[Foy]
+| Implémentation Jakarta Servlet 6.1
+
+| xref:mansart::index.adoc[Mansart]
+| Jakarta Data 1.0 + Jakarta Persistence 3.2 *(en conception)*
+|===
+
+== Statut
+
+[CAUTION]
+====
+La suite est en **0.1.0-SNAPSHOT**. Aucune garantie de stabilité d'API. Aucune release publique. Ne pas utiliser en production.
+====
+
+Ce qui marche aujourd'hui :
+
+* Chappe — HTTP/1.1, HTTP/2, virtual threads, conformance RFC 9110/9112/9113.
+* Vauban — CDI 4.1 Lite build-time, plugin Maven, intégration JUnit.
+* Cassini — REST 4.0, intégration TCK partielle (voir `cassini/cassini-migration.md`).
+* Champollion — JSON-P 2.1 + JSON-B 3.0, génération APT, suites TCK partielles (voir `champollion/JSON-ROADMAP.md`).
+* Foy — Servlet 6.1, intégration TCK partielle.
+* Vidocq — orchestrateur initial avec extensions Mansart H2 + transactions.
+
+Ce qui est en chantier :
+
+* Mansart — Jakarta Data 1.0 SPI, JPA 3.2 en plan.
+* WebSocket — Chappe + Foy.
+* HTTP/3 / QUIC — Chappe.
+* MicroProfile Health, Metrics, OpenAPI, JWT, Telemetry — Vidocq.
+
+== Liens utiles
+
+* Forge : https://forge.vidocq.dev/vidocq[forge.vidocq.dev/vidocq]
+* GitHub mirror : *(à venir)*
+* Matrix / Discord : *(à venir)*

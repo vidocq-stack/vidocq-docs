@@ -1,0 +1,87 @@
+.admonitionblock {
+  margin: 1.5rem 0;
+  padding: 0.8rem 1rem 0.8rem 1.2rem;
+  background: var(--c-bg-warm);
+  border-left: 3px solid var(--c-rule);
+  position: relative;
+}
+
+.admonitionblock .title {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--c-text-soft);
+  margin-bottom: 0.4rem;
+  display: inline-block;
+}
+
+.admonitionblock > table {
+  border: 0;
+  margin: 0;
+  width: 100%;
+}
+
+.admonitionblock > table td {
+  border: 0;
+  padding: 0;
+  vertical-align: top;
+}
+
+.admonitionblock > table td.icon {
+  width: 2.5rem;
+  font-size: 1.5rem;
+  line-height: 1;
+  text-align: center;
+  color: var(--c-accent);
+  padding-top: 0.1em;
+}
+
+.admonitionblock > table td.icon::before {
+  content: "❦";
+  font-family: var(--font-display);
+}
+
+/* NOTE — filet ocre fin */
+.admonitionblock.note {
+  border-left-color: var(--c-accent);
+}
+.admonitionblock.note > table td.icon::before {
+  content: "✷";
+}
+
+/* TIP — étoile à 8 branches ocre */
+.admonitionblock.tip {
+  border-left-color: var(--c-accent);
+}
+.admonitionblock.tip > table td.icon::before {
+  content: "✺";
+}
+
+/* CAUTION / WARNING — sceau bordeaux + bordure 3px */
+.admonitionblock.caution,
+.admonitionblock.warning {
+  border-left: 3px solid var(--c-warning);
+  background: color-mix(in srgb, var(--c-warning) 6%, var(--c-bg-warm));
+}
+.admonitionblock.caution > table td.icon,
+.admonitionblock.warning > table td.icon {
+  color: var(--c-warning);
+}
+.admonitionblock.caution > table td.icon::before,
+.admonitionblock.warning > table td.icon::before {
+  content: "⚜";
+}
+
+/* IMPORTANT — double filet bordeaux */
+.admonitionblock.important {
+  border-left: 3px double var(--c-warning);
+  border-right: 1px solid var(--c-warning);
+}
+.admonitionblock.important > table td.icon {
+  color: var(--c-warning);
+}
+.admonitionblock.important > table td.icon::before {
+  content: "✠";
+}

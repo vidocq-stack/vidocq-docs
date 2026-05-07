@@ -1,0 +1,62 @@
+/*
+ * Polices auto-hébergées en WOFF2.
+ * À récupérer via `npm run fetch-fonts` (cf. scripts/fetch-fonts.sh).
+ * Si les fichiers ne sont pas présents, on tombe sur fonts système.
+ */
+
+/* EB Garamond — corps de texte */
+@font-face {
+  font-family: "EB Garamond";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("../font/eb-garamond-regular.woff2") format("woff2");
+  unicode-range: U+0000-024F, U+1E00-1EFF, U+2000-206F, U+2074, U+20AC,
+    U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: "EB Garamond";
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: url("../font/eb-garamond-italic.woff2") format("woff2");
+}
+@font-face {
+  font-family: "EB Garamond";
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("../font/eb-garamond-semibold.woff2") format("woff2");
+}
+
+/* Cormorant Garamond — titres */
+@font-face {
+  font-family: "Cormorant Garamond";
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("../font/cormorant-garamond-semibold.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Cormorant Garamond";
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("../font/cormorant-garamond-bold.woff2") format("woff2");
+}
+
+/* JetBrains Mono — code */
+@font-face {
+  font-family: "JetBrains Mono";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("../font/jetbrains-mono-regular.woff2") format("woff2");
+}
+@font-face {
+  font-family: "JetBrains Mono";
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("../font/jetbrains-mono-semibold.woff2") format("woff2");
+}

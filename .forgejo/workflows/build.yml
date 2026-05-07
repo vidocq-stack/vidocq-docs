@@ -1,0 +1,98 @@
+name: build
+
+on:
+  push:
+    branches: [main]
+    tags: ['v*']
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: docker
+    steps:
+      - name: Checkout vidocq-docs
+        uses: actions/checkout@v4
+        with:
+          path: vidocq-docs
+
+      # Pour le stage chappe-builder du Dockerfile : on a besoin du repo chappe
+      # comme sibling. En production on tag par version, en CI on prend HEAD main.
+      - name: Checkout chappe (frère)
+        uses: actions/checkout@v4
+        with:
+          repository: vidocq/chappe
+          path: chappe
+          ref: main
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 'lts/*'
+
+      - name: Setup JDK 25
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '25'
+
+      - name: Fetch Chappe version
+        working-directory: vidocq-docs
+        run: node scripts/fetch-chappe-version.js
+
+      - name: Fetch fonts (best-effort)
+        working-directory: vidocq-docs
+        run: bash scripts/fetch-fonts.sh || echo "fallback system fonts"
+
+      - name: Build UI bundle
+        working-directory: vidocq-docs/ui-bundle
+        run: |
+          npm ci
+          npm run build
+
+      - name: Build Antora site
+        working-directory: vidocq-docs
+        run: npx --yes antora@^3.1.0 antora-playbook.yml
+
+      - name: Login to Forgejo registry
+        run: echo "${{ secrets.FORGEJO_TOKEN }}" | docker login forge.vidocq.dev -u "${{ secrets.FORGEJO_USER }}" --password-stdin
+
+      - name: Compute tags
+        id: tags
+        run: |
+          if [[ "$GITHUB_REF" == refs/heads/main ]]; then
+            echo "tag=snapshot-${GITHUB_SHA::7}" >> "$GITHUB_OUTPUT"
+            echo "extra=snapshot" >> "$GITHUB_OUTPUT"
+            echo "channel=staging" >> "$GITHUB_OUTPUT"
+          elif [[ "$GITHUB_REF" == refs/tags/v* ]]; then
+            VERSION="${GITHUB_REF_NAME#v}"
+            echo "tag=$VERSION" >> "$GITHUB_OUTPUT"
+            echo "extra=latest" >> "$GITHUB_OUTPUT"
+            echo "channel=prod" >> "$GITHUB_OUTPUT"
+          else
+            echo "tag=ref-${GITHUB_SHA::7}" >> "$GITHUB_OUTPUT"
+            echo "extra=" >> "$GITHUB_OUTPUT"
+            echo "channel=" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Build & push image
+        run: |
+          set -eu
+          IMG=forge.vidocq.dev/vidocq/vidocq-docs
+          # Le contexte est la racine pour permettre au Dockerfile d'accéder à ../chappe
+          docker build \
+            -f vidocq-docs/Dockerfile \
+            -t "$IMG:${{ steps.tags.outputs.tag }}" \
+            $( [ -n "${{ steps.tags.outputs.extra }}" ] && echo "-t $IMG:${{ steps.tags.outputs.extra }}" ) \
+            .
+          docker push "$IMG:${{ steps.tags.outputs.tag }}"
+          if [ -n "${{ steps.tags.outputs.extra }}" ]; then
+            docker push "$IMG:${{ steps.tags.outputs.extra }}"
+          fi
+
+      - name: Trigger Portainer redeploy (staging)
+        if: steps.tags.outputs.channel == 'staging'
+        run: curl -fsSL -X POST "${{ secrets.PORTAINER_WEBHOOK_STAGING }}"
+
+      - name: Trigger Portainer redeploy (prod)
+        if: steps.tags.outputs.channel == 'prod'
+        run: curl -fsSL -X POST "${{ secrets.PORTAINER_WEBHOOK_PROD }}"

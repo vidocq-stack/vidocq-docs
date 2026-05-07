@@ -1,0 +1,8 @@
+name: home
+title: Vidocq
+version: ~
+nav:
+  - modules/ROOT/nav.adoc
+asciidoc:
+  attributes:
+    lang: en

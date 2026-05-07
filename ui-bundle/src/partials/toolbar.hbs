@@ -1,0 +1,12 @@
+<nav class="toolbar" aria-label="toolbar">
+  {{#if page.componentVersion}}
+    <span class="component-name">{{page.componentVersion.title}}</span>
+  {{/if}}
+  {{#if page.versions}}
+    <select class="component-version-selector" aria-label="{{i18n 'version'}}">
+      {{#each page.versions}}
+        <option value="{{url}}"{{#if @first}} selected{{/if}}>{{version}}</option>
+      {{/each}}
+    </select>
+  {{/if}}
+</nav>

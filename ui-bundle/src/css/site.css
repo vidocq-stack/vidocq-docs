@@ -1,0 +1,20 @@
+/*
+ * Vidocq documentation — UI XIXᵉ siècle.
+ * Auto-hébergé : aucune CDN, aucune Google Fonts.
+ * Fallback sérif/mono système si les WOFF2 ne sont pas embarqués.
+ */
+
+@import "fonts.css";
+@import "vars.css";
+@import "base.css";
+@import "typography.css";
+@import "layout.css";
+@import "header.css";
+@import "nav.css";
+@import "content.css";
+@import "admonitions.css";
+@import "code.css";
+@import "footer.css";
+@import "ornaments.css";
+@import "language-toggle.css";
+@import "dark.css";
