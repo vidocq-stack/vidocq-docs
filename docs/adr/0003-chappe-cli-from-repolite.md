@@ -49,13 +49,14 @@ Au moment de cet ADR, `chappe-cli` est livré :
 
 **C** — fat-jar `chappe-cli` tiré de repolite à chaque build.
 
-Le Dockerfile passe de 3 stages à 3 stages également, mais avec une nature différente :
+Le Dockerfile passe à 2 stages :
 
 ```
-Stage 1 (node:lts-alpine)         : UI bundle + Antora       → /build/site
-Stage 2 (eclipse-temurin:25-jdk)  : mvn dependency:copy      → /opt/chappe/chappe-cli.jar
-Stage 3 (eclipse-temurin:25-jre)  : COPY site + jar + entrypoint
+Stage 1 (eclipse-temurin:25-jdk)  : mvn dependency:copy   → /opt/chappe/chappe-cli.jar
+Stage 2 (eclipse-temurin:25-jre)  : COPY build/site + jar + entrypoint
 ```
+
+Le **build Antora est sorti du Dockerfile** : Antora doit cloner les 7 repos modules en HTTPS, ce qui demande des `~/.git-credentials`. Plutôt que de propager ces creds dans BuildKit (via `--secret` + helper), on garde la responsabilité du build Antora côté **runner / build local** ; le `docker build` se contente de `COPY build/site`. Cela simplifie les credentials et accélère le build (Antora n'est pas réinstallé à chaque image).
 
 Le launcher Java custom (`server/`) est supprimé. La CLI Chappe (`chappe serve`) prend le relais à 100 %.
 

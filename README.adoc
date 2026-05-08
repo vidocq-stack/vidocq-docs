@@ -67,8 +67,19 @@ npx antora@^3.1.0 antora-playbook-local.yml
 
 == Build Docker (avec Chappe)
 
+[IMPORTANT]
+====
+Le `docker build` **n'est pas self-contained** : il consomme `./build/site`
+qui doit avoir été produit avant par Antora (le runner CI le fait,
+`scripts/build-local.sh` aussi). Cf. link:docs/adr/0003-chappe-cli-from-repolite.md[ADR 0003].
+====
+
 [source,bash]
 ----
+# 1. Builder le site Antora (UI bundle + Antora pull les 7 repos modules)
+bash scripts/build-local.sh        # produit ./build/site
+
+# 2. Builder l'image Docker (qui COPY build/site + tire chappe-cli depuis repolite)
 docker build \
   --build-arg CHAPPE_VERSION=0.1.0-SNAPSHOT \
   --build-arg MAVEN_REPO_URL=https://repo.vidocq.dev/snapshots \
@@ -77,8 +88,10 @@ docker run --rm -p 8080:8080 vidocq-docs:test
 # → http://localhost:8080
 ----
 
-Le contexte de build est uniquement ce repo : plus besoin de cloner `chappe`
-en frère, le `Dockerfile` tire `chappe-cli-shaded` depuis repolite (cf. link:docs/adr/0003-chappe-cli-from-repolite.md[ADR 0003]).
+Le contexte de build est uniquement ce repo. Plus besoin de cloner `chappe`
+en frère : le `Dockerfile` tire `chappe-cli-shaded` depuis repolite, et le
+site est pré-bâti par Antora côté runner / build local (où les credentials
+git sont disponibles).
 
 Variables d'environnement reconnues par l'`entrypoint.sh` du container :
 

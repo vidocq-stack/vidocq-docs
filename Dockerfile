@@ -1,34 +1,25 @@
 # syntax=docker/dockerfile:1.7
 #
 # Vidocq documentation — image Docker.
-# Stage 1 : build UI bundle + Antora.
-# Stage 2 : tire le fat-jar chappe-cli-shaded depuis repolite (Maven).
-# Stage 3 : runtime JRE 25 minimal qui sert le site via `chappe-cli`.
 #
-# ⇢ Plus de stage chappe-builder (compilation depuis sources).
-# ⇢ Plus de launcher Java custom : la CLI standalone Chappe (`chappe serve`)
-#   prend le relais. Cf. ADR-0003.
+# Le site Antora est buildé HORS Dockerfile (par le runner / build local) :
+# Antora doit cloner les 7 repos modules en HTTPS, ce qui demande des
+# `~/.git-credentials`. Plutôt que de propager ces creds dans BuildKit
+# (via --secret + helper), on garde la responsabilité du build Antora
+# côté runner ; le `docker build` se contente de COPY le résultat.
+#
+# Pré-requis du `docker build` : `./build/site/` doit exister.
+#   - en CI : étape "Build Antora site" du workflow le produit
+#   - en local : `bash scripts/build-local.sh` le produit
+#
+# Stage 1 : tire le fat-jar chappe-cli-shaded depuis repolite (Maven).
+# Stage 2 : runtime JRE 25 minimal qui sert le site via `chappe-cli`.
 
 ARG CHAPPE_VERSION=0.1.0-SNAPSHOT
 ARG MAVEN_REPO_URL=https://repo.vidocq.dev/snapshots
 
 # ------------------------------------------------------------------
-# Stage 1 — Site Antora
-# ------------------------------------------------------------------
-FROM node:lts-alpine AS site-builder
-WORKDIR /build
-COPY ui-bundle/package*.json ./ui-bundle/
-RUN cd ui-bundle && npm ci
-COPY scripts/ ./scripts/
-COPY antora-playbook.yml ./
-COPY content/ ./content/
-COPY ui-bundle/ ./ui-bundle/
-RUN node scripts/fetch-chappe-version.js || echo "[fetch-chappe-version] best-effort"
-RUN cd ui-bundle && npm run build
-RUN npx --yes antora@^3.1.0 antora-playbook.yml
-
-# ------------------------------------------------------------------
-# Stage 2 — Fetch chappe-cli (fat-jar shaded) depuis repolite
+# Stage 1 — Fetch chappe-cli (fat-jar shaded) depuis repolite
 # ------------------------------------------------------------------
 FROM eclipse-temurin:25-jdk-alpine AS chappe-fetcher
 ARG CHAPPE_VERSION
@@ -64,12 +55,13 @@ RUN mvn -B -ntp \
     && ls -lh /opt/chappe/chappe-cli.jar
 
 # ------------------------------------------------------------------
-# Stage 3 — Runtime
+# Stage 2 — Runtime
 # ------------------------------------------------------------------
 FROM eclipse-temurin:25-jre-alpine
 WORKDIR /opt/vidocq-docs
 
-COPY --from=site-builder /build/build/site /var/www/vidocq-docs
+# Site Antora pré-bâti côté runner / local (cf. en-tête).
+COPY build/site /var/www/vidocq-docs
 COPY --from=chappe-fetcher /opt/chappe/chappe-cli.jar /opt/vidocq-docs/chappe-cli.jar
 COPY chappe-config.yml /etc/chappe/config.yml
 
