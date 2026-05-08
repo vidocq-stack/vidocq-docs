@@ -79,8 +79,21 @@ jobs:
         # (asciidoctor-kroki) → FATAL "Cannot find module 'asciidoctor-kroki'".
         run: npm ci --no-audit --no-fund
 
+      - name: Compute site URL
+        id: siteurl
+        # Le playbook prod a `site.url: https://doc.vidocq.dev`. Mais sur main
+        # on déploie sur staging-doc.vidocq.dev → on overide via la CLI Antora
+        # pour que les liens absolus (logo navbar, sitemap, og:url…) pointent
+        # bien sur l'URL où le site sera servi.
+        run: |
+          if [[ "$GITHUB_REF" == refs/heads/main ]]; then
+            echo "url=https://staging-doc.vidocq.dev" >> "$GITHUB_OUTPUT"
+          else
+            echo "url=https://doc.vidocq.dev" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Build Antora site
-        run: ./node_modules/.bin/antora antora-playbook.yml
+        run: ./node_modules/.bin/antora --url "${{ steps.siteurl.outputs.url }}" antora-playbook.yml
 
       - name: Login to Forgejo registry
         # Forgejo Actions interdit le préfixe FORGEJO_ sur les secrets utilisateur :

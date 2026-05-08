@@ -65,7 +65,7 @@ asciidoc:
     kroki-default-format: svg
 
     # --- URLs des repos ---
-    repo-chappe: 'https://github.com/VidocqMP/chappe'
+    repo-chappe: 'https://forge.vidocq.dev/vidocq/chappe'
     repo-vauban: 'https://forge.vidocq.dev/vidocq/vauban'
     repo-champollion: 'https://forge.vidocq.dev/vidocq/champollion'
     repo-foy: 'https://forge.vidocq.dev/vidocq/foy'

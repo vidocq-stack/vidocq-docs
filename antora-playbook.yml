@@ -69,10 +69,7 @@ asciidoc:
     kroki-default-format: svg
 
     # --- URLs des repos (centralisées : changer ici, pas dans les modules) ---
-    # Note : Chappe est hébergé sur GitHub (VidocqMP/chappe), les autres sur la
-    # forge interne. La doc référence la forge pour la cohérence mais GitHub
-    # reste l'upstream Chappe (cf. chappe/README.md).
-    repo-chappe: 'https://github.com/VidocqMP/chappe'
+    repo-chappe: 'https://forge.vidocq.dev/vidocq/chappe'
     repo-vauban: 'https://forge.vidocq.dev/vidocq/vauban'
     repo-champollion: 'https://forge.vidocq.dev/vidocq/champollion'
     repo-foy: 'https://forge.vidocq.dev/vidocq/foy'
