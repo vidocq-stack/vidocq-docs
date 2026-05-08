@@ -234,7 +234,7 @@ chaque environnement (staging et prod) — chaque app a sa redirect URI.
 
 | `OIDC_CLIENT_ID`     | Client ID donné par Forgejo
 | `OIDC_CLIENT_SECRET` | Client Secret de la même app
-| `OIDC_COOKIE_SECRET` | sortie de `openssl rand -base64 32` (générer une seule fois par environnement)
+| `OIDC_COOKIE_SECRET` | exactement 16, 24 ou 32 bytes (= chars ASCII). Générer avec `openssl rand -hex 16` (= 32 chars). **Ne pas** utiliser `openssl rand -base64 32` qui sort 44 chars et fait planter `oauth2-proxy`
 |===
 
 ==== c. Forwarder NPM vers le sidecar (et plus vers Chappe directement)
