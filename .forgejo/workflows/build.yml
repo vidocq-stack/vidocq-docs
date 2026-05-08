@@ -26,15 +26,24 @@ jobs:
       - name: Detect Docker daemon (DinD gateway)
         # Le job tourne dans le dind. Le démon Docker est le dind lui-même,
         # accessible via le gateway de son bridge interne (route default).
+        # `iproute2` (commande `ip`) n'est pas dans l'image catthehacker:act,
+        # donc on parse /proc/net/route à la main.
+        # Format : la route default a Destination=00000000, Gateway en hex
+        # little-endian (ex. 010011AC = 0xAC 0x11 0x00 0x01 = 172.17.0.1).
         run: |
           set -e
-          GW=$(ip -4 route show default | awk '/default/ { print $3 }')
-          if [ -z "$GW" ]; then
+          GW_HEX=$(awk '$2 == "00000000" { print $3; exit }' /proc/net/route 2>/dev/null || true)
+          if [ -n "$GW_HEX" ] && [ "${#GW_HEX}" -ge 8 ]; then
+            GW=$(printf "%d.%d.%d.%d\n" \
+              "0x${GW_HEX:6:2}" \
+              "0x${GW_HEX:4:2}" \
+              "0x${GW_HEX:2:2}" \
+              "0x${GW_HEX:0:2}")
+          else
             GW=172.17.0.1   # fallback Docker bridge default
           fi
           echo "DinD gateway: $GW"
-          # Test de joignabilité du démon (timeout court — sinon on saura vite)
-          if ! timeout 5 sh -c "</dev/tcp/$GW/2375"; then
+          if ! timeout 5 bash -c "</dev/tcp/$GW/2375"; then
             echo "::error::Docker daemon at tcp://$GW:2375 unreachable"
             exit 1
           fi
