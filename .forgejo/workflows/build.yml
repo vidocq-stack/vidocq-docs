@@ -102,23 +102,35 @@ jobs:
         # Build args :
         #   CHAPPE_VERSION : version Chappe à tirer depuis repolite
         #   MAVEN_REPO_URL : par défaut https://repo.vidocq.dev/snapshots
-        # Secret BuildKit `mavencreds` (1 ligne `user:token`) :
-        #   monté en /run/secrets/mavencreds uniquement pour le stage chappe-fetcher ;
+        # Secret BuildKit `mavensettings` :
+        #   monté en /root/.m2/settings.xml uniquement pour `RUN mvn` ;
         #   les creds n'apparaissent dans aucune couche de l'image finale.
-        #   On utilise `user:token` (et non un settings.xml) parce que repolite
-        #   n'expose pas le maven-metadata.xml au niveau SNAPSHOT — le Dockerfile
-        #   bypass Maven et fait `curl` direct sur le listing repolite.
         run: |
           set -eu
           IMG=forge.vidocq.dev/vidocq/vidocq-docs
 
-          CREDS_FILE=$(mktemp)
-          chmod 600 "$CREDS_FILE"
-          printf '%s:%s' "${{ secrets.MAVEN_REPO_USER }}" "${{ secrets.MAVEN_REPO_TOKEN }}" > "$CREDS_FILE"
-          trap 'rm -f "$CREDS_FILE"' EXIT
+          # Génère le settings.xml temporaire (creds repolite).
+          SETTINGS_FILE=$(mktemp)
+          cat > "$SETTINGS_FILE" <<'XML'
+          <?xml version="1.0" encoding="UTF-8"?>
+          <settings xmlns="http://maven.apache.org/SETTINGS/1.2.0">
+            <servers>
+              <server>
+                <id>vidocq-repolite</id>
+                <username>__USER__</username>
+                <password>__TOKEN__</password>
+              </server>
+            </servers>
+          </settings>
+          XML
+          # Le heredoc est quoted pour empêcher l'expansion shell des chevrons,
+          # on substitue ensuite les placeholders.
+          sed -i "s|__USER__|${{ secrets.MAVEN_REPO_USER }}|; s|__TOKEN__|${{ secrets.MAVEN_REPO_TOKEN }}|" "$SETTINGS_FILE"
+          chmod 600 "$SETTINGS_FILE"
+          trap 'rm -f "$SETTINGS_FILE"' EXIT
 
           docker build \
-            --secret "id=mavencreds,src=$CREDS_FILE" \
+            --secret "id=mavensettings,src=$SETTINGS_FILE" \
             --build-arg CHAPPE_VERSION="${CHAPPE_VERSION:-0.1.0-SNAPSHOT}" \
             --build-arg MAVEN_REPO_URL="${MAVEN_REPO_URL:-https://repo.vidocq.dev/snapshots}" \
             -t "$IMG:${{ steps.tags.outputs.tag }}" \

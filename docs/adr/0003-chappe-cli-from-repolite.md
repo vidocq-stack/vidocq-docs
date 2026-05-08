@@ -52,11 +52,9 @@ Au moment de cet ADR, `chappe-cli` est livré :
 Le Dockerfile passe à 2 stages :
 
 ```
-Stage 1 (alpine + curl)           : list & fetch chappe-cli-shaded.jar  → /opt/chappe/chappe-cli.jar
+Stage 1 (eclipse-temurin:25-jdk)  : mvn dependency:copy   → /opt/chappe/chappe-cli.jar
 Stage 2 (eclipse-temurin:25-jre)  : COPY build/site + jar + entrypoint
 ```
-
-**Note technique repolite** : la version actuelle de repolite n'expose pas le `maven-metadata.xml` au niveau SNAPSHOT (`/<group>/<artifact>/<version>-SNAPSHOT/maven-metadata.xml` → 404). Maven ne peut donc pas résoudre la coordonnée SNAPSHOT pour découvrir le timestamp courant. On bypass Maven : le stage `chappe-fetcher` liste le dossier SNAPSHOT via `curl`, sélectionne le dernier jar shaded par tri lexicographique sur `chappe-cli-X.Y.Z-YYYYMMDD.HHMMSS-N-shaded.jar`, et le télécharge. À l'avenir, configurer repolite pour générer ce metadata.xml permettra de revenir à `mvn dependency:copy`.
 
 Le **build Antora est sorti du Dockerfile** : Antora doit cloner les 7 repos modules en HTTPS, ce qui demande des `~/.git-credentials`. Plutôt que de propager ces creds dans BuildKit (via `--secret` + helper), on garde la responsabilité du build Antora côté **runner / build local** ; le `docker build` se contente de `COPY build/site`. Cela simplifie les credentials et accélère le build (Antora n'est pas réinstallé à chaque image).
 
