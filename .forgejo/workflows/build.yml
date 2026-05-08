@@ -11,18 +11,34 @@ jobs:
     runs-on: docker
     # Le label `docker` du runner Forgejo mappe par défaut sur `docker:dind`
     # (alpine, pas de Node). On surcharge avec `catthehacker/ubuntu:act-22.04`
-    # (Node 20 + Docker CLI + bash). DOCKER_HOST pointe vers le sidecar dind
-    # de la stack runner (cf. forgejo-runner/runner-config.yaml côté hôte qui
-    # définit le réseau partagé `runner-net` et propage cette env var).
+    # (Node 20 + Docker CLI + bash). DOCKER_HOST est détecté dynamiquement
+    # par l'étape `Detect Docker daemon` ci-dessous : le job tourne DANS le
+    # sidecar dind (pas sur l'hôte), donc le démon Docker lui est joignable
+    # via le gateway de son bridge interne (typiquement 172.17.0.1).
     container:
       image: catthehacker/ubuntu:act-22.04
-      env:
-        DOCKER_HOST: tcp://docker-in-docker:2375
     steps:
       - name: Checkout
         uses: actions/checkout@v4
         # Plus de checkout du repo frère vidocq/chappe : le Dockerfile pull
         # désormais le fat-jar `chappe-cli-shaded` depuis repolite (cf. ADR-0003).
+
+      - name: Detect Docker daemon (DinD gateway)
+        # Le job tourne dans le dind. Le démon Docker est le dind lui-même,
+        # accessible via le gateway de son bridge interne (route default).
+        run: |
+          set -e
+          GW=$(ip -4 route show default | awk '/default/ { print $3 }')
+          if [ -z "$GW" ]; then
+            GW=172.17.0.1   # fallback Docker bridge default
+          fi
+          echo "DinD gateway: $GW"
+          # Test de joignabilité du démon (timeout court — sinon on saura vite)
+          if ! timeout 5 sh -c "</dev/tcp/$GW/2375"; then
+            echo "::error::Docker daemon at tcp://$GW:2375 unreachable"
+            exit 1
+          fi
+          echo "DOCKER_HOST=tcp://$GW:2375" >> "$GITHUB_ENV"
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
