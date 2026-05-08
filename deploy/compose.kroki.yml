@@ -1,0 +1,104 @@
+# Stack Kroki self-hosted — déployée par Portainer (Stack-from-Git).
+#
+# Pourquoi self-hosted ? Le serveur public https://kroki.io est régulièrement
+# saturé (504 Gateway Timeout sous charge). En self-host, le build Antora de
+# vidocq-docs est :
+#   1. Indépendant : aucune dépendance réseau externe au moment du build.
+#   2. Reproductible : même version de PlantUML / Mermaid à chaque run.
+#   3. Rapide : pas de RTT internet, pas de rate-limiting.
+#
+# Architecture :
+#
+#   NPM (TLS) ──► kroki:8000  (service principal — PlantUML, C4, Graphviz, BPMN…)
+#       (kroki.vidocq.dev)        │
+#                                 ├──► kroki-mermaid:8002  (sidecar Mermaid)
+#                                 └──► kroki-bpmn:8003     (sidecar BPMN, optionnel)
+#
+# Le service `kroki` proxifie automatiquement les requêtes mermaid/bpmn/excalidraw
+# vers les sidecars via les variables KROKI_*_HOST. Sans sidecar, ces formats
+# renvoient un 400.
+#
+# Configuration NPM (Nginx Proxy Manager) :
+#   Domain Name        : kroki.vidocq.dev
+#   Forward Hostname   : kroki
+#   Forward Port       : 8000
+#   Block Common Exploits : ON
+#   Websockets Support : OFF (Kroki est en HTTP simple)
+#   SSL                : Let's Encrypt + Force SSL + HTTP/2
+#   Cache Assets       : OFF (les SVG ne profitent pas du cache NPM ; Kroki a son
+#                        propre cache via `KROKI_DIAGRAM_DEFAULT_FETCH_CACHE_TTL_HOURS`)
+#
+# Variables d'env consommées (Portainer UI → Stack → Environment variables) :
+#   KROKI_TAG          tag de l'image kroki (défaut : 0.27.1)
+#   KROKI_MAX_URI_LEN  taille max d'une requête GET (défaut : 16384, suffisant
+#                      pour les diagrammes encodés base64 envoyés par
+#                      asciidoctor-kroki en mode `kroki-fetch-diagram=true`).
+#
+# Une fois la stack up, mettre à jour le playbook Antora :
+#   asciidoc.attributes.kroki-server-url: https://kroki.vidocq.dev
+
+services:
+
+  kroki:
+    image: yuzutech/kroki:${KROKI_TAG:-0.27.1}
+    container_name: kroki
+    restart: unless-stopped
+    environment:
+      # Désactivation des moteurs lourds non utilisés par Vidocq pour réduire
+      # la surface d'attaque et la conso mémoire (~150 Mo économisés par moteur).
+      KROKI_SAFE_MODE: SECURE
+      KROKI_MAX_URI_LENGTH: ${KROKI_MAX_URI_LEN:-16384}
+
+      # Pointage vers les sidecars (réseau interne kroki-net).
+      KROKI_MERMAID_HOST: kroki-mermaid
+      KROKI_MERMAID_PORT: "8002"
+      # Décommenter si tu actives le sidecar BPMN ci-dessous :
+      # KROKI_BPMN_HOST: kroki-bpmn
+      # KROKI_BPMN_PORT: "8003"
+    networks:
+      - reverseproxy
+      - kroki-net
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8000/health || exit 1"]
+      interval: 30s
+      timeout: 3s
+      start_period: 15s
+      retries: 3
+    labels:
+      io.vidocq.environment: production
+      io.vidocq.component: kroki
+      io.vidocq.role: diagram-renderer
+
+  kroki-mermaid:
+    image: yuzutech/kroki-mermaid:${KROKI_TAG:-0.27.1}
+    container_name: kroki-mermaid
+    restart: unless-stopped
+    expose:
+      - "8002"
+    networks:
+      - kroki-net
+    labels:
+      io.vidocq.environment: production
+      io.vidocq.component: kroki
+      io.vidocq.role: mermaid-sidecar
+
+  # Sidecar BPMN — décommenter si besoin de diagrammes BPMN dans la doc.
+  # kroki-bpmn:
+  #   image: yuzutech/kroki-bpmn:${KROKI_TAG:-0.27.1}
+  #   container_name: kroki-bpmn
+  #   restart: unless-stopped
+  #   expose:
+  #     - "8003"
+  #   networks:
+  #     - kroki-net
+  #   labels:
+  #     io.vidocq.environment: production
+  #     io.vidocq.component: kroki
+  #     io.vidocq.role: bpmn-sidecar
+
+networks:
+  reverseproxy:
+    external: true
+    name: reverseproxy_default
+  kroki-net:
+    driver: bridge

@@ -55,11 +55,12 @@ asciidoc:
     primary-language: fr
 
     # --- Kroki ---
-    # En local : kroki-fetch-diagram=false → blocs convertis en <img src="kroki.io/...">,
-    # rendu paresseux côté navigateur. Le build local ne dépend pas de la dispo de kroki.io.
-    # (En prod, on garde kroki-fetch-diagram=true côté antora-playbook.yml pour avoir des SVG
-    # statiques dans le site servi par Chappe.)
-    kroki-server-url: https://kroki.io
+    # En local : pointe vers le Kroki self-hosted (kroki.vidocq.dev). En cas de
+    # panne ou de dev offline, override : `npx antora --attribute kroki-server-url=…`.
+    # `kroki-fetch-diagram: false` → blocs convertis en <img src="kroki.vidocq.dev/…">,
+    # rendu paresseux côté navigateur — le build local reste rapide et ne bloque
+    # pas si Kroki est inaccessible. (En prod, true côté antora-playbook.yml.)
+    kroki-server-url: https://kroki.vidocq.dev
     kroki-fetch-diagram: false
     kroki-default-format: svg
 

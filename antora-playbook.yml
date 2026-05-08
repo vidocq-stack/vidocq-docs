@@ -59,12 +59,12 @@ asciidoc:
     primary-language: fr
 
     # --- Kroki ---
-    # Serveur public par défaut. Pour basculer sur self-hosted (en cas de panne
-    # kroki.io ou de besoin offline), changer kroki-server-url ici, ou
-    # surcharger via la CLI : `--attribute kroki-server-url=https://kroki.local`.
+    # Self-hosted par défaut (déploiement décrit dans deploy/compose.kroki.yml,
+    # exposé via NPM en kroki.vidocq.dev). kroki.io public reste utilisable en
+    # secours via : `npx antora --attribute kroki-server-url=https://kroki.io …`.
     # `kroki-fetch-diagram: true` télécharge les SVG au build → site servi par
     # Chappe = 100 % statique, aucune dépendance runtime à kroki.
-    kroki-server-url: https://kroki.io
+    kroki-server-url: https://kroki.vidocq.dev
     kroki-fetch-diagram: true
     kroki-default-format: svg
 
