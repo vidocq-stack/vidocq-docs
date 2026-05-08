@@ -47,14 +47,17 @@ RUN <<EOF cat > pom.xml
 EOF
 # `mavensettings` est un secret BuildKit (cf. workflow `--secret id=...`).
 # Monté UNIQUEMENT pendant ce RUN, jamais dans les couches finales de l'image.
+#
+# Note : `-DstripVersion=true -DstripClassifier=true` ne fonctionnent pas sur
+# les SNAPSHOT timestampés (`0.1.0-YYYYMMDD.HHMMSS-N`) avec dependency-plugin
+# 3.7.0 — le fichier garde son nom complet. On fait un `mv` explicite après.
 RUN --mount=type=secret,id=mavensettings,target=/root/.m2/settings.xml,required=true \
     mvn -B -ntp \
       dependency:copy \
       -Dartifact=io.vidocq.chappe:chappe-cli:${CHAPPE_VERSION}:jar:shaded \
       -DoutputDirectory=/opt/chappe \
-      -DstripVersion=true \
-      -DstripClassifier=true \
       -Dtransitive=false \
+    && mv /opt/chappe/chappe-cli-*-shaded.jar /opt/chappe/chappe-cli.jar \
     && ls -lh /opt/chappe/chappe-cli.jar
 
 # ------------------------------------------------------------------
