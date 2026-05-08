@@ -72,8 +72,15 @@ jobs:
           echo "https://${{ secrets.REGISTRY_USER }}:${{ secrets.REGISTRY_TOKEN }}@forge.vidocq.dev" > ~/.git-credentials
           chmod 600 ~/.git-credentials
 
+      - name: Install Antora deps (root)
+        # Installe Antora CLI + asciidoctor-kroki (cf. package.json racine).
+        # Avant : `npx --yes antora@^3.1.0` était utilisé seul, mais il ne
+        # résout pas les extensions AsciiDoc déclarées dans le playbook
+        # (asciidoctor-kroki) → FATAL "Cannot find module 'asciidoctor-kroki'".
+        run: npm ci --no-audit --no-fund
+
       - name: Build Antora site
-        run: npx --yes antora@^3.1.0 antora-playbook.yml
+        run: ./node_modules/.bin/antora antora-playbook.yml
 
       - name: Login to Forgejo registry
         # Forgejo Actions interdit le préfixe FORGEJO_ sur les secrets utilisateur :
