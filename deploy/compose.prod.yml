@@ -1,15 +1,24 @@
 # Stack production — déployée par Portainer (Stack-from-Git).
 #
-# Hostname public attendu : doc.vidocq.dev
-# Reverse-proxy : Nginx Proxy Manager (hors-stack), connecté au même
-#   réseau `reverseproxy_default`. Le container n'expose AUCUN port sur l'hôte.
+# Architecture :
 #
-# Variables d'env consommées (cf. deploy/.env.example) :
-#   IMAGE_TAG      tag de l'image (défaut : latest — typiquement un v0.x.y release)
-#   CONTAINER_NAME nom DNS interne, doit matcher le forward configuré dans NPM
-#                  (défaut : vidocq-docs-prod)
+#   NPM (TLS) ──► oauth2-proxy:4180 ──► vidocq-docs-prod:8080 (Chappe)
+#       (doc.vidocq.dev)                ▲                ▲
+#                                       │                │
+#                                       └─ OIDC dance ───┘
+#                                          forge.vidocq.dev
+#
+# Variables d'env consommées (à régler dans Portainer UI → Stack → Environment
+# variables) :
+#   IMAGE_TAG           tag de l'image (défaut : latest — un v0.x.y release)
+#   CONTAINER_NAME      nom du container Chappe (défaut : vidocq-docs-prod) ;
+#                       le sidecar OIDC s'appelle ${CONTAINER_NAME}-oauth.
+#   OIDC_CLIENT_ID      Client ID de l'app OAuth2 Forgejo (vidocq-docs-prod)
+#   OIDC_CLIENT_SECRET  Client Secret de la même app
+#   OIDC_COOKIE_SECRET  32 bytes base64 (`openssl rand -base64 32`)
 
 services:
+
   vidocq-docs:
     image: forge.vidocq.dev/vidocq/vidocq-docs:${IMAGE_TAG:-latest}
     container_name: ${CONTAINER_NAME:-vidocq-docs-prod}
@@ -21,7 +30,7 @@ services:
       CHAPPE_CACHE: "max-age=3600, public"  # cache long en prod
       STAGING: "false"
     networks:
-      - reverseproxy
+      - internal
     healthcheck:
       test: ["CMD", "wget", "-qO-", "http://localhost:8080/healthz"]
       interval: 30s
@@ -32,7 +41,50 @@ services:
       io.vidocq.environment: production
       io.vidocq.component: docs
 
+  oauth2-proxy:
+    image: quay.io/oauth2-proxy/oauth2-proxy:v7.7.1
+    container_name: ${CONTAINER_NAME:-vidocq-docs-prod}-oauth
+    restart: unless-stopped
+    depends_on:
+      vidocq-docs:
+        condition: service_healthy
+    environment:
+      OAUTH2_PROXY_PROVIDER: oidc
+      OAUTH2_PROXY_OIDC_ISSUER_URL: https://forge.vidocq.dev
+      OAUTH2_PROXY_CLIENT_ID: ${OIDC_CLIENT_ID:?OIDC_CLIENT_ID is required}
+      OAUTH2_PROXY_CLIENT_SECRET: ${OIDC_CLIENT_SECRET:?OIDC_CLIENT_SECRET is required}
+      OAUTH2_PROXY_COOKIE_SECRET: ${OIDC_COOKIE_SECRET:?OIDC_COOKIE_SECRET is required}
+      OAUTH2_PROXY_HTTP_ADDRESS: 0.0.0.0:4180
+      OAUTH2_PROXY_REDIRECT_URL: https://doc.vidocq.dev/oauth2/callback
+      OAUTH2_PROXY_REDIRECT_URL_FORCE_HTTPS: "true"
+      OAUTH2_PROXY_REVERSE_PROXY: "true"
+      OAUTH2_PROXY_UPSTREAMS: http://${CONTAINER_NAME:-vidocq-docs-prod}:8080/
+      OAUTH2_PROXY_EMAIL_DOMAINS: "*"
+      OAUTH2_PROXY_COOKIE_DOMAINS: .vidocq.dev
+      OAUTH2_PROXY_WHITELIST_DOMAINS: .vidocq.dev
+      OAUTH2_PROXY_COOKIE_SECURE: "true"
+      OAUTH2_PROXY_COOKIE_HTTPONLY: "true"
+      OAUTH2_PROXY_PASS_USER_HEADERS: "true"
+      OAUTH2_PROXY_PASS_AUTHORIZATION_HEADER: "true"
+      OAUTH2_PROXY_PASS_ACCESS_TOKEN: "true"
+      OAUTH2_PROXY_PING_PATH: /ping
+      OAUTH2_PROXY_SKIP_AUTH_ROUTES: "GET=^/healthz$$"
+    networks:
+      - reverseproxy
+      - internal
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:4180/ping"]
+      interval: 30s
+      timeout: 3s
+      start_period: 5s
+      retries: 3
+    labels:
+      io.vidocq.environment: production
+      io.vidocq.component: oauth2-proxy
+
 networks:
   reverseproxy:
     external: true
     name: reverseproxy_default
+  internal:
+    driver: bridge

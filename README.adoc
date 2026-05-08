@@ -204,11 +204,44 @@ dans les secrets Forgejo (`PORTAINER_WEBHOOK_STAGING` ou `_PROD`). Le workflow
 poke ce webhook après chaque `docker push`, ce qui force Portainer à re-pull
 l'image et à `docker compose up -d`.
 
-=== 4. Côté Nginx Proxy Manager
+=== 4. Authentification OIDC via Forgejo
 
-NPM tourne sur l'hôte et partage le réseau Docker `reverseproxy_default` avec
-le container `vidocq-docs`. Le compose attache le service à ce réseau **sans
-exposer de port sur l'hôte**.
+Le site est protégé par un sidecar `oauth2-proxy` qui délègue l'auth à Forgejo
+(seuls les utilisateurs loggés sur `forge.vidocq.dev` peuvent voir le site).
+Cf. les composes `deploy/compose.{staging,prod}.yml`.
+
+==== a. Créer une *OAuth2 Application* côté Forgejo
+
+*User Settings → Applications → OAuth2 Applications → Create*
+
+[cols="1,2"]
+|===
+| Champ | Valeur
+
+| Application Name | `vidocq-docs-staging` (et un autre pour prod : `vidocq-docs-prod`)
+| Redirect URI     | `https://staging-doc.vidocq.dev/oauth2/callback` (resp. `https://doc.vidocq.dev/oauth2/callback`)
+| Confidential Client | ✓
+|===
+
+Forgejo retourne **Client ID** et **Client Secret**. Refais l'opération pour
+chaque environnement (staging et prod) — chaque app a sa redirect URI.
+
+==== b. Variables Portainer à ajouter sur chaque stack
+
+[cols="1,2"]
+|===
+| Variable | Valeur
+
+| `OIDC_CLIENT_ID`     | Client ID donné par Forgejo
+| `OIDC_CLIENT_SECRET` | Client Secret de la même app
+| `OIDC_COOKIE_SECRET` | sortie de `openssl rand -base64 32` (générer une seule fois par environnement)
+|===
+
+==== c. Forwarder NPM vers le sidecar (et plus vers Chappe directement)
+
+Le compose isole maintenant Chappe sur un réseau `internal` ; il n'est plus
+joignable depuis NPM. C'est `oauth2-proxy:4180` qui prend le relais sur
+`reverseproxy_default`.
 
 *Hosts → Proxy Hosts → Add Proxy Host* :
 
@@ -216,16 +249,24 @@ exposer de port sur l'hôte**.
 |===
 | Champ | Valeur staging / prod
 
-| Domain Names    | `staging-doc.vidocq.dev` / `doc.vidocq.dev`
-| Scheme          | `http`
-| Forward Hostname | `vidocq-docs-staging` / `vidocq-docs-prod` *(le `container_name` du compose)*
-| Forward Port    | `8080`
+| Domain Names         | `staging-doc.vidocq.dev` / `doc.vidocq.dev`
+| Scheme               | `http`
+| Forward Hostname     | `vidocq-docs-staging-oauth` / `vidocq-docs-prod-oauth`
+| Forward Port         | `4180`
 | Block Common Exploits | activé
-| Websockets Support    | inactif (pas de WS à ce stade)
+| Websockets Support    | activé *(oauth2-proxy en utilise pour le auth-status)*
 | SSL → Force SSL       | activé (Let's Encrypt)
 |===
 
-NPM résout le `container_name` via le DNS Docker du réseau partagé.
+==== d. Test du flow
+
+. Naviguer (en privé) vers `https://staging-doc.vidocq.dev`
+. Redirection automatique vers `https://forge.vidocq.dev/login/oauth/authorize?...`
+. Login Forgejo (et Consent au premier passage)
+. Redirection `/oauth2/callback` → cookie posé → site
+. Le cookie domain est `.vidocq.dev` → la session est partagée entre staging et prod (un seul login pour les deux)
+
+NPM résout `vidocq-docs-staging-oauth` via le DNS Docker du réseau partagé.
 
 === 5. Vérifier
 
