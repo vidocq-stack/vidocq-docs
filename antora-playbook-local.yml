@@ -55,8 +55,12 @@ asciidoc:
     primary-language: fr
 
     # --- Kroki ---
+    # En local : kroki-fetch-diagram=false → blocs convertis en <img src="kroki.io/...">,
+    # rendu paresseux côté navigateur. Le build local ne dépend pas de la dispo de kroki.io.
+    # (En prod, on garde kroki-fetch-diagram=true côté antora-playbook.yml pour avoir des SVG
+    # statiques dans le site servi par Chappe.)
     kroki-server-url: https://kroki.io
-    kroki-fetch-diagram: true
+    kroki-fetch-diagram: false
     kroki-default-format: svg
 
     # --- URLs des repos ---
@@ -80,3 +84,7 @@ asciidoc:
     spec-mp-health: 'https://microprofile.io/specifications/microprofile-health/'
     spec-mp-metrics: 'https://microprofile.io/specifications/microprofile-metrics/'
     spec-mp-openapi: 'https://microprofile.io/specifications/microprofile-open-api/'
+
+    # --- Bases d'URLs supplémentaires ---
+    url-jep: 'https://openjdk.org/jeps'
+    url-jakarta: 'https://jakarta.ee'

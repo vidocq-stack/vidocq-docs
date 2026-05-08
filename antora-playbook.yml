@@ -92,3 +92,7 @@ asciidoc:
     spec-mp-health: 'https://microprofile.io/specifications/microprofile-health/'
     spec-mp-metrics: 'https://microprofile.io/specifications/microprofile-metrics/'
     spec-mp-openapi: 'https://microprofile.io/specifications/microprofile-open-api/'
+
+    # --- Bases d'URLs supplémentaires ---
+    url-jep: 'https://openjdk.org/jeps'
+    url-jakarta: 'https://jakarta.ee'
