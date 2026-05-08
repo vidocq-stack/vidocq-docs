@@ -79,8 +79,25 @@ qui doit avoir été produit avant par Antora (le runner CI le fait,
 # 1. Builder le site Antora (UI bundle + Antora pull les 7 repos modules)
 bash scripts/build-local.sh        # produit ./build/site
 
-# 2. Builder l'image Docker (qui COPY build/site + tire chappe-cli depuis repolite)
-docker build \
+# 2. Préparer un settings.xml temporaire avec les creds repolite (lecture)
+SETTINGS=$(mktemp)
+cat > "$SETTINGS" <<XML
+<?xml version="1.0" encoding="UTF-8"?>
+<settings xmlns="http://maven.apache.org/SETTINGS/1.2.0">
+  <servers>
+    <server>
+      <id>vidocq-repolite</id>
+      <username>${MAVEN_REPO_USER:?}</username>
+      <password>${MAVEN_REPO_TOKEN:?}</password>
+    </server>
+  </servers>
+</settings>
+XML
+trap 'rm -f "$SETTINGS"' EXIT
+
+# 3. Builder l'image Docker (BuildKit obligatoire pour --secret)
+DOCKER_BUILDKIT=1 docker build \
+  --secret "id=mavensettings,src=$SETTINGS" \
   --build-arg CHAPPE_VERSION=0.1.0-SNAPSHOT \
   --build-arg MAVEN_REPO_URL=https://repo.vidocq.dev/snapshots \
   -t vidocq-docs:test .
@@ -145,8 +162,10 @@ et par Portainer pour pull l'image (cf. étape suivante). Côté secrets de repo
 |===
 | Secret | Valeur
 
-| `REGISTRY_USER`             | utilisateur ou bot avec `write:package`
-| `REGISTRY_TOKEN`            | token généré ci-dessus
+| `REGISTRY_USER`             | utilisateur Forgejo (push/pull container registry, `write:package`)
+| `REGISTRY_TOKEN`            | token Forgejo associé
+| `MAVEN_REPO_USER`           | utilisateur lecture sur repolite `https://repo.vidocq.dev/snapshots` (souvent identique à REGISTRY_USER)
+| `MAVEN_REPO_TOKEN`          | token associé (lecture des artefacts Chappe)
 | `PORTAINER_WEBHOOK_STAGING` | URL de webhook Portainer (étape 3)
 | `PORTAINER_WEBHOOK_PROD`    | URL de webhook Portainer (étape 3)
 |===

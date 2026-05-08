@@ -45,7 +45,10 @@ RUN <<EOF cat > pom.xml
   </repositories>
 </project>
 EOF
-RUN mvn -B -ntp \
+# `mavensettings` est un secret BuildKit (cf. workflow `--secret id=...`).
+# Monté UNIQUEMENT pendant ce RUN, jamais dans les couches finales de l'image.
+RUN --mount=type=secret,id=mavensettings,target=/root/.m2/settings.xml,required=true \
+    mvn -B -ntp \
       dependency:copy \
       -Dartifact=io.vidocq.chappe:chappe-cli:${CHAPPE_VERSION}:jar:shaded \
       -DoutputDirectory=/opt/chappe \
