@@ -38,6 +38,15 @@ jobs:
           npm ci
           npm run build
 
+      - name: Configure git credentials for Antora
+        # Antora ne supporte pas ssh:// — il pull les sources en https.
+        # Si les repos vidocq/* sont privés (ou même publics avec rate-limit
+        # anonyme), Antora a besoin d'un fichier ~/.git-credentials.
+        run: |
+          git config --global credential.helper store
+          echo "https://${{ secrets.REGISTRY_USER }}:${{ secrets.REGISTRY_TOKEN }}@forge.vidocq.dev" > ~/.git-credentials
+          chmod 600 ~/.git-credentials
+
       - name: Build Antora site
         run: npx --yes antora@^3.1.0 antora-playbook.yml
 

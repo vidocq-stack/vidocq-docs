@@ -3,27 +3,34 @@ site:
   start_page: home-fr::index.adoc
   url: https://doc.vidocq.dev
 
+# Antora ne supporte que http(s) ou des chemins filesystem — pas ssh://.
+# Pour des repos privés, le workflow CI (et le build local) doit avoir un
+# `~/.git-credentials` rempli :
+#   echo "https://<user>:<token>@forge.vidocq.dev" > ~/.git-credentials
+#   git config --global credential.helper store
+# Antora lit automatiquement ce fichier (helper Git standard).
+
 content:
   sources:
-    - url: ssh://git@forge.vidocq.dev:55122/vidocq/vidocq.git
+    - url: https://forge.vidocq.dev/vidocq/vidocq.git
       branches: [main]
       start_paths: [docs/en, docs/fr]
-    - url: ssh://git@forge.vidocq.dev:55122/vidocq/vauban.git
+    - url: https://forge.vidocq.dev/vidocq/vauban.git
       branches: [main]
       start_paths: [docs/en, docs/fr]
-    - url: ssh://git@forge.vidocq.dev:55122/vidocq/cassini.git
+    - url: https://forge.vidocq.dev/vidocq/cassini.git
       branches: [main]
       start_paths: [docs/en, docs/fr]
-    - url: ssh://git@forge.vidocq.dev:55122/vidocq/champollion.git
+    - url: https://forge.vidocq.dev/vidocq/champollion.git
       branches: [main]
       start_paths: [docs/en, docs/fr]
-    - url: ssh://git@forge.vidocq.dev:55122/vidocq/chappe.git
+    - url: https://forge.vidocq.dev/vidocq/chappe.git
       branches: [main]
       start_paths: [docs/en, docs/fr]
-    - url: ssh://git@forge.vidocq.dev:55122/vidocq/foy.git
+    - url: https://forge.vidocq.dev/vidocq/foy.git
       branches: [main]
       start_paths: [docs/en, docs/fr]
-    - url: ssh://git@forge.vidocq.dev:55122/vidocq/mansart.git
+    - url: https://forge.vidocq.dev/vidocq/mansart.git
       branches: [main]
       start_paths: [docs/en, docs/fr]
     - url: .
