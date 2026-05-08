@@ -1,0 +1,107 @@
+= Vidocq-MPS face à Quarkus, Helidon SE et Spring Boot 4
+:description: Comparatif technique sur dix axes et correspondances conceptuelles.
+
+[.lead]
+Cette page compare Vidocq-MPS aux trois runtimes Java contemporains les plus proches dans leur intention : Quarkus, Helidon SE 4 et Spring Boot 4. La comparaison porte sur le modèle d'exécution et les choix d'architecture, pas sur des chiffres de performance — ces derniers sont consignés dans les `BENCH.md` des modules concernés.
+
+== Tableau comparatif
+
+[cols="2,2,2,2,2",options="header"]
+|===
+| Axe | Vidocq-MPS | Quarkus | Helidon SE 4 | Spring Boot 4
+
+| JDK supporté
+| Java 25 (LTS) requis
+| Java 17+ (Java 21 recommandé)
+| Java 21+ (Java 25 supporté)
+| Java 17+ (Java 21 recommandé)
+
+| Modèle de threading I/O
+| Virtual threads partout
+| Reactive (Mutiny) + worker threads ; virtual threads en option
+| Virtual threads (Helidon Níma)
+| Virtual threads (opt-in `spring.threads.virtual.enabled`)
+
+| Build-time vs runtime
+| Build-time (BuildStep + APT + Class-File API)
+| Build-time (extension SPI + Jandex + Gizmo)
+| Runtime (réflexion + ServiceLoader)
+| Runtime (réflexion + auto-configuration)
+
+| JPMS
+| JPMS-natif strict, `module-info.java` partout
+| Classpath ; modules MR-JAR partiel
+| Classpath ; modules dans certaines libs
+| Classpath
+
+| AOT (GraalVM `native-image`)
+| Compatible par construction (zéro réflexion)
+| Première classe (Quarkus native)
+| Supporté
+| Supporté (Spring AOT)
+
+| Project Leyden CDS
+| Compatible (zéro proxy dynamique)
+| Compatible
+| Compatible
+| Compatible (Spring 6.1+)
+
+| Surface réflexion runtime
+| Aucune (codegen statique)
+| Réduite (Jandex + Gizmo)
+| Significative (CDI lite, Yasson)
+| Significative (auto-config, AOP)
+
+| Container CDI
+| xref:vauban::index.adoc[Vauban] (CDI 4.1 Lite, build-time)
+| ArC (CDI Lite, build-time)
+| Pas de CDI en SE
+| Spring DI (pas Jakarta CDI)
+
+| Implémentation REST
+| xref:cassini::index.adoc[Cassini] (Jakarta REST 4.0)
+| RESTEasy Reactive (Jakarta REST 3.1)
+| Helidon WebServer + JAX-RS (MP)
+| Spring Web MVC / WebFlux (pas JAX-RS)
+
+| Implémentation JSON
+| xref:champollion::index.adoc[Champollion] (JSON-P 2.1 + JSON-B 3.0)
+| Jackson + Yasson
+| Jackson + Yasson
+| Jackson
+
+| Dépendances tierces socle
+| Aucune hors specs Jakarta / MicroProfile
+| Vert.x, Netty, Hibernate, Jackson, etc.
+| Netty, Yasson, Jackson, etc.
+| Tomcat / Jetty / Netty, Hibernate, Jackson
+
+| Spec MicroProfile
+| Config, Health, Metrics, OpenAPI (en cours)
+| Implémentation complète
+| Implémentation complète (MP)
+| Pas de MicroProfile (Spring Actuator à la place)
+|===
+
+[NOTE]
+====
+Cold start, mémoire résidente et taille d'image dépendent fortement de la taille de l'application et de l'option AOT/JIT. Ces chiffres sont consignés par module dans les `BENCH.md` respectifs (lien:{repo-chappe}/src/branch/main/BENCH.md[Chappe], lien:{repo-cassini}/src/branch/main/BENCH.md[Cassini], lien:{repo-champollion}/src/branch/main/BENCH.md[Champollion]) et confrontés aux exemples du dossier `compare-to/`.
+====
+
+== Si vous venez de Quarkus
+
+Vidocq-MPS partage la philosophie build-time de Quarkus : **BuildStep**, **BuildItem**, **Recorder**, extension SPI. La principale différence est l'exécution : Vidocq utilise virtual threads par défaut là où Quarkus reste majoritairement reactive (Mutiny). Pas de migration cosmétique nécessaire côté Jakarta REST 4.0 — le code des resources reste identique. Comparatif d'exemple : `compare-to/quarkus-rest-example/`.
+
+== Si vous venez de Helidon SE 4
+
+Helidon SE et Vidocq partagent le pari des **virtual threads** comme modèle par défaut, et la simplicité d'un serveur HTTP propre. Différence centrale : Helidon SE n'a pas de container CDI ni de codegen build-time — chaque endpoint est enregistré programmatiquement, et la réflexion reste présente côté JSON (Yasson). Vidocq-MPS retire la réflexion de la chaîne. Comparatif d'exemple : `compare-to/helidon4-rest-example/`.
+
+== Si vous venez de Spring Boot 4
+
+Le modèle Spring repose sur l'auto-configuration et la réflexion d'amorçage. Vidocq-MPS le remplace par une SPI d'extensions explicite et de la génération de code à la compilation. Côté API : `@RestController` devient `@Path`, `@Autowired` devient `@Inject` (CDI 4.1 Lite), Spring Data JPA devient Jakarta Data 1.0 (Mansart). Pas d'équivalent direct à `@SpringBootApplication` — Vidocq-MPS bootstrap est explicite et minimal. Comparatif d'exemple : `compare-to/springboot4-rest-example/`.
+
+== Approfondir
+
+* xref:architecture.adoc[Architecture détaillée des modules Vidocq]
+* xref:roadmap.adoc[Roadmap consolidée]
+* xref:vidocq::migration.adoc[Guide de migration Vidocq-MPS]

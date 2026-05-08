@@ -1,0 +1,128 @@
+= Vidocq ecosystem architecture
+:description: Overview of module boundaries, dependency matrix, and cross-cutting invariants.
+
+[.lead]
+The Vidocq ecosystem is composed of seven independent modules. This page describes their boundaries, their interfaces, and the cross-cutting choices that apply uniformly to all of them.
+
+== C4 view — Container level
+
+[plantuml]
+....
+@startuml
+!include <C4/C4_Container>
+
+title Vidocq-MPS — C4 Container diagram
+
+Person(dev, "Developer", "Writes a MicroProfile + Jakarta REST application")
+System_Ext(jdk, "JDK 25", "Virtual threads, Class-File API, scoped values")
+
+System_Boundary(vidocq, "Vidocq ecosystem") {
+  Container(mps, "Vidocq-MPS", "Java 25", "Bootstrap, lifecycle, extension SPI, jlink/jpackage/Docker packaging")
+
+  Container(chappe, "Chappe", "Java 25", "HTTP/1.1 + H2 + H3 server, virtual threads, RFC 9110/9112/9113")
+  Container(foy, "Foy", "Java 25", "Jakarta Servlet 6.1 implementation")
+  Container(cassini, "Cassini", "Java 25", "Jakarta REST 4.0 / JAX-RS implementation")
+  Container(vauban, "Vauban", "Java 25", "CDI 4.1 Lite container, build-time")
+  Container(champollion, "Champollion", "Java 25", "JSON-P 2.1 + JSON-B 3.0, APT codegen")
+  Container(mansart, "Mansart", "Java 25", "Jakarta Data 1.0 + Transactions 2.0 + JPA 3.2 (M7)")
+}
+
+ContainerDb_Ext(db, "JDBC datasource", "H2, PostgreSQL")
+
+Rel(dev, mps, "Declares extensions, builds")
+Rel(mps, cassini, "Starts")
+Rel(mps, foy, "Starts")
+Rel(mps, vauban, "CDI bootstrap")
+Rel(mps, mansart, "Persistence bootstrap")
+
+Rel(cassini, chappe, "HttpExchange")
+Rel(foy, chappe, "HttpExchange")
+Rel(cassini, champollion, "JSON entity provider")
+Rel(cassini, vauban, "@Inject")
+Rel(foy, vauban, "@Inject")
+Rel(mansart, vauban, "@Repository, @Transactional")
+Rel(mansart, db, "JDBC")
+
+Rel(chappe, jdk, "Virtual threads, sockets")
+Rel(vauban, jdk, "Class-File API")
+Rel(champollion, jdk, "APT")
+
+@enduml
+....
+
+Quick reading:
+
+* **Chappe** is the only HTTP entry point. Foy and Cassini never talk to a `ServerSocketChannel` directly — they consume the Chappe exchange SPI.
+* **Vauban** is wired into every module that needs `@Inject` (Cassini, Foy, Mansart, Vidocq-MPS), but depends on no one.
+* **Champollion** is a leaf on the JSON side: Cassini uses it as the default entity provider, but Champollion does not know about Cassini.
+* **Mansart** knows nothing about HTTP or REST. It only consumes Vauban (`@Transactional` interceptor) and JDBC.
+* **Vidocq-MPS** orchestrates everything through an extension SPI (BuildStep, BuildItem, Recorder).
+
+== Dependency matrix
+
+[mermaid]
+....
+flowchart LR
+    CHAPPE[Chappe<br/>transport]
+    VAUBAN[Vauban<br/>CDI]
+    CHAMPOLLION[Champollion<br/>JSON]
+    FOY[Foy<br/>Servlet]
+    CASSINI[Cassini<br/>REST]
+    MANSART[Mansart<br/>Data]
+    VIDOCQ[Vidocq-MPS<br/>orchestrator]
+
+    FOY --> CHAPPE
+    FOY --> VAUBAN
+    CASSINI --> CHAPPE
+    CASSINI --> VAUBAN
+    CASSINI --> CHAMPOLLION
+    MANSART --> VAUBAN
+    VIDOCQ --> FOY
+    VIDOCQ --> CASSINI
+    VIDOCQ --> VAUBAN
+    VIDOCQ --> CHAMPOLLION
+    VIDOCQ --> CHAPPE
+    VIDOCQ --> MANSART
+....
+
+Three notable properties:
+
+. The graph is **acyclic** — no foundational module depends on a downstream one.
+. Chappe, Vauban and Champollion are **foundational bricks**: no dependency on any other Vidocq module.
+. Foy and Cassini are **interchangeable** as far as Vidocq-MPS is concerned: an application can run without Servlet (Cassini directly on Chappe) or without REST (Foy directly on Chappe).
+
+== Cross-cutting choices
+
+Four invariants apply across the whole ecosystem.
+
+=== 1. Zero or very few dependencies
+
+Only the relevant **Jakarta / MicroProfile specs** are allowed at runtime. No Tomcat, Jetty, Netty, Weld, ArC, Yasson, Hibernate, RESTEasy. Any new runtime dependency must be explicitly justified in the PR.
+
+=== 2. Strict JPMS
+
+Every module ships its own `module-info.java`. Minimal `exports`. No unjustified `opens`. No classpath. No `add-opens` at launch. The integrity of the module graph is checked by the workspace `jpms-guardian` agent.
+
+=== 3. Static codegen instead of runtime reflection
+
+Anything that would otherwise be done by reflection or dynamic proxy is **generated at compile time**:
+
+* **APT** (Annotation Processor) — Vauban (injection graph), Champollion (JSON-B bindings), Mansart (`*RepositoryImpl`, metamodel).
+* **Class-File API** (JEP 484) — Vauban (interceptors), Mansart (`Connection` proxy).
+* No ASM, no Byte Buddy, no JDK dynamic proxy.
+
+Direct payoff: compatible with **GraalVM `native-image`** and **Project Leyden CDS** without reflection configuration.
+
+=== 4. Virtual threads everywhere for I/O
+
+Every I/O module uses `Executors.newVirtualThreadPerTaskExecutor()`. No platform pool by default. Context propagation (transaction, security) goes through `ScopedValue` rather than `ThreadLocal` whenever possible.
+
+== Drill into a module
+
+* xref:chappe::index.adoc[Chappe — HTTP transport]
+* xref:vauban::index.adoc[Vauban — CDI 4.1 Lite]
+* xref:champollion::index.adoc[Champollion — JSON-P / JSON-B]
+* xref:foy::index.adoc[Foy — Servlet 6.1]
+* xref:cassini::index.adoc[Cassini — Jakarta REST 4.0]
+* xref:mansart::index.adoc[Mansart — Jakarta Data + JPA]
+* xref:vidocq::index.adoc[Vidocq-MPS — orchestrator]

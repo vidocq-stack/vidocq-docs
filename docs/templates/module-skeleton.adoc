@@ -1,0 +1,170 @@
+= Squelette canonique d'un module Vidocq
+:description: Référence éditoriale — structure des 8 pages d'un module dans le site Antora.
+
+[.lead]
+Tout module de l'écosystème Vidocq (chappe, vauban, champollion, foy, cassini, mansart, vidocq-mps) suit la **même structure de pages** dans `docs/{fr,en}/modules/ROOT/pages/`. Cela garantit qu'un visiteur trouve toujours l'information au même endroit, qu'il navigue entre Cassini et Mansart, en français ou en anglais.
+
+== Pages obligatoires
+
+[cols="1,3,1",options="header"]
+|===
+| Fichier | Rôle | Modules
+
+| `index.adoc`
+| Pitch + **origine du nom** + specs ciblées + lien repo + état TCK résumé + matrice de dépendances + un diagramme de positionnement.
+| Tous
+
+| `getting-started.adoc`
+| **Comment l'utiliser** : prérequis, deux ou trois cas d'usage minimaux, "Hello World" exécutable. Priorité avant les internals.
+| Tous
+
+| `usage.adoc`
+| Cas d'usage avancés et recettes. Configuration fine, intégration avec les autres modules, patterns courants.
+| Tous
+
+| `concepts.adoc`
+| Vocabulaire et modèle conceptuel. Ce que veulent dire "extension", "transport", "scope", "provider"… selon le module.
+| Tous
+
+| `internals.adoc`
+| **Fonctionnement interne**. Diagrammes de séquence, schémas d'architecture, choix d'implémentation, points de virtual threads. Toujours après `getting-started`.
+| Tous
+
+| `tck.adoc`
+| **État des TCK officiels** + tests skippés justifiés (référence au `TCK.md` du repo). Tableau de couverture par section de la spec.
+| champollion, foy, cassini, mansart, vidocq
+
+| `reference.adoc`
+| Référence complète : config, API publique, CLI, attributs JPMS exportés, propriétés `MicroProfile Config`.
+| Tous
+
+| `migration.adoc`
+| Migration depuis l'écosystème existant : Tomcat → Foy, Weld → Vauban, Yasson → Champollion, etc.
+| Tous
+|===
+
+== Squelette `index.adoc`
+
+[source,asciidoc]
+....
+= {Nom du module}
+:description: {Phrase courte sur le rôle technique}.
+
+[.lead]
+{Une phrase qui pose le module : ce qu'il implémente, sur quoi il repose, ce qui le distingue.}
+
+== Origine du nom
+
+{Figure historique + dates + rôle. Lien métaphorique avec le module. Une référence Wikipédia FR.}
+
+== En un coup d'œil
+
+[cols="1,3"]
+|===
+| Spec implémentée | {lien spec via attribut, ex. {spec-rest-4}}
+| Repo | {url repo via attribut, ex. {repo-cassini}}
+| Java | 25 (LTS)
+| Module JPMS | `io.vidocq.{nom}`
+| Dépendances runtime | {zéro / specs Jakarta uniquement / etc.}
+| TCK | {✅ XX/YY passés — détails xref:tck.adoc[ici] / ⚠️ partiel / ❌ pas encore exécuté}
+|===
+
+== Positionnement dans l'écosystème
+
+[mermaid]
+....
+{diagramme mermaid montrant les modules amont/aval}
+....
+
+== Ressources rapides
+
+* xref:getting-started.adoc[Démarrage rapide]
+* xref:concepts.adoc[Concepts]
+* xref:internals.adoc[Fonctionnement interne]
+* xref:tck.adoc[État TCK]   // si applicable
+* xref:reference.adoc[Référence]
+* xref:migration.adoc[Migration depuis l'existant]
+....
+
+== Squelette `tck.adoc` (modules concernés uniquement)
+
+[source,asciidoc]
+....
+= TCK : {nom de la spec}
+:description: État de conformité aux Technology Compatibility Kits Jakarta.
+
+[.lead]
+Cette page consolide l'état des tests TCK officiels exécutés contre {module}. Elle est régénérée à chaque release. La source de vérité au quotidien reste le `TCK.md` du repo.
+
+== Synthèse
+
+[cols="2,1,1,3"]
+|===
+| Section spec | Total | Passés | Notes
+
+| §X.Y …
+| 42
+| 42
+| ✅
+|===
+
+== Tests volontairement skippés
+
+[cols="3,5"]
+|===
+| Test | Raison
+
+| `org.example.SomeBatteryTest`
+| Dépend de feature non encore implémentée (cf. lien:{repo-xxx}/issues/123[issue #123]).
+|===
+
+== Tests skippés pour cause d'environnement
+
+(tests qui requièrent JNDI applicatif, conteneur EE complet, etc. — pas un manquement applicatif)
+
+== Reproduire localement
+
+[source,bash]
+----
+cd {module}
+./run-official-tck-{spec}.sh all
+----
+....
+
+== Conventions transverses
+
+=== Liens vers les repos
+
+Toujours via les attributs définis dans le playbook : `{repo-chappe}`, `{repo-vauban}`, `{repo-champollion}`, `{repo-foy}`, `{repo-cassini}`, `{repo-mansart}`, `{repo-vidocq}`. **Jamais** d'URL en dur dans une page.
+
+=== Liens vers les specs
+
+Idem : `{spec-rest-4}`, `{spec-servlet-6-1}`, `{spec-jsonp-2-1}`, `{spec-jsonb-3-0}`, `{spec-cdi-4-1}`, `{spec-data-1}`, `{spec-jpa-3-2}`, `{spec-mp-config}`, `{spec-mp-health}`, `{spec-mp-metrics}`, `{spec-mp-openapi}`.
+
+=== Diagrammes
+
+* **mermaid** pour les flux séquentiels et les graphes de dépendances.
+* **plantuml** pour les schémas C4, les diagrammes de composants et les structures statiques.
+* Toujours via `[mermaid]` ou `[plantuml]` + bloc délimité `....`. Le rendu passe par Kroki au build (SVG fetché statiquement).
+
+=== Ton
+
+Français canonique. Phrases courtes, pas de marketing creux. Une assertion par phrase. Les chiffres de perf renvoient toujours à `BENCH.md` du repo concerné, jamais inline.
+
+=== Anchors
+
+Pas d'`id` explicite ; Antora les génère depuis les titres. Si un anchor stable est requis (lien externe), ajouter `[#anchor-stable]` juste avant le titre.
+
+== Navigation `nav.adoc`
+
+[source,asciidoc]
+....
+* xref:index.adoc[{Nom du module}]
+** xref:getting-started.adoc[Démarrage rapide]
+** xref:usage.adoc[Cas d'usage]
+** xref:concepts.adoc[Concepts]
+** xref:internals.adoc[Fonctionnement interne]
+** xref:tck.adoc[TCK]   // si applicable
+** xref:reference.adoc[Référence]
+** xref:migration.adoc[Migration]
+....

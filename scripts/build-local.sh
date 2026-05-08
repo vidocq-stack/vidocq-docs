@@ -19,7 +19,6 @@ cd "$ROOT"
 UI_ONLY=0
 SITE_ONLY=0
 SERVE=0
-ANTORA_VERSION="3.1.0"
 
 for arg in "$@"; do
   case "$arg" in
@@ -102,7 +101,19 @@ if [[ ${#MISSING[@]} -gt 0 ]]; then
   echo "[build-local] Antora va échouer sur les sources concernées." >&2
 fi
 
-npx --yes "antora@^$ANTORA_VERSION" antora-playbook-local.yml
+# Installe les deps Antora racine (antora CLI + asciidoctor-kroki) si absentes.
+# Le `package.json` racine épingle les versions ; pas de `npm install` ad-hoc.
+if [[ ! -d node_modules/@antora ]]; then
+  echo "[build-local] install des deps Antora (root package.json)…"
+  if [[ -f package-lock.json ]]; then
+    npm ci --no-audit --no-fund
+  else
+    npm install --no-audit --no-fund
+  fi
+fi
+
+# `node_modules/.bin/antora` est présent grâce au package.json racine.
+node_modules/.bin/antora antora-playbook-local.yml
 echo "[build-local] Site : $ROOT/build/site"
 
 # ------------------------------------------------------------------

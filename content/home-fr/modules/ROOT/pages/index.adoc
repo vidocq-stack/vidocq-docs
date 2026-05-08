@@ -4,6 +4,45 @@
 [.lead]
 Vidocq est une suite de runtimes Jakarta EE et MicroProfile écrite en Java 25 pur, JPMS-natif, fondée sur la génération de code statique (Class-File API + APT) et les virtual threads.
 
+== L'écosystème en un diagramme
+
+[mermaid]
+....
+flowchart TB
+    subgraph Orchestration["Orchestration"]
+        VIDOCQ[Vidocq-MPS<br/>serveur d'application MicroProfile]
+    end
+    subgraph REST["Jakarta REST / Servlet"]
+        CASSINI[Cassini<br/>Jakarta REST 4.0]
+        FOY[Foy<br/>Jakarta Servlet 6.1]
+    end
+    subgraph Sérialisation["Sérialisation"]
+        CHAMPOLLION[Champollion<br/>JSON-P 2.1 + JSON-B 3.0]
+    end
+    subgraph DI["Injection de dépendances"]
+        VAUBAN[Vauban<br/>CDI 4.1 Lite build-time]
+    end
+    subgraph Persistence["Persistence"]
+        MANSART[Mansart<br/>Jakarta Data 1.0 + JPA 3.2]
+    end
+    subgraph Transport["Transport HTTP"]
+        CHAPPE[Chappe<br/>HTTP/1.1 + H2 + H3]
+    end
+
+    VIDOCQ --> CASSINI
+    VIDOCQ --> FOY
+    VIDOCQ --> VAUBAN
+    VIDOCQ --> MANSART
+    CASSINI --> CHAPPE
+    CASSINI --> CHAMPOLLION
+    CASSINI --> VAUBAN
+    FOY --> CHAPPE
+    FOY --> VAUBAN
+    MANSART --> VAUBAN
+....
+
+Chaque module est un projet indépendant, publié séparément, avec son propre cycle de vie. Vidocq-MPS les assemble via une SPI d'extensions inspirée de Quarkus.
+
 == Pourquoi un nouveau runtime ?
 
 Trois raisons :
@@ -16,31 +55,44 @@ Trois raisons :
 
 == Les composants
 
-[cols="1,3"]
+[cols="1,3,2",options="header"]
 |===
-| Composant | Rôle
+| Composant | Rôle | Repo
 
-| xref:vidocq::index.adoc[Vidocq]
+| xref:vidocq::index.adoc[Vidocq-MPS]
 | Serveur d'application MicroProfile, orchestrateur d'extensions
+| {repo-vidocq}
 
 | xref:vauban::index.adoc[Vauban]
 | Container CDI 4.1 Lite, build-time, JPMS-natif
+| {repo-vauban}
 
 | xref:cassini::index.adoc[Cassini]
 | Implémentation Jakarta REST 4.0 / JAX-RS
+| {repo-cassini}
 
 | xref:champollion::index.adoc[Champollion]
 | Implémentation Jakarta JSON-P 2.1 + JSON-B 3.0
+| {repo-champollion}
 
 | xref:chappe::index.adoc[Chappe]
-| Serveur HTTP/1.1 + HTTP/2, virtual threads, zéro dépendance
+| Serveur HTTP/1.1 + HTTP/2 (HTTP/3 en chantier), virtual threads, zéro dépendance
+| {repo-chappe}
 
 | xref:foy::index.adoc[Foy]
 | Implémentation Jakarta Servlet 6.1
+| {repo-foy}
 
 | xref:mansart::index.adoc[Mansart]
-| Jakarta Data 1.0 + Jakarta Persistence 3.2 *(en conception)*
+| Jakarta Data 1.0 + Jakarta Persistence 3.2 *(M7 en attente)*
+| {repo-mansart}
 |===
+
+== Pages transverses
+
+* xref:architecture.adoc[Architecture globale] — frontières des modules, matrice de dépendances, choix transverses (zéro-dépendance, JPMS, codegen, virtual threads).
+* xref:compare.adoc[Comparatif] — Vidocq-MPS face à Quarkus, Helidon SE 4 et Spring Boot 4.
+* xref:roadmap.adoc[Roadmap consolidée] — statut par module et jalons proches (M2x, M5, M6c, M7).
 
 == Statut
 
@@ -64,6 +116,8 @@ Ce qui est en chantier :
 * WebSocket — Chappe + Foy.
 * HTTP/3 / QUIC — Chappe.
 * MicroProfile Health, Metrics, OpenAPI, JWT, Telemetry — Vidocq.
+
+Détail complet par module : xref:roadmap.adoc[Roadmap consolidée].
 
 == Liens utiles
 

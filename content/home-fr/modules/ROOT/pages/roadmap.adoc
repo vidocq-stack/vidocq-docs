@@ -1,0 +1,104 @@
+= Roadmap consolidée de l'écosystème Vidocq
+:description: État par module et jalons proches.
+
+[.lead]
+Cette page agrège l'état d'avancement des sept modules. Chaque section pointe vers la documentation du module pour le détail. La suite est en `0.1.0-SNAPSHOT` — aucune release publique, aucune garantie de stabilité d'API.
+
+== Jalons proches
+
+[cols="1,2,2,1",options="header"]
+|===
+| Jalon | Module | Périmètre | Statut
+
+| M2x
+| xref:chappe::index.adoc[Chappe]
+| HTTP/3 / QUIC, WebSocket
+| en chantier
+
+| M5
+| xref:foy::index.adoc[Foy]
+| Couverture TCK Servlet 6.1 → 100 %
+| en cours
+
+| M5
+| xref:cassini::index.adoc[Cassini]
+| Couverture TCK REST 4.0 (2535/2535 atteint, durcissement intégration)
+| atteint, durcissement
+
+| M6c
+| xref:mansart::index.adoc[Mansart]
+| TCK Jakarta Transactions 2.0 — suite complète
+| en cours
+
+| M7
+| xref:mansart::index.adoc[Mansart]
+| `mansart-persistence` — Jakarta Persistence 3.2 (JPA classique)
+| en attente
+
+| —
+| xref:vidocq::index.adoc[Vidocq-MPS]
+| MicroProfile Health, Metrics, OpenAPI, JWT, Telemetry
+| en cours
+|===
+
+// TODO@user: confirmer la numérotation des jalons (M2a/M2b/M2h pour Chappe, M5 pour Cassini/Foy) — extraite des index modules mais à valider avec les ROADMAP.md complets de chaque repo.
+
+== Statut détaillé par module
+
+=== Chappe — transport HTTP
+
+* **Acquis** : HTTP/1.1 et HTTP/2 conformes RFC 9110/9112/9113, virtual threads, zéro dépendance.
+* **En chantier** : HTTP/3 / QUIC, WebSocket (RFC 6455), durcissement TLS.
+* **À venir** : intégration MicroProfile Telemetry côté transport.
+* Détail : xref:chappe::index.adoc[Chappe].
+
+=== Vauban — CDI 4.1 Lite
+
+* **Acquis** : résolution build-time du graphe d'injection, plugin Maven, intégration JUnit, génération via Class-File API + APT.
+* **En chantier** : couverture complète du TCK CDI 4.1 Lite, support des décorateurs, propagation `ScopedValue` pour les contextes scopés.
+* **À venir** : profile Full (au-delà de Lite).
+* Détail : xref:vauban::index.adoc[Vauban].
+
+=== Champollion — JSON-P / JSON-B
+
+* **Acquis** : JSON-P 2.1 (178/179 PASS, 99,4 %), bindings JSON-B 3.0 générés à l'APT.
+* **En chantier** : baseline TCK JSON-B 3.0 complet, durcissement performance streaming.
+* **À venir** : intégration profil JSON Patch, JSON Pointer avancé.
+* Détail : xref:champollion::index.adoc[Champollion].
+
+=== Foy — Servlet 6.1
+
+* **Acquis** : ~90 % du TCK officiel Jakarta Servlet 6.1, intégration Chappe, intégration Vauban CDI.
+* **En chantier** : couverture TCK 100 %, WebSocket via Chappe, durcissement async.
+* **À venir** : Servlet 7 dès publication de la spec.
+* Détail : xref:foy::index.adoc[Foy].
+
+=== Cassini — Jakarta REST 4.0
+
+* **Acquis** : 2535/2535 tests TCK REST 4.0 applicables (100 %), intégration transport Chappe, entity providers Champollion, CDI Vauban optionnelle.
+* **En chantier** : durcissement intégration MicroProfile (Config, Health), filters et interceptors avancés.
+* **À venir** : intégration MicroProfile JWT côté Cassini.
+* Détail : xref:cassini::index.adoc[Cassini].
+
+=== Mansart — Jakarta Data + Transactions + JPA
+
+* **Acquis** : Jakarta Data 1.0 — TCK 73/73 (M7), pool JDBC virtual-threads-natif, transaction manager Jakarta Transactions 2.0 (smoke 5/5), `@Transactional` via Vauban.
+* **En chantier (M6c)** : suite TCK Jakarta Transactions 2.0 complète.
+* **En attente (M7)** : `mansart-persistence` — implémentation Jakarta Persistence 3.2 classique. `mansart-jakarta-data` couvre déjà les besoins courants dans Vidocq.
+* Détail : xref:mansart::index.adoc[Mansart].
+
+=== Vidocq-MPS — orchestrateur
+
+* **Acquis** : bootstrap, lifecycle, SPI BuildStep / BuildItem / Recorder, extensions Mansart H2 + transactions, plugin Maven (jlink / jpackage / Docker).
+* **En chantier** : MicroProfile Config, Health, Metrics, OpenAPI.
+* **À venir** : MicroProfile JWT, Telemetry, Fault Tolerance, Rest Client.
+* Détail : xref:vidocq::index.adoc[Vidocq-MPS].
+
+== Suivre l'avancement
+
+Les bugs reproductibles et chiffres de performance sont consignés à la racine de chaque repo :
+
+* `BUG.md` — bugs reproductibles, hypothèses, statut.
+* `BENCH.md` — runs JMH/wrk/comparatifs, deltas vs run précédent.
+
+Les TCK officiels (Cassini, Foy, Champollion, Mansart) sont exécutés via les scripts `run-official-tck-*.sh` du sous-projet concerné.
