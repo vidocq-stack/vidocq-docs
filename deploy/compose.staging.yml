@@ -27,6 +27,12 @@ services:
     image: forge.vidocq.dev/vidocq/vidocq-docs:${IMAGE_TAG:-snapshot}
     container_name: ${CONTAINER_NAME:-vidocq-docs-staging}
     restart: unless-stopped
+    # IMAGE_TAG est mutable (`snapshot` réécrit à chaque push main) ; sans
+    # `pull_policy: always`, Portainer/Docker garde l'image en cache local et
+    # le webhook re-crée le container sur l'ancienne digest. Avec `always`,
+    # chaque (re)création force `docker pull` → on récupère bien la nouvelle
+    # image publiée par la CI Forgejo.
+    pull_policy: always
     environment:
       CHAPPE_DOCROOT: /var/www/vidocq-docs
       CHAPPE_PORT: "8080"
