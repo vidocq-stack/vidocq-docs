@@ -12,7 +12,7 @@ site:
 
 content:
   sources:
-    - url: https://forge.vidocq.dev/vidocq/vidocq.git
+    - url: https://forge.vidocq.dev/vidocq/vidocq-mps.git
       branches: [main]
       start_paths: [docs/en, docs/fr]
     - url: https://forge.vidocq.dev/vidocq/vauban.git
