@@ -71,6 +71,11 @@ COPY build/site /var/www/vidocq-docs
 COPY --from=chappe-fetcher /opt/chappe/chappe-cli.jar /opt/vidocq-docs/chappe-cli.jar
 COPY chappe-config.yml /etc/chappe/config.yml
 
+# Endpoint /healthz statique pour le HEALTHCHECK Docker.
+# `chappe serve` est un static-file server : il faut donc qu'un vrai fichier
+# existe pour que GET /healthz retourne 200. Pas un endpoint applicatif.
+RUN echo "ok" > /var/www/vidocq-docs/healthz
+
 # Wrapper minimal : traduit les env vars en flags CLI Chappe.
 COPY <<EOF /opt/vidocq-docs/entrypoint.sh
 #!/bin/sh
