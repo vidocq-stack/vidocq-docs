@@ -79,25 +79,15 @@ qui doit avoir été produit avant par Antora (le runner CI le fait,
 # 1. Builder le site Antora (UI bundle + Antora pull les 7 repos modules)
 bash scripts/build-local.sh        # produit ./build/site
 
-# 2. Préparer un settings.xml temporaire avec les creds repolite (lecture)
-SETTINGS=$(mktemp)
-cat > "$SETTINGS" <<XML
-<?xml version="1.0" encoding="UTF-8"?>
-<settings xmlns="http://maven.apache.org/SETTINGS/1.2.0">
-  <servers>
-    <server>
-      <id>vidocq-repolite</id>
-      <username>${MAVEN_REPO_USER:?}</username>
-      <password>${MAVEN_REPO_TOKEN:?}</password>
-    </server>
-  </servers>
-</settings>
-XML
-trap 'rm -f "$SETTINGS"' EXIT
+# 2. Préparer un fichier `user:token` temporaire (creds repolite, lecture)
+CREDS=$(mktemp)
+chmod 600 "$CREDS"
+printf '%s:%s' "${MAVEN_REPO_USER:?}" "${MAVEN_REPO_TOKEN:?}" > "$CREDS"
+trap 'rm -f "$CREDS"' EXIT
 
 # 3. Builder l'image Docker (BuildKit obligatoire pour --secret)
 DOCKER_BUILDKIT=1 docker build \
-  --secret "id=mavensettings,src=$SETTINGS" \
+  --secret "id=mavencreds,src=$CREDS" \
   --build-arg CHAPPE_VERSION=0.1.0-SNAPSHOT \
   --build-arg MAVEN_REPO_URL=https://repo.vidocq.dev/snapshots \
   -t vidocq-docs:test .

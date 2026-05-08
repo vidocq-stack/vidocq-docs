@@ -21,41 +21,30 @@ ARG MAVEN_REPO_URL=https://repo.vidocq.dev/snapshots
 # ------------------------------------------------------------------
 # Stage 1 — Fetch chappe-cli (fat-jar shaded) depuis repolite
 # ------------------------------------------------------------------
-FROM eclipse-temurin:25-jdk-alpine AS chappe-fetcher
+# Maven n'est pas utilisable ici : repolite n'expose pas le
+# `maven-metadata.xml` au niveau version SNAPSHOT, donc `mvn dependency:*`
+# ne sait pas résoudre le timestamp courant. On fait l'inverse : on
+# liste le dossier SNAPSHOT via curl, on prend le dernier shaded.jar par
+# tri lexicographique (les timestamps `YYYYMMDD.HHMMSS-N` sont triables).
+FROM alpine:3 AS chappe-fetcher
 ARG CHAPPE_VERSION
 ARG MAVEN_REPO_URL
-RUN apk add --no-cache maven
-WORKDIR /tmp/fetch
-# Mini-pom dédié à la résolution. Pas de transitives (chappe-cli est shaded).
-RUN <<EOF cat > pom.xml
-<?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0">
-  <modelVersion>4.0.0</modelVersion>
-  <groupId>vidocq.docs.fetch</groupId>
-  <artifactId>fetch</artifactId>
-  <version>1</version>
-  <packaging>pom</packaging>
-  <repositories>
-    <repository>
-      <id>vidocq-repolite</id>
-      <url>${MAVEN_REPO_URL}</url>
-      <snapshots><enabled>true</enabled><updatePolicy>always</updatePolicy></snapshots>
-      <releases><enabled>true</enabled></releases>
-    </repository>
-  </repositories>
-</project>
-EOF
-# `mavensettings` est un secret BuildKit (cf. workflow `--secret id=...`).
-# Monté UNIQUEMENT pendant ce RUN, jamais dans les couches finales de l'image.
-RUN --mount=type=secret,id=mavensettings,target=/root/.m2/settings.xml,required=true \
-    mvn -B -ntp \
-      dependency:copy \
-      -Dartifact=io.vidocq.chappe:chappe-cli:${CHAPPE_VERSION}:jar:shaded \
-      -DoutputDirectory=/opt/chappe \
-      -DstripVersion=true \
-      -DstripClassifier=true \
-      -Dtransitive=false \
-    && ls -lh /opt/chappe/chappe-cli.jar
+RUN apk add --no-cache curl
+WORKDIR /opt/chappe
+# `mavencreds` est un secret BuildKit, contenu attendu : `user:token` (1 ligne).
+# Monté UNIQUEMENT pendant ce RUN, jamais dans une couche finale.
+RUN --mount=type=secret,id=mavencreds,target=/run/secrets/mavencreds,required=true \
+    set -eu; \
+    CREDS=$(cat /run/secrets/mavencreds); \
+    DIR="${MAVEN_REPO_URL%/}/io/vidocq/chappe/chappe-cli/${CHAPPE_VERSION}/"; \
+    echo "Listing $DIR"; \
+    LATEST=$(curl -fsSL -u "$CREDS" "$DIR" \
+              | grep -oE 'chappe-cli-[0-9.]+-[0-9.-]+-shaded\.jar' \
+              | sort -V | tail -1); \
+    [ -n "$LATEST" ] || { echo "ERROR: no shaded jar found in $DIR" >&2; exit 1; }; \
+    echo "Fetching: $LATEST"; \
+    curl -fsSL -u "$CREDS" "${DIR}${LATEST}" -o /opt/chappe/chappe-cli.jar; \
+    ls -lh /opt/chappe/chappe-cli.jar
 
 # ------------------------------------------------------------------
 # Stage 2 — Runtime
