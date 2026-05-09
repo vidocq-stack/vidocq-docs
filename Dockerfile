@@ -84,6 +84,7 @@ DOCROOT="\${CHAPPE_DOCROOT:-/var/www/vidocq-docs}"
 PORT="\${CHAPPE_PORT:-8080}"
 ARGS="serve --root \${DOCROOT} --port \${PORT}"
 [ "\${CHAPPE_GZIP:-true}" = "true" ] && ARGS="\${ARGS} --gzip"
+[ "\${CHAPPE_ACCESS_LOG:-true}" = "true" ] && ARGS="\${ARGS} --access-log"
 echo "[vidocq-docs] chappe \${ARGS}  (staging=\${STAGING:-false})"
 exec java -jar /opt/vidocq-docs/chappe-cli.jar \${ARGS}
 EOF
@@ -98,6 +99,7 @@ ENV CHAPPE_DOCROOT=/var/www/vidocq-docs
 ENV CHAPPE_PORT=8080
 ENV CHAPPE_BIND=0.0.0.0
 ENV CHAPPE_GZIP=true
+ENV CHAPPE_ACCESS_LOG=true
 ENV STAGING=false
 
 EXPOSE 8080
