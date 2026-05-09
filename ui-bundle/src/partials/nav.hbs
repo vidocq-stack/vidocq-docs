@@ -1,5 +1,7 @@
+{{> components-quick-nav}}
+
 {{#if page.componentVersion}}
-  <h3>{{page.componentVersion.title}}</h3>
+  <h3 class="component-nav-title">{{page.componentVersion.title}}</h3>
 {{/if}}
 {{#each page.navigation}}
   <ul>

@@ -73,3 +73,68 @@
 .nav > ul > li {
   counter-increment: roman;
 }
+
+/* ── Accès rapide aux modules de l'écosystème ─────────────────────── */
+/* Bloc inséré en tête du sidebar par partials/components-quick-nav.hbs.
+   Liste les 7 composants Antora (home + 6 modules) pour qu'on saute
+   d'un module à l'autre sans repasser par la home. */
+.components-quick-nav {
+  margin: 0 0 1.5rem 0;
+  padding: 0 0 1rem 0;
+  border-bottom: 1px solid var(--color-border, #d6c9a8);
+}
+
+.components-quick-nav h3 {
+  margin: 0 0 0.5rem 0;
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--color-muted, #8a7755);
+  font-weight: 600;
+  counter-reset: none;       /* pas de numérotation romaine ici */
+}
+
+.components-quick-nav ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.components-quick-nav__item {
+  margin: 0;
+  padding: 0.15rem 0;
+  counter-increment: none;    /* idem : pas de roman.css */
+}
+
+.components-quick-nav__item a {
+  display: block;
+  padding: 0.2rem 0.4rem;
+  border-radius: 3px;
+  text-decoration: none;
+  font-size: 0.95rem;
+  color: var(--color-text, inherit);
+}
+
+.components-quick-nav__item a:hover {
+  background: var(--color-bg-hover, rgba(0, 0, 0, 0.04));
+}
+
+.components-quick-nav__item.is-current > a {
+  background: var(--color-accent-bg, rgba(180, 140, 80, 0.12));
+  font-weight: 600;
+}
+
+.components-quick-nav__item.is-home > a {
+  font-style: italic;
+}
+
+.components-quick-nav__hint {
+  font-size: 0.78rem;
+  color: var(--color-muted, #8a7755);
+  font-style: italic;
+  margin-left: 0.3em;
+}
+
+.component-nav-title {
+  margin-top: 0;
+}

@@ -1,0 +1,18 @@
+{{#with (components-quick-nav)}}
+  {{#if length}}
+    <nav class="components-quick-nav" aria-label="{{i18n 'modules'}}">
+      <h3>{{i18n 'modules'}}</h3>
+      <ul>
+        {{#each this}}
+          <li class="components-quick-nav__item{{#if isHome}} is-home{{/if}}{{#if (eq name ../../page.componentVersion.name)}} is-current{{/if}}">
+            {{#if url}}
+              <a href="{{relativize url}}">{{title}}{{#if isHome}} <span class="components-quick-nav__hint">{{i18n 'overview'}}</span>{{/if}}</a>
+            {{else}}
+              <span>{{title}}</span>
+            {{/if}}
+          </li>
+        {{/each}}
+      </ul>
+    </nav>
+  {{/if}}
+{{/with}}

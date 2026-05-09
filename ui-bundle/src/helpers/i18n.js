@@ -14,6 +14,8 @@ const STRINGS = {
     'toggle-theme':       'Basculer thème clair/sombre',
     'lang-fr':            'Français',
     'lang-en':            'English',
+    'modules':            'Modules',
+    'overview':           'Vue d’ensemble',
   },
   en: {
     'on-this-page':       'On this page',
@@ -28,6 +30,8 @@ const STRINGS = {
     'toggle-theme':       'Toggle light/dark theme',
     'lang-fr':            'Français',
     'lang-en':            'English',
+    'modules':            'Modules',
+    'overview':           'Overview',
   },
 };
 
