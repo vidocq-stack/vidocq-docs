@@ -84,7 +84,19 @@ DOCROOT="\${CHAPPE_DOCROOT:-/var/www/vidocq-docs}"
 PORT="\${CHAPPE_PORT:-8080}"
 ARGS="serve --root \${DOCROOT} --port \${PORT}"
 [ "\${CHAPPE_GZIP:-true}" = "true" ] && ARGS="\${ARGS} --gzip"
-[ "\${CHAPPE_ACCESS_LOG:-true}" = "true" ] && ARGS="\${ARGS} --access-log"
+
+# Feature detection : --access-log a été introduit dans chappe@500cb06.
+# Pour éviter de crasher l'image quand le SNAPSHOT pull-é est antérieur
+# (race CI chappe vs vidocq-docs), on ne passe le flag que s'il est exposé
+# dans le help. Cache le résultat pour éviter un double-démarrage JVM.
+HELP_OUTPUT=\$(java -jar /opt/vidocq-docs/chappe-cli.jar --help 2>&1 || true)
+if [ "\${CHAPPE_ACCESS_LOG:-true}" = "true" ]; then
+  if echo "\$HELP_OUTPUT" | grep -q -- '--access-log'; then
+    ARGS="\${ARGS} --access-log"
+  else
+    echo "[vidocq-docs] WARN: chappe-cli ne supporte pas --access-log (binaire antérieur à 500cb06), pas d'access log"
+  fi
+fi
 echo "[vidocq-docs] chappe \${ARGS}  (staging=\${STAGING:-false})"
 exec java -jar /opt/vidocq-docs/chappe-cli.jar \${ARGS}
 EOF
