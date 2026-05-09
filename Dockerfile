@@ -85,7 +85,7 @@ PORT="\${CHAPPE_PORT:-8080}"
 ARGS="serve --root \${DOCROOT} --port \${PORT}"
 [ "\${CHAPPE_GZIP:-true}" = "true" ] && ARGS="\${ARGS} --gzip"
 echo "[vidocq-docs] chappe \${ARGS}  (staging=\${STAGING:-false})"
-exec java --enable-preview -jar /opt/vidocq-docs/chappe-cli.jar \${ARGS}
+exec java -jar /opt/vidocq-docs/chappe-cli.jar \${ARGS}
 EOF
 RUN chmod +x /opt/vidocq-docs/entrypoint.sh
 
