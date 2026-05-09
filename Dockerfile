@@ -17,6 +17,11 @@
 
 ARG CHAPPE_VERSION=0.1.0-SNAPSHOT
 ARG MAVEN_REPO_URL=https://repo.vidocq.dev/snapshots
+# Invalide le layer dependency:copy à chaque build CI : sans ça BuildKit
+# réutilise le jar caché de la précédente exécution même si un nouveau
+# SNAPSHOT a été publié entre-temps. Le workflow CI passe `--build-arg
+# CHAPPE_PULL_NONCE=$(date +%s)` pour forcer l'invalidation.
+ARG CHAPPE_PULL_NONCE=initial
 
 # ------------------------------------------------------------------
 # Stage 1 — Fetch chappe-cli (fat-jar shaded) depuis repolite
@@ -24,6 +29,7 @@ ARG MAVEN_REPO_URL=https://repo.vidocq.dev/snapshots
 FROM eclipse-temurin:25-jdk-alpine AS chappe-fetcher
 ARG CHAPPE_VERSION
 ARG MAVEN_REPO_URL
+ARG CHAPPE_PULL_NONCE
 RUN apk add --no-cache maven
 WORKDIR /tmp/fetch
 # Mini-pom dédié à la résolution. Pas de transitives (chappe-cli est shaded).
@@ -52,13 +58,15 @@ EOF
 # les SNAPSHOT timestampés (`0.1.0-YYYYMMDD.HHMMSS-N`) avec dependency-plugin
 # 3.7.0 — le fichier garde son nom complet. On fait un `mv` explicite après.
 RUN --mount=type=secret,id=mavensettings,target=/root/.m2/settings.xml,required=true \
-    mvn -B -ntp \
+    echo "Pull nonce: ${CHAPPE_PULL_NONCE}" \
+    && mvn -B -ntp -U \
       dependency:copy \
       -Dartifact=io.vidocq.chappe:chappe-cli:${CHAPPE_VERSION}:jar:shaded \
       -DoutputDirectory=/opt/chappe \
       -Dtransitive=false \
     && mv /opt/chappe/chappe-cli-*-shaded.jar /opt/chappe/chappe-cli.jar \
-    && ls -lh /opt/chappe/chappe-cli.jar
+    && ls -lh /opt/chappe/chappe-cli.jar \
+    && unzip -p /opt/chappe/chappe-cli.jar chappe-build.properties || true
 
 # ------------------------------------------------------------------
 # Stage 2 — Runtime

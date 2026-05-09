@@ -153,6 +153,7 @@ jobs:
             --secret "id=mavensettings,src=$SETTINGS_FILE" \
             --build-arg CHAPPE_VERSION="${CHAPPE_VERSION:-0.1.0-SNAPSHOT}" \
             --build-arg MAVEN_REPO_URL="${MAVEN_REPO_URL:-https://repo.vidocq.dev/snapshots}" \
+            --build-arg CHAPPE_PULL_NONCE="$(date +%s)-${GITHUB_SHA::7}" \
             -t "$IMG:${{ steps.tags.outputs.tag }}" \
             $( [ -n "${{ steps.tags.outputs.extra }}" ] && echo "-t $IMG:${{ steps.tags.outputs.extra }}" ) \
             .
