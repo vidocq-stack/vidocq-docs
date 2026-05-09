@@ -1,6 +1,9 @@
 = Vidocq
 :description: A suite of Jakarta EE / MicroProfile runtimes, Java 25, JPMS-native, minimal dependencies.
 
+[.text-center]
+image::vidocq-logo.png[Vidocq,360,role=home-logo]
+
 [.lead]
 Vidocq is a suite of Jakarta EE and MicroProfile runtimes written in pure Java 25, JPMS-native, built on static code generation (Class-File API + APT) and virtual threads.
 
