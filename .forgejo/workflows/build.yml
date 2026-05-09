@@ -162,9 +162,15 @@ jobs:
           fi
 
       - name: Trigger Portainer redeploy (staging)
+        # `?pullimage=true` (Portainer 2.20+) → équivalent du clic
+        # "Pull and redeploy" dans l'UI : Portainer fait `docker pull` puis
+        # recrée le container. Sans ce flag, le webhook stack lance juste
+        # `docker compose up -d` qui voit la stack inchangée et ne fait rien
+        # — c'est pour ça que `pull_policy: always` dans le compose ne se
+        # déclenchait pas (le container n'est pas recréé donc pas re-pullé).
         if: steps.tags.outputs.channel == 'staging'
-        run: curl -fsSL -X POST "${{ secrets.PORTAINER_WEBHOOK_STAGING }}"
+        run: curl -fsSL --retry 3 -X POST "${{ secrets.PORTAINER_WEBHOOK_STAGING }}?pullimage=true"
 
       - name: Trigger Portainer redeploy (prod)
         if: steps.tags.outputs.channel == 'prod'
-        run: curl -fsSL -X POST "${{ secrets.PORTAINER_WEBHOOK_PROD }}"
+        run: curl -fsSL --retry 3 -X POST "${{ secrets.PORTAINER_WEBHOOK_PROD }}?pullimage=true"
