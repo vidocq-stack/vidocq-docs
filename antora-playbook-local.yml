@@ -13,6 +13,10 @@ content:
       branches: HEAD
       worktrees: HEAD
       start_paths: [docs/en, docs/fr]
+    - url: ../ravel
+      branches: HEAD
+      worktrees: HEAD
+      start_paths: [docs/en, docs/fr]
     - url: ../cassini
       branches: HEAD
       worktrees: HEAD
@@ -71,6 +75,7 @@ asciidoc:
     repo-foy: 'https://forge.vidocq.dev/vidocq/foy'
     repo-cassini: 'https://forge.vidocq.dev/vidocq/cassini'
     repo-mansart: 'https://forge.vidocq.dev/vidocq/mansart'
+    repo-ravel: 'https://forge.vidocq.dev/vidocq/ravel'
     repo-vidocq: 'https://forge.vidocq.dev/vidocq/vidocq-mps'
 
     # --- URLs des specs Jakarta / MicroProfile ---

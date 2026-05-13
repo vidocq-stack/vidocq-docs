@@ -18,6 +18,9 @@ content:
     - url: https://forge.vidocq.dev/vidocq/vauban.git
       branches: [main]
       start_paths: [docs/en, docs/fr]
+    - url: https://forge.vidocq.dev/vidocq/ravel.git
+      branches: [main]
+      start_paths: [docs/en, docs/fr]
     - url: https://forge.vidocq.dev/vidocq/cassini.git
       branches: [main]
       start_paths: [docs/en, docs/fr]
@@ -68,13 +71,14 @@ asciidoc:
     kroki-fetch-diagram: true
     kroki-default-format: svg
 
-    # --- URLs des repos (centralisées : changer ici, pas dans les modules) ---
+    # --- URLs des repos (centralises : changer ici, pas dans les modules) ---
     repo-chappe: 'https://forge.vidocq.dev/vidocq/chappe'
     repo-vauban: 'https://forge.vidocq.dev/vidocq/vauban'
     repo-champollion: 'https://forge.vidocq.dev/vidocq/champollion'
     repo-foy: 'https://forge.vidocq.dev/vidocq/foy'
     repo-cassini: 'https://forge.vidocq.dev/vidocq/cassini'
     repo-mansart: 'https://forge.vidocq.dev/vidocq/mansart'
+    repo-ravel: 'https://forge.vidocq.dev/vidocq/ravel'
     repo-vidocq: 'https://forge.vidocq.dev/vidocq/vidocq-mps'
 
     # --- URLs des specs Jakarta / MicroProfile (canoniques jakarta.ee) ---
