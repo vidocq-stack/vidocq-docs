@@ -12,7 +12,7 @@
  * composent, et enfin l'orchestrateur — l'ordre que la doc canonique a
  * adopté pour la roadmap et les pages transverses.
  */
-const ORDER_BASE = ['home', 'chappe', 'vauban', 'champollion', 'foy', 'cassini', 'mansart', 'vidocq'];
+const ORDER_BASE = ['home', 'chappe', 'vauban', 'champollion', 'ravel', 'foy', 'cassini', 'mansart', 'vidocq'];
 
 module.exports = function componentsQuickNav (options) {
   const ctx = (options && options.data && options.data.root) || {};

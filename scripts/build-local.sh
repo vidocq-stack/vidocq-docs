@@ -91,7 +91,7 @@ fi
 
 # Vérifie que les sept clones frères sont là (sinon Antora va se plaindre).
 MISSING=()
-for sib in vidocq vauban cassini champollion chappe foy mansart; do
+for sib in vidocq-mps vauban ravel cassini champollion chappe foy mansart; do
   if [[ ! -d "../$sib/.git" ]]; then
     MISSING+=("$sib")
   fi
