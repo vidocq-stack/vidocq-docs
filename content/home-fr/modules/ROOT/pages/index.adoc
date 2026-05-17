@@ -28,6 +28,9 @@ flowchart TB
     subgraph Persistence["Persistence"]
         MANSART[Mansart<br/>Jakarta Data 1.0 + JPA 3.2]
     end
+    subgraph Health["MicroProfile Health"]
+        KNOCK[Knock<br/>MicroProfile Health 4.0]
+    end
     subgraph Transport["Transport HTTP"]
         CHAPPE[Chappe<br/>HTTP/1.1 + H2 + H3]
     end
@@ -36,9 +39,12 @@ flowchart TB
     VIDOCQ --> FOY
     VIDOCQ --> VAUBAN
     VIDOCQ --> MANSART
+    VIDOCQ --> KNOCK
     CASSINI --> CHAPPE
     CASSINI --> CHAMPOLLION
     CASSINI --> VAUBAN
+    KNOCK --> CASSINI
+    KNOCK --> VAUBAN
     FOY --> CHAPPE
     FOY --> VAUBAN
     MANSART --> VAUBAN
@@ -86,6 +92,10 @@ Trois raisons :
 | Implémentation Jakarta Servlet 6.1
 | {repo-foy}
 
+| xref:knock::index.adoc[Knock]
+| Implmentation MicroProfile Health 4.0
+| {repo-knock}
+
 | xref:mansart::index.adoc[Mansart]
 | Jakarta Data 1.0 + Jakarta Persistence 3.2 *(M7 en attente)*
 | {repo-mansart}
@@ -118,7 +128,7 @@ Ce qui est en chantier :
 * Mansart — Jakarta Data 1.0 SPI, JPA 3.2 en plan.
 * WebSocket — Chappe + Foy.
 * HTTP/3 / QUIC — Chappe.
-* MicroProfile Health, Metrics, OpenAPI, JWT, Telemetry — Vidocq.
+* Metrics, OpenAPI, JWT, Telemetry — Vidocq.
 
 Détail complet par module : xref:roadmap.adoc[Roadmap consolidée].
 

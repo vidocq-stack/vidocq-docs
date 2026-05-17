@@ -36,6 +36,9 @@ content:
     - url: https://forge.vidocq.dev/vidocq/mansart.git
       branches: [main]
       start_paths: [docs/en, docs/fr]
+    - url: https://forge.vidocq.dev/vidocq/knock.git
+      branches: [main]
+      start_paths: [docs/en, docs/fr]
     - url: .
       branches: HEAD
       start_paths: [content/home-en, content/home-fr]
@@ -80,6 +83,7 @@ asciidoc:
     repo-mansart: 'https://forge.vidocq.dev/vidocq/mansart'
     repo-ravel: 'https://forge.vidocq.dev/vidocq/ravel'
     repo-vidocq: 'https://forge.vidocq.dev/vidocq/vidocq-mps'
+    repo-knock: 'https://forge.vidocq.dev/vidocq/knock'
 
     # --- URLs des specs Jakarta / MicroProfile (canoniques jakarta.ee) ---
     spec-rest-4: 'https://jakarta.ee/specifications/restful-ws/4.0/'

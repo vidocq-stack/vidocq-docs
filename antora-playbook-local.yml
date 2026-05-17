@@ -5,7 +5,7 @@ site:
 
 content:
   sources:
-    - url: ../vidocq
+    - url: ../vidocq-mps
       branches: HEAD
       worktrees: HEAD
       start_paths: [docs/en, docs/fr]
@@ -34,6 +34,10 @@ content:
       worktrees: HEAD
       start_paths: [docs/en, docs/fr]
     - url: ../mansart
+      branches: HEAD
+      worktrees: HEAD
+      start_paths: [docs/en, docs/fr]
+    - url: ../knock
       branches: HEAD
       worktrees: HEAD
       start_paths: [docs/en, docs/fr]
@@ -77,6 +81,7 @@ asciidoc:
     repo-mansart: 'https://forge.vidocq.dev/vidocq/mansart'
     repo-ravel: 'https://forge.vidocq.dev/vidocq/ravel'
     repo-vidocq: 'https://forge.vidocq.dev/vidocq/vidocq-mps'
+    repo-knock: 'https://forge.vidocq.dev/vidocq/knock'
 
     # --- URLs des specs Jakarta / MicroProfile ---
     spec-rest-4: 'https://jakarta.ee/specifications/restful-ws/4.0/'
