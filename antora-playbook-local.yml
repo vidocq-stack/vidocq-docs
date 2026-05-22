@@ -76,7 +76,7 @@ asciidoc:
     repo-cassini: 'https://forge.vidocq.dev/vidocq/cassini'
     repo-mansart: 'https://forge.vidocq.dev/vidocq/mansart'
     repo-ravel: 'https://forge.vidocq.dev/vidocq/ravel'
-    repo-vidocq: 'https://forge.vidocq.dev/vidocq/vidocq-mps'
+    repo-vidocq: 'https://forge.vidocq.dev/vidocq/vidocq'
 
     # --- URLs des specs Jakarta / MicroProfile ---
     spec-rest-4: 'https://jakarta.ee/specifications/restful-ws/4.0/'

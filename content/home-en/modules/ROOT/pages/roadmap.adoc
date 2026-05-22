@@ -36,7 +36,7 @@ This page aggregates the progress of all seven modules. Each section links to th
 | pending
 
 | —
-| xref:vidocq::index.adoc[Vidocq-MPS]
+| xref:vidocq::index.adoc[Vidocq Runtime]
 | MicroProfile Health, Metrics, OpenAPI, JWT, Telemetry
 | in progress
 |===
@@ -87,12 +87,12 @@ This page aggregates the progress of all seven modules. Each section links to th
 * **Pending (M7)**: `mansart-persistence` — classic Jakarta Persistence 3.2 implementation. `mansart-jakarta-data` already covers everyday needs in Vidocq.
 * Details: xref:mansart::index.adoc[Mansart].
 
-=== Vidocq-MPS — orchestrator
+=== Vidocq Runtime — orchestrator
 
 * **Done**: bootstrap, lifecycle, BuildStep / BuildItem / Recorder SPI, Mansart H2 + transactions extensions, Maven plugin (jlink / jpackage / Docker).
 * **In progress**: MicroProfile Config, Health, Metrics, OpenAPI.
 * **Coming up**: MicroProfile JWT, Telemetry, Fault Tolerance, Rest Client.
-* Details: xref:vidocq::index.adoc[Vidocq-MPS].
+* Details: xref:vidocq::index.adoc[Vidocq Runtime].
 
 == Track progress
 

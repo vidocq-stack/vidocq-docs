@@ -2,7 +2,7 @@
 :description: Référence éditoriale — structure des 8 pages d'un module dans le site Antora.
 
 [.lead]
-Tout module de l'écosystème Vidocq (chappe, vauban, champollion, foy, cassini, mansart, vidocq-mps) suit la **même structure de pages** dans `docs/{fr,en}/modules/ROOT/pages/`. Cela garantit qu'un visiteur trouve toujours l'information au même endroit, qu'il navigue entre Cassini et Mansart, en français ou en anglais.
+Tout module de l'écosystème Vidocq (chappe, vauban, champollion, foy, cassini, mansart, vidocq) suit la **même structure de pages** dans `docs/{fr,en}/modules/ROOT/pages/`. Cela garantit qu'un visiteur trouve toujours l'information au même endroit, qu'il navigue entre Cassini et Mansart, en français ou en anglais.
 
 == Pages obligatoires
 

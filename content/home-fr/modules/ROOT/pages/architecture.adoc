@@ -11,13 +11,13 @@ L'écosystème Vidocq se compose de sept modules indépendants. Cette page décr
 @startuml
 !include <C4/C4_Container>
 
-title Vidocq-MPS — diagramme C4 Container
+title Vidocq Runtime — diagramme C4 Container
 
 Person(dev, "Développeur", "Écrit une application MicroProfile + Jakarta REST")
 System_Ext(jdk, "JDK 25", "Virtual threads, Class-File API, scoped values")
 
 System_Boundary(vidocq, "Écosystème Vidocq") {
-  Container(mps, "Vidocq-MPS", "Java 25", "Bootstrap, lifecycle, SPI d'extensions, packaging jlink/jpackage/Docker")
+  Container(mps, "Vidocq Runtime", "Java 25", "Bootstrap, lifecycle, SPI d'extensions, packaging jlink/jpackage/Docker")
 
   Container(chappe, "Chappe", "Java 25", "Serveur HTTP/1.1 + H2 + H3, virtual threads, RFC 9110/9112/9113")
   Container(foy, "Foy", "Java 25", "Implémentation Jakarta Servlet 6.1")
@@ -53,10 +53,10 @@ Rel(champollion, jdk, "APT")
 Lecture rapide :
 
 * **Chappe** est la seule porte d'entrée HTTP. Foy et Cassini ne parlent jamais directement à un `ServerSocketChannel` — ils consomment la SPI d'échange Chappe.
-* **Vauban** est branché à tous les modules qui ont besoin de `@Inject` (Cassini, Foy, Mansart, Vidocq-MPS), mais ne dépend de personne.
+* **Vauban** est branché à tous les modules qui ont besoin de `@Inject` (Cassini, Foy, Mansart, Vidocq Runtime), mais ne dépend de personne.
 * **Champollion** est une feuille côté JSON : Cassini l'utilise comme entity provider par défaut, mais Champollion ne connaît pas Cassini.
 * **Mansart** ne connaît ni HTTP ni REST. Il consomme uniquement Vauban (intercepteur `@Transactional`) et JDBC.
-* **Vidocq-MPS** orchestre l'ensemble via une SPI d'extensions (BuildStep, BuildItem, Recorder).
+* **Vidocq Runtime** orchestre l'ensemble via une SPI d'extensions (BuildStep, BuildItem, Recorder).
 
 == Matrice de dépendances
 
@@ -69,7 +69,7 @@ flowchart LR
     FOY[Foy<br/>Servlet]
     CASSINI[Cassini<br/>REST]
     MANSART[Mansart<br/>Data]
-    VIDOCQ[Vidocq-MPS<br/>orchestrateur]
+    VIDOCQ[Vidocq Runtime<br/>orchestrateur]
 
     FOY --> CHAPPE
     FOY --> VAUBAN
@@ -89,7 +89,7 @@ Trois propriétés notables :
 
 . Le graphe est **acyclique** — aucun module socle ne dépend d'un module aval.
 . Chappe, Vauban et Champollion sont des **briques fondatrices** : aucune dépendance vers un autre module Vidocq.
-. Foy et Cassini sont **interchangeables** côté Vidocq-MPS : on peut servir une appli sans Servlet (Cassini direct sur Chappe) ou sans REST (Foy direct sur Chappe).
+. Foy et Cassini sont **interchangeables** côté Vidocq Runtime : on peut servir une appli sans Servlet (Cassini direct sur Chappe) ou sans REST (Foy direct sur Chappe).
 
 == Choix transverses
 
@@ -125,4 +125,4 @@ Tous les modules I/O utilisent `Executors.newVirtualThreadPerTaskExecutor()`. Au
 * xref:foy::index.adoc[Foy — Servlet 6.1]
 * xref:cassini::index.adoc[Cassini — Jakarta REST 4.0]
 * xref:mansart::index.adoc[Mansart — Jakarta Data + JPA]
-* xref:vidocq::index.adoc[Vidocq-MPS — orchestrateur]
+* xref:vidocq::index.adoc[Vidocq Runtime — orchestrateur]
