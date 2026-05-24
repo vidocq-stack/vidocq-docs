@@ -1,14 +1,14 @@
-= Vidocq-MPS face à Quarkus, Helidon SE et Spring Boot 4
+= Vidocq Runtime face à Quarkus, Helidon SE et Spring Boot 4
 :description: Comparatif technique sur dix axes et correspondances conceptuelles.
 
 [.lead]
-Cette page compare Vidocq-MPS aux trois runtimes Java contemporains les plus proches dans leur intention : Quarkus, Helidon SE 4 et Spring Boot 4. La comparaison porte sur le modèle d'exécution et les choix d'architecture, pas sur des chiffres de performance — ces derniers sont consignés dans les `BENCH.md` des modules concernés.
+Cette page compare Vidocq Runtime aux trois runtimes Java contemporains les plus proches dans leur intention : Quarkus, Helidon SE 4 et Spring Boot 4. La comparaison porte sur le modèle d'exécution et les choix d'architecture, pas sur des chiffres de performance — ces derniers sont consignés dans les `BENCH.md` des modules concernés.
 
 == Tableau comparatif
 
 [cols="2,2,2,2,2",options="header"]
 |===
-| Axe | Vidocq-MPS | Quarkus | Helidon SE 4 | Spring Boot 4
+| Axe | Vidocq Runtime | Quarkus | Helidon SE 4 | Spring Boot 4
 
 | JDK supporté
 | Java 25 (LTS) requis
@@ -90,18 +90,18 @@ Cold start, mémoire résidente et taille d'image dépendent fortement de la tai
 
 == Si vous venez de Quarkus
 
-Vidocq-MPS partage la philosophie build-time de Quarkus : **BuildStep**, **BuildItem**, **Recorder**, extension SPI. La principale différence est l'exécution : Vidocq utilise virtual threads par défaut là où Quarkus reste majoritairement reactive (Mutiny). Pas de migration cosmétique nécessaire côté Jakarta REST 4.0 — le code des resources reste identique. Comparatif d'exemple : `compare-to/quarkus-rest-example/`.
+Vidocq Runtime partage la philosophie build-time de Quarkus : **BuildStep**, **BuildItem**, **Recorder**, extension SPI. La principale différence est l'exécution : Vidocq utilise virtual threads par défaut là où Quarkus reste majoritairement reactive (Mutiny). Pas de migration cosmétique nécessaire côté Jakarta REST 4.0 — le code des resources reste identique. Comparatif d'exemple : `compare-to/quarkus-rest-example/`.
 
 == Si vous venez de Helidon SE 4
 
-Helidon SE et Vidocq partagent le pari des **virtual threads** comme modèle par défaut, et la simplicité d'un serveur HTTP propre. Différence centrale : Helidon SE n'a pas de container CDI ni de codegen build-time — chaque endpoint est enregistré programmatiquement, et la réflexion reste présente côté JSON (Yasson). Vidocq-MPS retire la réflexion de la chaîne. Comparatif d'exemple : `compare-to/helidon4-rest-example/`.
+Helidon SE et Vidocq partagent le pari des **virtual threads** comme modèle par défaut, et la simplicité d'un serveur HTTP propre. Différence centrale : Helidon SE n'a pas de container CDI ni de codegen build-time — chaque endpoint est enregistré programmatiquement, et la réflexion reste présente côté JSON (Yasson). Vidocq Runtime retire la réflexion de la chaîne. Comparatif d'exemple : `compare-to/helidon4-rest-example/`.
 
 == Si vous venez de Spring Boot 4
 
-Le modèle Spring repose sur l'auto-configuration et la réflexion d'amorçage. Vidocq-MPS le remplace par une SPI d'extensions explicite et de la génération de code à la compilation. Côté API : `@RestController` devient `@Path`, `@Autowired` devient `@Inject` (CDI 4.1 Lite), Spring Data JPA devient Jakarta Data 1.0 (Mansart). Pas d'équivalent direct à `@SpringBootApplication` — Vidocq-MPS bootstrap est explicite et minimal. Comparatif d'exemple : `compare-to/springboot4-rest-example/`.
+Le modèle Spring repose sur l'auto-configuration et la réflexion d'amorçage. Vidocq Runtime le remplace par une SPI d'extensions explicite et de la génération de code à la compilation. Côté API : `@RestController` devient `@Path`, `@Autowired` devient `@Inject` (CDI 4.1 Lite), Spring Data JPA devient Jakarta Data 1.0 (Mansart). Pas d'équivalent direct à `@SpringBootApplication` — Vidocq Runtime bootstrap est explicite et minimal. Comparatif d'exemple : `compare-to/springboot4-rest-example/`.
 
 == Approfondir
 
 * xref:architecture.adoc[Architecture détaillée des modules Vidocq]
 * xref:roadmap.adoc[Roadmap consolidée]
-* xref:vidocq::migration.adoc[Guide de migration Vidocq-MPS]
+* xref:vidocq::migration.adoc[Guide de migration Vidocq Runtime]

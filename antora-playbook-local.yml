@@ -5,7 +5,7 @@ site:
 
 content:
   sources:
-    - url: ../vidocq-mps
+    - url: ../vidocq
       branches: HEAD
       worktrees: HEAD
       start_paths: [docs/en, docs/fr]
@@ -80,7 +80,7 @@ asciidoc:
     repo-cassini: 'https://forge.vidocq.dev/vidocq/cassini'
     repo-mansart: 'https://forge.vidocq.dev/vidocq/mansart'
     repo-ravel: 'https://forge.vidocq.dev/vidocq/ravel'
-    repo-vidocq: 'https://forge.vidocq.dev/vidocq/vidocq-mps'
+    repo-vidocq: 'https://forge.vidocq.dev/vidocq/vidocq'
     repo-knock: 'https://forge.vidocq.dev/vidocq/knock'
 
     # --- URLs des specs Jakarta / MicroProfile ---

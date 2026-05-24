@@ -13,7 +13,7 @@ Vidocq est une suite de runtimes Jakarta EE et MicroProfile écrite en Java 25 p
 ....
 flowchart TB
     subgraph Orchestration["Orchestration"]
-        VIDOCQ[Vidocq-MPS<br/>serveur d'application MicroProfile]
+        VIDOCQ[Vidocq Runtime<br/>serveur d'application MicroProfile]
     end
     subgraph REST["Jakarta REST / Servlet"]
         CASSINI[Cassini<br/>Jakarta REST 4.0]
@@ -50,7 +50,7 @@ flowchart TB
     MANSART --> VAUBAN
 ....
 
-Chaque module est un projet indépendant, publié séparément, avec son propre cycle de vie. Vidocq-MPS les assemble via une SPI d'extensions inspirée de Quarkus.
+Chaque module est un projet indépendant, publié séparément, avec son propre cycle de vie. Vidocq Runtime les assemble via une SPI d'extensions inspirée de Quarkus.
 
 == Pourquoi un nouveau runtime ?
 
@@ -68,7 +68,7 @@ Trois raisons :
 |===
 | Composant | Rôle | Repo
 
-| xref:vidocq::index.adoc[Vidocq-MPS]
+| xref:vidocq::index.adoc[Vidocq Runtime]
 | Serveur d'application MicroProfile, orchestrateur d'extensions
 | {repo-vidocq}
 
@@ -104,7 +104,7 @@ Trois raisons :
 == Pages transverses
 
 * xref:architecture.adoc[Architecture globale] — frontières des modules, matrice de dépendances, choix transverses (zéro-dépendance, JPMS, codegen, virtual threads).
-* xref:compare.adoc[Comparatif] — Vidocq-MPS face à Quarkus, Helidon SE 4 et Spring Boot 4.
+* xref:compare.adoc[Comparatif] — Vidocq Runtime face à Quarkus, Helidon SE 4 et Spring Boot 4.
 * xref:roadmap.adoc[Roadmap consolidée] — statut par module et jalons proches (M2x, M5, M6c, M7).
 
 == Statut

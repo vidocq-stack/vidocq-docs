@@ -13,7 +13,7 @@ Vidocq is a suite of Jakarta EE and MicroProfile runtimes written in pure Java 2
 ....
 flowchart TB
     subgraph Orchestration["Orchestration"]
-        VIDOCQ[Vidocq-MPS<br/>MicroProfile application server]
+        VIDOCQ[Vidocq Runtime<br/>MicroProfile application server]
     end
     subgraph REST["Jakarta REST / Servlet"]
         CASSINI[Cassini<br/>Jakarta REST 4.0]
@@ -50,7 +50,7 @@ flowchart TB
     MANSART --> VAUBAN
 ....
 
-Each module is an independent project, released separately, with its own life-cycle. Vidocq-MPS assembles them through a Quarkus-inspired extension SPI.
+Each module is an independent project, released separately, with its own life-cycle. Vidocq Runtime assembles them through a Quarkus-inspired extension SPI.
 
 == Why a new runtime?
 
@@ -68,7 +68,7 @@ Three reasons:
 |===
 | Component | Role | Repository
 
-| xref:vidocq::index.adoc[Vidocq-MPS]
+| xref:vidocq::index.adoc[Vidocq Runtime]
 | MicroProfile application server, extension orchestrator
 | {repo-vidocq}
 
@@ -104,7 +104,7 @@ Three reasons:
 == Cross-cutting pages
 
 * xref:architecture.adoc[Overall architecture] — module boundaries, dependency matrix, cross-cutting choices (zero-dependency, JPMS, codegen, virtual threads).
-* xref:compare.adoc[Comparison] — Vidocq-MPS against Quarkus, Helidon SE 4 and Spring Boot 4.
+* xref:compare.adoc[Comparison] — Vidocq Runtime against Quarkus, Helidon SE 4 and Spring Boot 4.
 * xref:roadmap.adoc[Consolidated roadmap] — module-by-module status and upcoming milestones (M2x, M5, M6c, M7).
 
 == Status
