@@ -15,26 +15,31 @@ services:
     image: registry:2.8.3
     container_name: vidocq-registry
     restart: unless-stopped
-    # Write the htpasswd file from the env var at startup (avoids having to pre-populate
-    # a volume), then hand off to the real registry entrypoint.
+    # Generate the htpasswd file IN the container at startup from plaintext
+    # username/password env vars, then hand off to the real registry entrypoint.
+    # This avoids pasting a bcrypt hash (whose `$` get mangled by Portainer/compose
+    # env interpolation) and reuses the exact same credentials the CI logs in with.
     entrypoint: ["/bin/sh", "-c"]
     command:
       - |
         set -eu
+        command -v htpasswd >/dev/null 2>&1 || apk add --no-cache apache2-utils >/dev/null
         mkdir -p /auth
-        printf '%s\n' "$$REGISTRY_HTPASSWD" > /auth/htpasswd
+        htpasswd -Bbc /auth/htpasswd "$$REGISTRY_USERNAME" "$$REGISTRY_PASSWORD"
         exec /entrypoint.sh /etc/docker/registry/config.yml
     environment:
       # Allow the registry API to delete manifests/blobs — required for GC to reclaim space.
       REGISTRY_STORAGE_DELETE_ENABLED: "true"
       # Stable secret used to sign state carried in requests; must stay constant & secret.
       REGISTRY_HTTP_SECRET: ${REGISTRY_HTTP_SECRET:?set a long random string (openssl rand -hex 32)}
-      # Basic auth via the htpasswd file written above.
       REGISTRY_AUTH: htpasswd
       REGISTRY_AUTH_HTPASSWD_REALM: "registry.vidocq.dev"
       REGISTRY_AUTH_HTPASSWD_PATH: /auth/htpasswd
-      # Paste a bcrypt htpasswd line here (see README).
-      REGISTRY_HTPASSWD: ${REGISTRY_HTPASSWD:?paste a bcrypt htpasswd line (see deploy/registry/README.md)}
+      # SAME credentials the CI uses to `docker login` (Codeberg secrets
+      # REGISTRY_USERNAME / REGISTRY_PASSWORD). Prefer an alphanumeric password
+      # (no shell-special chars) to keep it interpolation-safe.
+      REGISTRY_USERNAME: ${REGISTRY_USERNAME:?set the registry username, e.g. vidocq-ci}
+      REGISTRY_PASSWORD: ${REGISTRY_PASSWORD:?set the registry password (same value as the Codeberg secret)}
     volumes:
       - registry-data:/var/lib/registry
     expose:

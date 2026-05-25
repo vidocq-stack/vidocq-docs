@@ -22,16 +22,17 @@ docker inspect -f '{{range $k,$v := .NetworkSettings.Networks}}{{$k}}{{end}}' <y
 DNS: point `registry.vidocq.dev` (A/AAAA or CNAME) at the Foix host, same as your other
 NPM-served hosts.
 
-## 2. Generate the two secrets
+## 2. Pick the credentials
 
-```bash
-# (a) htpasswd line — bcrypt. Choose a CI username (e.g. vidocq-ci) and a strong password.
-docker run --rm httpd:2.4-alpine htpasswd -Bbn vidocq-ci 'CHANGE_ME_STRONG_PASSWORD'
-#   -> copy the WHOLE output line, e.g.  vidocq-ci:$2y$05$....
+No bcrypt to generate: the stack hashes the password in-container at startup. Just choose:
 
-# (b) HTTP secret — any long random string.
-openssl rand -hex 32
-```
+- a **username**, e.g. `vidocq-ci`;
+- a **password** — strong and **alphanumeric** (avoid shell-special chars like `$`), e.g.
+  `openssl rand -hex 24`;
+- an **HTTP secret** — any long random string, e.g. `openssl rand -hex 32`.
+
+Use the **same** username/password as the Codeberg CI secrets (`REGISTRY_USERNAME` /
+`REGISTRY_PASSWORD`) — see step 6.
 
 ## 3. Deploy the stack in Portainer
 
@@ -41,8 +42,9 @@ variables** section add:
 
 | Variable | Value |
 | --- | --- |
-| `REGISTRY_HTPASSWD` | the full htpasswd line from step 2a |
-| `REGISTRY_HTTP_SECRET` | the random string from step 2b |
+| `REGISTRY_USERNAME` | the username from step 2 (e.g. `vidocq-ci`) |
+| `REGISTRY_PASSWORD` | the password from step 2 |
+| `REGISTRY_HTTP_SECRET` | the random string from step 2 |
 
 Deploy. Two containers come up: `vidocq-registry` and `vidocq-registry-gc`.
 
