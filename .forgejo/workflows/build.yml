@@ -124,23 +124,18 @@ jobs:
             docker push "$IMG:${{ steps.tags.outputs.extra }}"
           fi
 
-      - name: Redeploy STAGING stack on Foix Portainer
-        # main -> snapshot -> staging-doc.vidocq.dev. Git-backed stack redeploy via the
-        # Portainer API; `?pullImage=true` forces a docker pull then recreates the container.
+      # Redeploy via a Portainer STACK WEBHOOK — the simplest, most robust trigger:
+      # a single unauthenticated POST, no endpointId / HTTP-method / stack-id pitfalls
+      # of the token-based /git/redeploy API. Enable the webhook on each stack
+      # (Portainer -> Stack -> Webhooks -> Enable -> copy the URL) and store the FULL
+      # URL as the secret. The stacks use `pull_policy: always`, so the redeploy pulls
+      # the freshly pushed image.
+      - name: Redeploy STAGING stack (Foix Portainer webhook)
+        # main -> snapshot -> staging-doc.vidocq.dev
         if: steps.tags.outputs.channel == 'staging'
-        run: |
-          set -eu
-          BASE="${{ secrets.FOIX_PORTAINER_URL }}"; BASE="${BASE%/}"
-          curl -fsSL --retry 3 -X POST \
-            -H "X-API-Key: ${{ secrets.FOIX_PORTAINER_TOKEN }}" \
-            "${BASE}/api/stacks/${{ secrets.FOIX_PORTAINER_STAGING_STACK_ID }}/git/redeploy?pullImage=true"
+        run: curl -fsSL --retry 3 -X POST "${{ secrets.FOIX_PORTAINER_STAGING_WEBHOOK }}"
 
-      - name: Redeploy PROD stack on Foix Portainer
-        # v* tag -> <version>+latest -> doc.vidocq.dev.
+      - name: Redeploy PROD stack (Foix Portainer webhook)
+        # v* tag -> <version>+latest -> doc.vidocq.dev
         if: steps.tags.outputs.channel == 'prod'
-        run: |
-          set -eu
-          BASE="${{ secrets.FOIX_PORTAINER_URL }}"; BASE="${BASE%/}"
-          curl -fsSL --retry 3 -X POST \
-            -H "X-API-Key: ${{ secrets.FOIX_PORTAINER_TOKEN }}" \
-            "${BASE}/api/stacks/${{ secrets.FOIX_PORTAINER_DOCS_STACK_ID }}/git/redeploy?pullImage=true"
+        run: curl -fsSL --retry 3 -X POST "${{ secrets.FOIX_PORTAINER_PROD_WEBHOOK }}"
