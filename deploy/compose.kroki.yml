@@ -29,7 +29,9 @@
 #                        propre cache via `KROKI_DIAGRAM_DEFAULT_FETCH_CACHE_TTL_HOURS`)
 #
 # Variables d'env consommées (Portainer UI → Stack → Environment variables) :
-#   KROKI_TAG          tag de l'image kroki (défaut : 0.27.1)
+#   KROKI_TAG          tag des images kroki — core ET sidecars (défaut : 0.30.1).
+#                      Doit exister sur Docker Hub pour yuzutech/kroki ET
+#                      yuzutech/kroki-mermaid (ils sont publiés ensemble, même tag).
 #   KROKI_MAX_URI_LEN  taille max d'une requête GET (défaut : 16384, suffisant
 #                      pour les diagrammes encodés base64 envoyés par
 #                      asciidoctor-kroki en mode `kroki-fetch-diagram=true`).
@@ -40,7 +42,9 @@
 services:
 
   kroki:
-    image: yuzutech/kroki:latest
+    # Pin core + sidecars to the SAME tag (KROKI_TAG) — Kroki requires matching
+    # versions between the main service and its companion renderers.
+    image: yuzutech/kroki:${KROKI_TAG:-0.30.1}
     container_name: kroki
     restart: unless-stopped
     environment:
@@ -70,7 +74,7 @@ services:
       io.vidocq.role: diagram-renderer
 
   kroki-mermaid:
-    image: yuzutech/kroki-mermaid:${KROKI_TAG:-0.27.1}
+    image: yuzutech/kroki-mermaid:${KROKI_TAG:-0.30.1}
     container_name: kroki-mermaid
     restart: unless-stopped
     expose:
@@ -84,7 +88,7 @@ services:
 
   # Sidecar BPMN — décommenter si besoin de diagrammes BPMN dans la doc.
   # kroki-bpmn:
-  #   image: yuzutech/kroki-bpmn:${KROKI_TAG:-0.27.1}
+  #   image: yuzutech/kroki-bpmn:${KROKI_TAG:-0.30.1}
   #   container_name: kroki-bpmn
   #   restart: unless-stopped
   #   expose:
