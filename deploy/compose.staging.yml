@@ -10,13 +10,16 @@
 #
 # Environment variables (Portainer UI -> Stack -> Environment variables):
 #   TAG             image tag (default: snapshot — what the CI pushes from main)
-#   CONTAINER_NAME  Chappe container name (default: vidocq-docs-staging)
+#
+# The container name is fixed to `vidocq-docs-staging`: NPM's proxy host for
+# staging-doc.vidocq.dev forwards to vidocq-docs-staging:8080 (Docker DNS on the
+# reverseproxy network resolves the container by this name).
 
 services:
 
   vidocq-docs:
     image: registry.vidocq.dev/vidocq-docs:${TAG:-snapshot}
-    container_name: ${CONTAINER_NAME:-vidocq-docs-staging}
+    container_name: vidocq-docs-staging
     restart: unless-stopped
     # `snapshot` is mutable (rewritten on every push to main). Without
     # `pull_policy: always`, a redeploy would recreate the container on the cached
