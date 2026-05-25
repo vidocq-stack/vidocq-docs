@@ -40,7 +40,7 @@ services:
     expose:
       - "5000"
     networks:
-      - npm
+      - reverseproxy
 
   # Weekly online garbage collection. --delete-untagged drops the manifests orphaned
   # when the CI overwrites the `snapshot`/`latest` tags; GC then frees their blobs.
@@ -61,14 +61,16 @@ services:
     volumes:
       - registry-data:/var/lib/registry
     networks:
-      - npm
+      - reverseproxy
 
 volumes:
   registry-data:
 
 networks:
-  # Shared with the Nginx Proxy Manager container so NPM can reach the registry by name.
-  # Create once on the Foix host:  docker network create npm
-  # then attach your NPM container to it (NPM stack: networks: [npm]).
-  npm:
+  # The Nginx Proxy Manager network (NPM reaches the registry by container name on it).
+  # `name: reverseproxy_default` is NPM's existing Compose default network — both services
+  # must sit on it so the registry.vidocq.dev proxy host can forward to vidocq-registry:5000.
+  reverseproxy:
     external: true
+    name: reverseproxy_default
+

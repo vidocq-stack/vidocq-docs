@@ -9,10 +9,14 @@ terminates TLS**, so the registry container needs no certificate.
 
 ## 1. Prerequisites on the Foix host
 
+The stack attaches both containers to your **existing Nginx Proxy Manager network**,
+declared as the external network `reverseproxy_default` in `compose.yml`. Nothing to create
+— that network already exists (it is NPM's Compose default network). If your NPM network has
+a different name, change `name: reverseproxy_default` in `compose.yml` accordingly:
+
 ```bash
-# Shared network between NPM and the registry (skip if it already exists).
-docker network create npm
-# Attach your existing Nginx Proxy Manager container/stack to the `npm` network.
+# Find the network your NPM container is attached to:
+docker inspect -f '{{range $k,$v := .NetworkSettings.Networks}}{{$k}}{{end}}' <your-npm-container>
 ```
 
 DNS: point `registry.vidocq.dev` (A/AAAA or CNAME) at the Foix host, same as your other
