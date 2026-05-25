@@ -83,22 +83,22 @@ jobs:
       - name: Compute tags
         id: tags
         # Mutable tags only, so the self-cleaning registry GC works:
-        #   main  -> snapshot
-        #   v*    -> <version> + latest
+        #   main  -> snapshot   -> staging (staging-doc.vidocq.dev)
+        #   v*    -> <version> + latest -> prod (doc.vidocq.dev)
         run: |
           if [[ "$GITHUB_REF" == refs/heads/main ]]; then
             echo "tag=snapshot" >> "$GITHUB_OUTPUT"
             echo "extra=" >> "$GITHUB_OUTPUT"
-            echo "deploy=true" >> "$GITHUB_OUTPUT"
+            echo "channel=staging" >> "$GITHUB_OUTPUT"
           elif [[ "$GITHUB_REF" == refs/tags/v* ]]; then
             VERSION="${GITHUB_REF_NAME#v}"
             echo "tag=$VERSION" >> "$GITHUB_OUTPUT"
             echo "extra=latest" >> "$GITHUB_OUTPUT"
-            echo "deploy=true" >> "$GITHUB_OUTPUT"
+            echo "channel=prod" >> "$GITHUB_OUTPUT"
           else
             echo "tag=snapshot" >> "$GITHUB_OUTPUT"
             echo "extra=" >> "$GITHUB_OUTPUT"
-            echo "deploy=false" >> "$GITHUB_OUTPUT"
+            echo "channel=" >> "$GITHUB_OUTPUT"
           fi
 
       - name: Build & push image
@@ -124,11 +124,20 @@ jobs:
             docker push "$IMG:${{ steps.tags.outputs.extra }}"
           fi
 
-      - name: Redeploy docs stack on Foix Portainer
-        # Git-backed stack redeploy via the Portainer API. `?pullImage=true`
-        # forces a docker pull (mutable tags), then recreates the container.
-        # Only runs on push to main and on v* tags.
-        if: steps.tags.outputs.deploy == 'true'
+      - name: Redeploy STAGING stack on Foix Portainer
+        # main -> snapshot -> staging-doc.vidocq.dev. Git-backed stack redeploy via the
+        # Portainer API; `?pullImage=true` forces a docker pull then recreates the container.
+        if: steps.tags.outputs.channel == 'staging'
+        run: |
+          set -eu
+          BASE="${{ secrets.FOIX_PORTAINER_URL }}"; BASE="${BASE%/}"
+          curl -fsSL --retry 3 -X POST \
+            -H "X-API-Key: ${{ secrets.FOIX_PORTAINER_TOKEN }}" \
+            "${BASE}/api/stacks/${{ secrets.FOIX_PORTAINER_STAGING_STACK_ID }}/git/redeploy?pullImage=true"
+
+      - name: Redeploy PROD stack on Foix Portainer
+        # v* tag -> <version>+latest -> doc.vidocq.dev.
+        if: steps.tags.outputs.channel == 'prod'
         run: |
           set -eu
           BASE="${{ secrets.FOIX_PORTAINER_URL }}"; BASE="${BASE%/}"

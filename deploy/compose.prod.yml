@@ -8,13 +8,14 @@
 # Manager can reach it. No oauth2-proxy, no OIDC.
 #
 # Environment variables (set in Portainer UI -> Stack -> Environment variables):
-#   TAG             image tag (default: snapshot ; a v0.x.y release uses its version or latest)
+#   TAG             image tag (default: latest — what the CI pushes on v* release tags;
+#                   pin it to a specific version, e.g. 0.1.0, to freeze the prod docs)
 #   CONTAINER_NAME  Chappe container name (default: vidocq-docs)
 
 services:
 
   vidocq-docs:
-    image: registry.vidocq.dev/vidocq-docs:${TAG:-snapshot}
+    image: registry.vidocq.dev/vidocq-docs:${TAG:-latest}
     container_name: ${CONTAINER_NAME:-vidocq-docs}
     restart: unless-stopped
     # The tags we publish are mutable (`snapshot`, `latest`). Without
