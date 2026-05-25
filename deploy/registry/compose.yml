@@ -1,0 +1,74 @@
+# Self-hosted Docker registry for the Vidocq ecosystem — Portainer stack.
+#
+# Exposed by Nginx Proxy Manager at https://registry.vidocq.dev (NPM terminates TLS).
+# Self-cleaning: the `registry-gc` sidecar runs `garbage-collect --delete-untagged`
+# weekly, reclaiming the layers left behind when the CI overwrites mutable tags
+# (`snapshot`, `latest`). See deploy/registry/README.md for the full setup.
+#
+# Required stack environment variables (set them in the Portainer stack editor):
+#   REGISTRY_HTPASSWD     one bcrypt htpasswd line, e.g. output of
+#                         docker run --rm httpd:2.4-alpine htpasswd -Bbn vidocq-ci 'STRONG_PASSWORD'
+#   REGISTRY_HTTP_SECRET  long random string, e.g. openssl rand -hex 32
+
+services:
+  registry:
+    image: registry:2.8.3
+    container_name: vidocq-registry
+    restart: unless-stopped
+    # Write the htpasswd file from the env var at startup (avoids having to pre-populate
+    # a volume), then hand off to the real registry entrypoint.
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - |
+        set -eu
+        mkdir -p /auth
+        printf '%s\n' "$$REGISTRY_HTPASSWD" > /auth/htpasswd
+        exec /entrypoint.sh /etc/docker/registry/config.yml
+    environment:
+      # Allow the registry API to delete manifests/blobs — required for GC to reclaim space.
+      REGISTRY_STORAGE_DELETE_ENABLED: "true"
+      # Stable secret used to sign state carried in requests; must stay constant & secret.
+      REGISTRY_HTTP_SECRET: ${REGISTRY_HTTP_SECRET:?set a long random string (openssl rand -hex 32)}
+      # Basic auth via the htpasswd file written above.
+      REGISTRY_AUTH: htpasswd
+      REGISTRY_AUTH_HTPASSWD_REALM: "registry.vidocq.dev"
+      REGISTRY_AUTH_HTPASSWD_PATH: /auth/htpasswd
+      # Paste a bcrypt htpasswd line here (see README).
+      REGISTRY_HTPASSWD: ${REGISTRY_HTPASSWD:?paste a bcrypt htpasswd line (see deploy/registry/README.md)}
+    volumes:
+      - registry-data:/var/lib/registry
+    expose:
+      - "5000"
+    networks:
+      - npm
+
+  # Weekly online garbage collection. --delete-untagged drops the manifests orphaned
+  # when the CI overwrites the `snapshot`/`latest` tags; GC then frees their blobs.
+  # For a low-write personal registry the online-GC race is negligible; it runs ~weekly.
+  registry-gc:
+    image: registry:2.8.3
+    container_name: vidocq-registry-gc
+    restart: unless-stopped
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - |
+        while true; do
+          sleep 604800
+          echo "[registry-gc] $$(date -u) garbage-collect --delete-untagged"
+          registry garbage-collect --delete-untagged /etc/docker/registry/config.yml \
+            || echo "[registry-gc] GC failed (non-fatal, will retry next week)"
+        done
+    volumes:
+      - registry-data:/var/lib/registry
+    networks:
+      - npm
+
+volumes:
+  registry-data:
+
+networks:
+  # Shared with the Nginx Proxy Manager container so NPM can reach the registry by name.
+  # Create once on the Foix host:  docker network create npm
+  # then attach your NPM container to it (NPM stack: networks: [npm]).
+  npm:
+    external: true

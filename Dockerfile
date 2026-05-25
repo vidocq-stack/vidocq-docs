@@ -3,20 +3,20 @@
 # Vidocq documentation — image Docker.
 #
 # Le site Antora est buildé HORS Dockerfile (par le runner / build local) :
-# Antora doit cloner les 7 repos modules en HTTPS, ce qui demande des
-# `~/.git-credentials`. Plutôt que de propager ces creds dans BuildKit
-# (via --secret + helper), on garde la responsabilité du build Antora
-# côté runner ; le `docker build` se contente de COPY le résultat.
+# Antora clone les repos modules PUBLICS sur Codeberg en HTTPS anonyme.
+# On garde la responsabilité du build Antora côté runner ; le `docker build`
+# se contente de COPY le résultat.
 #
 # Pré-requis du `docker build` : `./build/site/` doit exister.
 #   - en CI : étape "Build Antora site" du workflow le produit
 #   - en local : `bash scripts/build-local.sh` le produit
 #
-# Stage 1 : tire le fat-jar chappe-cli-shaded depuis repolite (Maven).
+# Stage 1 : tire le fat-jar chappe-cli-shaded depuis le Central Portal
+#           snapshots (public, anonyme), via Maven.
 # Stage 2 : runtime JRE 25 minimal qui sert le site via `chappe-cli`.
 
 ARG CHAPPE_VERSION=0.1.0-SNAPSHOT
-ARG MAVEN_REPO_URL=https://repo.vidocq.dev/snapshots
+ARG MAVEN_REPO_URL=https://central.sonatype.com/repository/maven-snapshots
 # Invalide le layer dependency:copy à chaque build CI : sans ça BuildKit
 # réutilise le jar caché de la précédente exécution même si un nouveau
 # SNAPSHOT a été publié entre-temps. Le workflow CI passe `--build-arg
@@ -24,7 +24,7 @@ ARG MAVEN_REPO_URL=https://repo.vidocq.dev/snapshots
 ARG CHAPPE_PULL_NONCE=initial
 
 # ------------------------------------------------------------------
-# Stage 1 — Fetch chappe-cli (fat-jar shaded) depuis repolite
+# Stage 1 — Fetch chappe-cli (fat-jar shaded) depuis le Central snapshots
 # ------------------------------------------------------------------
 FROM eclipse-temurin:25-jdk-alpine AS chappe-fetcher
 ARG CHAPPE_VERSION
@@ -33,6 +33,7 @@ ARG CHAPPE_PULL_NONCE
 RUN apk add --no-cache maven
 WORKDIR /tmp/fetch
 # Mini-pom dédié à la résolution. Pas de transitives (chappe-cli est shaded).
+# Le repository est public (Central Portal snapshots) : aucun <server> credential.
 RUN <<EOF cat > pom.xml
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0">
@@ -43,7 +44,7 @@ RUN <<EOF cat > pom.xml
   <packaging>pom</packaging>
   <repositories>
     <repository>
-      <id>vidocq-repolite</id>
+      <id>central-snapshots</id>
       <url>${MAVEN_REPO_URL}</url>
       <snapshots><enabled>true</enabled><updatePolicy>always</updatePolicy></snapshots>
       <releases><enabled>true</enabled></releases>
@@ -51,14 +52,13 @@ RUN <<EOF cat > pom.xml
   </repositories>
 </project>
 EOF
-# `mavensettings` est un secret BuildKit (cf. workflow `--secret id=...`).
-# Monté UNIQUEMENT pendant ce RUN, jamais dans les couches finales de l'image.
+# Le repo Central snapshots est public : résolution anonyme, aucun secret
+# BuildKit ni settings.xml requis.
 #
 # Note : `-DstripVersion=true -DstripClassifier=true` ne fonctionnent pas sur
 # les SNAPSHOT timestampés (`0.1.0-YYYYMMDD.HHMMSS-N`) avec dependency-plugin
 # 3.7.0 — le fichier garde son nom complet. On fait un `mv` explicite après.
-RUN --mount=type=secret,id=mavensettings,target=/root/.m2/settings.xml,required=true \
-    echo "Pull nonce: ${CHAPPE_PULL_NONCE}" \
+RUN echo "Pull nonce: ${CHAPPE_PULL_NONCE}" \
     && mvn -B -ntp -U \
       dependency:copy \
       -Dartifact=io.vidocq.chappe:chappe-cli:${CHAPPE_VERSION}:jar:shaded \
@@ -110,7 +110,7 @@ exec java -jar /opt/vidocq-docs/chappe-cli.jar \${ARGS}
 EOF
 RUN chmod +x /opt/vidocq-docs/entrypoint.sh
 
-LABEL org.opencontainers.image.source="https://forge.vidocq.dev/vidocq/vidocq-docs"
+LABEL org.opencontainers.image.source="https://codeberg.org/Vidocq/vidocq-docs"
 LABEL org.opencontainers.image.licenses="Apache-2.0"
 LABEL org.opencontainers.image.title="Vidocq Documentation"
 LABEL org.opencontainers.image.description="Documentation Antora de l'écosystème Vidocq, servie par chappe-cli."

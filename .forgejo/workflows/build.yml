@@ -20,8 +20,9 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-        # Plus de checkout du repo frère vidocq/chappe : le Dockerfile pull
-        # désormais le fat-jar `chappe-cli-shaded` depuis repolite (cf. ADR-0003).
+        # No sibling vidocq/chappe checkout: the Dockerfile pulls the
+        # `chappe-cli-shaded` fat-jar from the public Central Portal snapshots
+        # (cf. ADR-0003).
 
       - name: Detect Docker daemon (DinD gateway)
         # Le job tourne dans le dind. Le démon Docker est le dind lui-même,
@@ -54,7 +55,7 @@ jobs:
         with:
           node-version: 'lts/*'
 
-      - name: Fetch Chappe version (pour le footer du UI bundle)
+      - name: Fetch Chappe version (for the UI bundle footer)
         run: node scripts/fetch-chappe-version.js
 
       - name: Build UI bundle
@@ -63,15 +64,6 @@ jobs:
           npm ci
           npm run build
 
-      - name: Configure git credentials for Antora
-        # Antora ne supporte pas ssh:// — il pull les sources en https.
-        # Si les repos vidocq/* sont privés (ou même publics avec rate-limit
-        # anonyme), Antora a besoin d'un fichier ~/.git-credentials.
-        run: |
-          git config --global credential.helper store
-          echo "https://${{ secrets.REGISTRY_USER }}:${{ secrets.REGISTRY_TOKEN }}@forge.vidocq.dev" > ~/.git-credentials
-          chmod 600 ~/.git-credentials
-
       - name: Install Antora deps (root)
         # Installe Antora CLI + asciidoctor-kroki (cf. package.json racine).
         # Avant : `npx --yes antora@^3.1.0` était utilisé seul, mais il ne
@@ -79,80 +71,50 @@ jobs:
         # (asciidoctor-kroki) → FATAL "Cannot find module 'asciidoctor-kroki'".
         run: npm ci --no-audit --no-fund
 
-      - name: Compute site URL
-        id: siteurl
-        # Le playbook prod a `site.url: https://doc.vidocq.dev`. Mais sur main
-        # on déploie sur staging-doc.vidocq.dev → on overide via la CLI Antora
-        # pour que les liens absolus (logo navbar, sitemap, og:url…) pointent
-        # bien sur l'URL où le site sera servi.
-        run: |
-          if [[ "$GITHUB_REF" == refs/heads/main ]]; then
-            echo "url=https://staging-doc.vidocq.dev" >> "$GITHUB_OUTPUT"
-          else
-            echo "url=https://doc.vidocq.dev" >> "$GITHUB_OUTPUT"
-          fi
-
       - name: Build Antora site
-        run: ./node_modules/.bin/antora --url "${{ steps.siteurl.outputs.url }}" antora-playbook.yml
+        # Single public environment: doc.vidocq.dev. SITE_URL overrides if set.
+        # kroki-server-url defaults to the self-hosted kroki.vidocq.dev (Foix),
+        # overridable via the KROKI_SERVER_URL env.
+        run: ./node_modules/.bin/antora --url "${SITE_URL:-https://doc.vidocq.dev}" --attribute kroki-server-url="${KROKI_SERVER_URL:-https://kroki.vidocq.dev}" antora-playbook.yml
 
-      - name: Login to Forgejo registry
-        # Forgejo Actions interdit le préfixe FORGEJO_ sur les secrets utilisateur :
-        # on utilise REGISTRY_USER / REGISTRY_TOKEN (cf. README, section Déploiement).
-        run: echo "${{ secrets.REGISTRY_TOKEN }}" | docker login forge.vidocq.dev -u "${{ secrets.REGISTRY_USER }}" --password-stdin
+      - name: Login to container registry
+        run: echo "${{ secrets.REGISTRY_PASSWORD }}" | docker login registry.vidocq.dev -u "${{ secrets.REGISTRY_USERNAME }}" --password-stdin
 
       - name: Compute tags
         id: tags
+        # Mutable tags only, so the self-cleaning registry GC works:
+        #   main  -> snapshot
+        #   v*    -> <version> + latest
         run: |
           if [[ "$GITHUB_REF" == refs/heads/main ]]; then
-            echo "tag=snapshot-${GITHUB_SHA::7}" >> "$GITHUB_OUTPUT"
-            echo "extra=snapshot" >> "$GITHUB_OUTPUT"
-            echo "channel=staging" >> "$GITHUB_OUTPUT"
+            echo "tag=snapshot" >> "$GITHUB_OUTPUT"
+            echo "extra=" >> "$GITHUB_OUTPUT"
+            echo "deploy=true" >> "$GITHUB_OUTPUT"
           elif [[ "$GITHUB_REF" == refs/tags/v* ]]; then
             VERSION="${GITHUB_REF_NAME#v}"
             echo "tag=$VERSION" >> "$GITHUB_OUTPUT"
             echo "extra=latest" >> "$GITHUB_OUTPUT"
-            echo "channel=prod" >> "$GITHUB_OUTPUT"
+            echo "deploy=true" >> "$GITHUB_OUTPUT"
           else
-            echo "tag=ref-${GITHUB_SHA::7}" >> "$GITHUB_OUTPUT"
+            echo "tag=snapshot" >> "$GITHUB_OUTPUT"
             echo "extra=" >> "$GITHUB_OUTPUT"
-            echo "channel=" >> "$GITHUB_OUTPUT"
+            echo "deploy=false" >> "$GITHUB_OUTPUT"
           fi
 
       - name: Build & push image
-        # Build args :
-        #   CHAPPE_VERSION : version Chappe à tirer depuis repolite
-        #   MAVEN_REPO_URL : par défaut https://repo.vidocq.dev/snapshots
-        # Secret BuildKit `mavensettings` :
-        #   monté en /root/.m2/settings.xml uniquement pour `RUN mvn` ;
-        #   les creds n'apparaissent dans aucune couche de l'image finale.
+        # The Dockerfile pulls chappe-cli anonymously from the public Central
+        # Portal snapshots: no Maven credentials, no BuildKit mavensettings secret.
+        # Build args:
+        #   CHAPPE_VERSION : Chappe version to pull from Central snapshots
+        #   MAVEN_REPO_URL : public Central Portal snapshots repository
+        #   CHAPPE_PULL_NONCE : invalidates the dependency:copy layer each run
         run: |
           set -eu
-          IMG=forge.vidocq.dev/vidocq/vidocq-docs
-
-          # Génère le settings.xml temporaire (creds repolite).
-          SETTINGS_FILE=$(mktemp)
-          cat > "$SETTINGS_FILE" <<'XML'
-          <?xml version="1.0" encoding="UTF-8"?>
-          <settings xmlns="http://maven.apache.org/SETTINGS/1.2.0">
-            <servers>
-              <server>
-                <id>vidocq-repolite</id>
-                <username>__USER__</username>
-                <password>__TOKEN__</password>
-              </server>
-            </servers>
-          </settings>
-          XML
-          # Le heredoc est quoted pour empêcher l'expansion shell des chevrons,
-          # on substitue ensuite les placeholders.
-          sed -i "s|__USER__|${{ secrets.MAVEN_REPO_USER }}|; s|__TOKEN__|${{ secrets.MAVEN_REPO_TOKEN }}|" "$SETTINGS_FILE"
-          chmod 600 "$SETTINGS_FILE"
-          trap 'rm -f "$SETTINGS_FILE"' EXIT
+          IMG=registry.vidocq.dev/vidocq-docs
 
           docker build \
-            --secret "id=mavensettings,src=$SETTINGS_FILE" \
-            --build-arg CHAPPE_VERSION="${CHAPPE_VERSION:-0.1.0-SNAPSHOT}" \
-            --build-arg MAVEN_REPO_URL="${MAVEN_REPO_URL:-https://repo.vidocq.dev/snapshots}" \
+            --build-arg CHAPPE_VERSION=0.1.0-SNAPSHOT \
+            --build-arg MAVEN_REPO_URL=https://central.sonatype.com/repository/maven-snapshots \
             --build-arg CHAPPE_PULL_NONCE="$(date +%s)-${GITHUB_SHA::7}" \
             -t "$IMG:${{ steps.tags.outputs.tag }}" \
             $( [ -n "${{ steps.tags.outputs.extra }}" ] && echo "-t $IMG:${{ steps.tags.outputs.extra }}" ) \
@@ -162,16 +124,14 @@ jobs:
             docker push "$IMG:${{ steps.tags.outputs.extra }}"
           fi
 
-      - name: Trigger Portainer redeploy (staging)
-        # `?pullimage=true` (Portainer 2.20+) → équivalent du clic
-        # "Pull and redeploy" dans l'UI : Portainer fait `docker pull` puis
-        # recrée le container. Sans ce flag, le webhook stack lance juste
-        # `docker compose up -d` qui voit la stack inchangée et ne fait rien
-        # — c'est pour ça que `pull_policy: always` dans le compose ne se
-        # déclenchait pas (le container n'est pas recréé donc pas re-pullé).
-        if: steps.tags.outputs.channel == 'staging'
-        run: curl -fsSL --retry 3 -X POST "${{ secrets.PORTAINER_WEBHOOK_STAGING }}?pullimage=true"
-
-      - name: Trigger Portainer redeploy (prod)
-        if: steps.tags.outputs.channel == 'prod'
-        run: curl -fsSL --retry 3 -X POST "${{ secrets.PORTAINER_WEBHOOK_PROD }}?pullimage=true"
+      - name: Redeploy docs stack on Foix Portainer
+        # Git-backed stack redeploy via the Portainer API. `?pullImage=true`
+        # forces a docker pull (mutable tags), then recreates the container.
+        # Only runs on push to main and on v* tags.
+        if: steps.tags.outputs.deploy == 'true'
+        run: |
+          set -eu
+          BASE="${{ secrets.FOIX_PORTAINER_URL }}"; BASE="${BASE%/}"
+          curl -fsSL --retry 3 -X POST \
+            -H "X-API-Key: ${{ secrets.FOIX_PORTAINER_TOKEN }}" \
+            "${BASE}/api/stacks/${{ secrets.FOIX_PORTAINER_DOCS_STACK_ID }}/git/redeploy?pullImage=true"

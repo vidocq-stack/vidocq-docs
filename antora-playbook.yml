@@ -4,39 +4,36 @@ site:
   url: https://doc.vidocq.dev
 
 # Antora ne supporte que http(s) ou des chemins filesystem — pas ssh://.
-# Pour des repos privés, le workflow CI (et le build local) doit avoir un
-# `~/.git-credentials` rempli :
-#   echo "https://<user>:<token>@forge.vidocq.dev" > ~/.git-credentials
-#   git config --global credential.helper store
-# Antora lit automatiquement ce fichier (helper Git standard).
+# Les sources sont des repos PUBLICS sur Codeberg (org Vidocq) : Antora les
+# clone en HTTPS anonyme, aucun `~/.git-credentials` n'est nécessaire.
 
 content:
   sources:
-    - url: https://forge.vidocq.dev/vidocq/vidocq.git
+    - url: https://codeberg.org/Vidocq/vidocq.git
       branches: [main]
       start_paths: [docs/en, docs/fr]
-    - url: https://forge.vidocq.dev/vidocq/vauban.git
+    - url: https://codeberg.org/Vidocq/vauban.git
       branches: [main]
       start_paths: [docs/en, docs/fr]
-    - url: https://forge.vidocq.dev/vidocq/ravel.git
+    - url: https://codeberg.org/Vidocq/ravel.git
       branches: [main]
       start_paths: [docs/en, docs/fr]
-    - url: https://forge.vidocq.dev/vidocq/cassini.git
+    - url: https://codeberg.org/Vidocq/cassini.git
       branches: [main]
       start_paths: [docs/en, docs/fr]
-    - url: https://forge.vidocq.dev/vidocq/champollion.git
+    - url: https://codeberg.org/Vidocq/champollion.git
       branches: [main]
       start_paths: [docs/en, docs/fr]
-    - url: https://forge.vidocq.dev/vidocq/chappe.git
+    - url: https://codeberg.org/Vidocq/chappe.git
       branches: [main]
       start_paths: [docs/en, docs/fr]
-    - url: https://forge.vidocq.dev/vidocq/foy.git
+    - url: https://codeberg.org/Vidocq/foy.git
       branches: [main]
       start_paths: [docs/en, docs/fr]
-    - url: https://forge.vidocq.dev/vidocq/mansart.git
+    - url: https://codeberg.org/Vidocq/mansart.git
       branches: [main]
       start_paths: [docs/en, docs/fr]
-    - url: https://forge.vidocq.dev/vidocq/knock.git
+    - url: https://codeberg.org/Vidocq/knock.git
       branches: [main]
       start_paths: [docs/en, docs/fr]
     - url: .
@@ -65,9 +62,8 @@ asciidoc:
     primary-language: fr
 
     # --- Kroki ---
-    # Self-hosted par défaut (déploiement décrit dans deploy/compose.kroki.yml,
-    # exposé via NPM en kroki.vidocq.dev). kroki.io public reste utilisable en
-    # secours via : `npx antora --attribute kroki-server-url=https://kroki.io …`.
+    # Kroki self-hosted (Foix) par défaut. Overridable via :
+    # `npx antora --attribute kroki-server-url=https://kroki.example …`.
     # `kroki-fetch-diagram: true` télécharge les SVG au build → site servi par
     # Chappe = 100 % statique, aucune dépendance runtime à kroki.
     kroki-server-url: https://kroki.vidocq.dev
@@ -75,15 +71,15 @@ asciidoc:
     kroki-default-format: svg
 
     # --- URLs des repos (centralises : changer ici, pas dans les modules) ---
-    repo-chappe: 'https://forge.vidocq.dev/vidocq/chappe'
-    repo-vauban: 'https://forge.vidocq.dev/vidocq/vauban'
-    repo-champollion: 'https://forge.vidocq.dev/vidocq/champollion'
-    repo-foy: 'https://forge.vidocq.dev/vidocq/foy'
-    repo-cassini: 'https://forge.vidocq.dev/vidocq/cassini'
-    repo-mansart: 'https://forge.vidocq.dev/vidocq/mansart'
-    repo-ravel: 'https://forge.vidocq.dev/vidocq/ravel'
-    repo-vidocq: 'https://forge.vidocq.dev/vidocq/vidocq'
-    repo-knock: 'https://forge.vidocq.dev/vidocq/knock'
+    repo-chappe: 'https://codeberg.org/Vidocq/chappe'
+    repo-vauban: 'https://codeberg.org/Vidocq/vauban'
+    repo-champollion: 'https://codeberg.org/Vidocq/champollion'
+    repo-foy: 'https://codeberg.org/Vidocq/foy'
+    repo-cassini: 'https://codeberg.org/Vidocq/cassini'
+    repo-mansart: 'https://codeberg.org/Vidocq/mansart'
+    repo-ravel: 'https://codeberg.org/Vidocq/ravel'
+    repo-vidocq: 'https://codeberg.org/Vidocq/vidocq'
+    repo-knock: 'https://codeberg.org/Vidocq/knock'
 
     # --- URLs des specs Jakarta / MicroProfile (canoniques jakarta.ee) ---
     spec-rest-4: 'https://jakarta.ee/specifications/restful-ws/4.0/'
