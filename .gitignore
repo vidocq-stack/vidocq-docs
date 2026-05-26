@@ -15,3 +15,6 @@ ui-bundle/src/data/versions.json
 *.iml
 *.ipr
 *.iws
+
+# Claude Code / tooling local
+.claude/
