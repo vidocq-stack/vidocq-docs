@@ -36,6 +36,12 @@ content:
     - url: https://codeberg.org/Vidocq/knock.git
       branches: [main]
       start_paths: [docs/en, docs/fr]
+    - url: https://codeberg.org/Vidocq/humboldt.git
+      branches: [main]
+      start_paths: [docs/en, docs/fr]
+    - url: https://codeberg.org/Vidocq/grimm.git
+      branches: [main]
+      start_paths: [docs/en, docs/fr]
     - url: .
       branches: HEAD
       start_paths: [content/home-en, content/home-fr]
@@ -80,6 +86,12 @@ asciidoc:
     repo-ravel: 'https://codeberg.org/Vidocq/ravel'
     repo-vidocq: 'https://codeberg.org/Vidocq/vidocq'
     repo-knock: 'https://codeberg.org/Vidocq/knock'
+    repo-humboldt: 'https://codeberg.org/Vidocq/humboldt'
+    repo-grimm: 'https://codeberg.org/Vidocq/grimm'
+    repo-cervantes: 'https://codeberg.org/Vidocq/cervantes'
+    repo-cyrano: 'https://codeberg.org/Vidocq/cyrano'
+    repo-dirac: 'https://codeberg.org/Vidocq/dirac'
+    repo-heisenberg: 'https://codeberg.org/Vidocq/heisenberg'
 
     # --- URLs des specs Jakarta / MicroProfile (canoniques jakarta.ee) ---
     spec-rest-4: 'https://jakarta.ee/specifications/restful-ws/4.0/'
@@ -93,6 +105,10 @@ asciidoc:
     spec-mp-health: 'https://microprofile.io/specifications/microprofile-health/'
     spec-mp-metrics: 'https://microprofile.io/specifications/microprofile-metrics/'
     spec-mp-openapi: 'https://microprofile.io/specifications/microprofile-open-api/'
+    spec-mp-jwt: 'https://microprofile.io/specifications/microprofile-jwt-auth/'
+    spec-mp-rest-client: 'https://microprofile.io/specifications/microprofile-rest-client/'
+    spec-mp-fault-tolerance: 'https://microprofile.io/specifications/microprofile-fault-tolerance/'
+    spec-mp-telemetry: 'https://microprofile.io/specifications/microprofile-telemetry/'
 
     # --- Bases d'URLs supplémentaires ---
     url-jep: 'https://openjdk.org/jeps'
