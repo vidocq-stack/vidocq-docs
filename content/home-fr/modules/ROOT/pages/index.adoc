@@ -28,8 +28,15 @@ flowchart TB
     subgraph Persistence["Persistence"]
         MANSART[Mansart<br/>Jakarta Data 1.0 + JPA 3.2]
     end
-    subgraph Health["MicroProfile Health"]
-        KNOCK[Knock<br/>MicroProfile Health 4.0]
+    subgraph MicroProfile["MicroProfile"]
+        RAVEL[Ravel<br/>Config 3.1]
+        KNOCK[Knock<br/>Health 4.0]
+        DIRAC[Dirac<br/>Metrics 5.1]
+        HEISENBERG[Heisenberg<br/>Fault Tolerance 4.1]
+        CERVANTES[Cervantes<br/>JWT 2.1]
+        CYRANO[Cyrano<br/>Rest Client 4.0]
+        HUMBOLDT[Humboldt<br/>Telemetry 2.1]
+        GRIMM[Grimm<br/>OpenAPI 4.1]
     end
     subgraph Transport["Transport HTTP"]
         CHAPPE[Chappe<br/>HTTP/1.1 + H2 + H3]
@@ -39,12 +46,22 @@ flowchart TB
     VIDOCQ --> FOY
     VIDOCQ --> VAUBAN
     VIDOCQ --> MANSART
+    VIDOCQ --> RAVEL
     VIDOCQ --> KNOCK
+    VIDOCQ --> DIRAC
+    VIDOCQ --> HEISENBERG
+    VIDOCQ --> CERVANTES
+    VIDOCQ --> CYRANO
+    VIDOCQ --> HUMBOLDT
+    VIDOCQ --> GRIMM
     CASSINI --> CHAPPE
     CASSINI --> CHAMPOLLION
     CASSINI --> VAUBAN
     KNOCK --> CASSINI
     KNOCK --> VAUBAN
+    CERVANTES --> CASSINI
+    CYRANO --> CASSINI
+    GRIMM --> CASSINI
     FOY --> CHAPPE
     FOY --> VAUBAN
     MANSART --> VAUBAN
@@ -92,9 +109,37 @@ Trois raisons :
 | Implémentation Jakarta Servlet 6.1
 | {repo-foy}
 
+| xref:ravel::index.adoc[Ravel]
+| Implémentation MicroProfile Config 3.1
+| {repo-ravel}
+
 | xref:knock::index.adoc[Knock]
-| Implmentation MicroProfile Health 4.0
+| Implémentation MicroProfile Health 4.0
 | {repo-knock}
+
+| xref:dirac::index.adoc[Dirac]
+| Implémentation MicroProfile Metrics 5.1
+| {repo-dirac}
+
+| xref:heisenberg::index.adoc[Heisenberg]
+| Implémentation MicroProfile Fault Tolerance 4.1
+| {repo-heisenberg}
+
+| xref:cervantes::index.adoc[Cervantes]
+| Implémentation MicroProfile JWT 2.1
+| {repo-cervantes}
+
+| xref:cyrano::index.adoc[Cyrano]
+| Implémentation MicroProfile Rest Client 4.0
+| {repo-cyrano}
+
+| xref:humboldt::index.adoc[Humboldt]
+| Implémentation MicroProfile Telemetry 2.1
+| {repo-humboldt}
+
+| xref:grimm::index.adoc[Grimm]
+| Implémentation MicroProfile OpenAPI 4.1
+| {repo-grimm}
 
 | xref:mansart::index.adoc[Mansart]
 | Jakarta Data 1.0 + Jakarta Persistence 3.2 *(M7 en attente)*
@@ -122,13 +167,14 @@ Ce qui marche aujourd'hui :
 * Champollion — JSON-P 2.1 + JSON-B 3.0, génération APT, suites TCK partielles (voir `champollion/JSON-ROADMAP.md`).
 * Foy — Servlet 6.1, intégration TCK partielle.
 * Vidocq — orchestrateur initial avec extensions Mansart H2 + transactions.
+* MicroProfile — Config (Ravel), Health (Knock), Metrics (Dirac), Fault Tolerance (Heisenberg), JWT (Cervantes), Rest Client (Cyrano), Telemetry (Humboldt), OpenAPI (Grimm), chacun câblé dans Vidocq Runtime via une extension.
 
 Ce qui est en chantier :
 
 * Mansart — Jakarta Data 1.0 SPI, JPA 3.2 en plan.
 * WebSocket — Chappe + Foy.
 * HTTP/3 / QUIC — Chappe.
-* Metrics, OpenAPI, JWT, Telemetry — Vidocq.
+* MicroProfile — durcissement TCK et intégration transverse dans Vidocq Runtime.
 
 Détail complet par module : xref:roadmap.adoc[Roadmap consolidée].
 

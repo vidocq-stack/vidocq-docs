@@ -2,7 +2,7 @@
 :description: Per-module status and upcoming milestones.
 
 [.lead]
-This page aggregates the progress of all seven modules. Each section links to the module's documentation for details. The suite is at `0.1.0-SNAPSHOT` — no public release, no API stability guarantee.
+This page aggregates the progress of all fifteen modules — seven Jakarta EE foundations plus eight MicroProfile implementations. Each section links to the module's documentation for details. The suite is at `0.1.0-SNAPSHOT` — no public release, no API stability guarantee.
 
 == Upcoming milestones
 
@@ -36,8 +36,13 @@ This page aggregates the progress of all seven modules. Each section links to th
 | pending
 
 | —
+| MicroProfile layer
+| Config (Ravel), Health (Knock), Metrics (Dirac), Fault Tolerance (Heisenberg), JWT (Cervantes), Rest Client (Cyrano), Telemetry (Humboldt), OpenAPI (Grimm)
+| implemented, TCK hardening
+
+| —
 | xref:vidocq::index.adoc[Vidocq Runtime]
-| MicroProfile Health, Metrics, OpenAPI, JWT, Telemetry
+| MicroProfile extension wiring and packaging
 | in progress
 |===
 
@@ -77,7 +82,7 @@ This page aggregates the progress of all seven modules. Each section links to th
 
 * **Done**: 2535/2535 applicable REST 4.0 TCK tests (100%), Chappe transport integration, Champollion entity providers, optional Vauban CDI.
 * **In progress**: MicroProfile (Config, Health) integration hardening, advanced filters and interceptors.
-* **Coming up**: MicroProfile JWT integration on Cassini.
+* **Coming up**: MicroProfile JWT `@RolesAllowed` integration on Cassini (via xref:cervantes::index.adoc[Cervantes]).
 * Details: xref:cassini::index.adoc[Cassini].
 
 === Mansart — Jakarta Data + Transactions + JPA
@@ -87,11 +92,24 @@ This page aggregates the progress of all seven modules. Each section links to th
 * **Pending (M7)**: `mansart-persistence` — classic Jakarta Persistence 3.2 implementation. `mansart-jakarta-data` already covers everyday needs in Vidocq.
 * Details: xref:mansart::index.adoc[Mansart].
 
+=== MicroProfile layer
+
+Eight independent MicroProfile implementations, each wired into Vidocq Runtime through the extension SPI and, where relevant, exposed over Cassini.
+
+* xref:ravel::index.adoc[Ravel] — MicroProfile Config 3.1. Implemented; TCK hardening.
+* xref:knock::index.adoc[Knock] — MicroProfile Health 4.0. Implemented; TCK hardening.
+* xref:dirac::index.adoc[Dirac] — MicroProfile Metrics 5.1. Implemented; TCK hardening.
+* xref:heisenberg::index.adoc[Heisenberg] — MicroProfile Fault Tolerance 4.1. Implemented; TCK hardening.
+* xref:cervantes::index.adoc[Cervantes] — MicroProfile JWT 2.1. Implemented; `@RolesAllowed` integration into Cassini in progress.
+* xref:cyrano::index.adoc[Cyrano] — MicroProfile Rest Client 4.0. Implemented; TCK hardening.
+* xref:humboldt::index.adoc[Humboldt] — MicroProfile Telemetry 2.1. Implemented (OTel API); SDK and gRPC export under design.
+* xref:grimm::index.adoc[Grimm] — MicroProfile OpenAPI 4.1. Implemented; TCK hardening.
+
 === Vidocq Runtime — orchestrator
 
-* **Done**: bootstrap, lifecycle, BuildStep / BuildItem / Recorder SPI, Mansart H2 + transactions extensions, Maven plugin (jlink / jpackage / Docker).
-* **In progress**: MicroProfile Config, Health, Metrics, OpenAPI.
-* **Coming up**: MicroProfile JWT, Telemetry, Fault Tolerance, Rest Client.
+* **Done**: bootstrap, lifecycle, BuildStep / BuildItem / Recorder SPI, Mansart H2 + transactions extensions, MicroProfile extension wiring (Config, Health, Metrics, Fault Tolerance, JWT, Rest Client, Telemetry, OpenAPI), Maven plugin (jlink / jpackage / Docker).
+* **In progress**: cross-cutting MicroProfile integration hardening, packaging.
+* **Coming up**: GraalVM `native-image` and Project Leyden CDS proof-of-concept.
 * Details: xref:vidocq::index.adoc[Vidocq Runtime].
 
 == Track progress
@@ -101,4 +119,4 @@ Reproducible bugs and performance numbers are recorded at the root of each repo:
 * `BUG.md` — reproducible bugs, hypotheses, status.
 * `BENCH.md` — JMH/wrk/comparative runs, deltas vs previous run.
 
-Official TCKs (Cassini, Foy, Champollion, Mansart) are executed via the `run-official-tck-*.sh` scripts of the relevant sub-project.
+Official TCKs (Cassini, Foy, Champollion, Mansart, and the MicroProfile modules) are executed via the `run-official-tck-*.sh` scripts of the relevant sub-project.

@@ -2,7 +2,7 @@
 :description: Overview of module boundaries, dependency matrix, and cross-cutting invariants.
 
 [.lead]
-The Vidocq ecosystem is composed of seven independent modules. This page describes their boundaries, their interfaces, and the cross-cutting choices that apply uniformly to all of them.
+The Vidocq ecosystem is composed of fifteen independent modules — seven Jakarta EE foundations plus eight MicroProfile implementations. This page describes their boundaries, their interfaces, and the cross-cutting choices that apply uniformly to all of them.
 
 == C4 view — Container level
 
@@ -69,6 +69,14 @@ flowchart LR
     FOY[Foy<br/>Servlet]
     CASSINI[Cassini<br/>REST]
     MANSART[Mansart<br/>Data]
+    RAVEL[Ravel<br/>MP Config]
+    KNOCK[Knock<br/>MP Health]
+    DIRAC[Dirac<br/>MP Metrics]
+    HEISENBERG[Heisenberg<br/>MP Fault Tolerance]
+    CERVANTES[Cervantes<br/>MP JWT]
+    CYRANO[Cyrano<br/>MP Rest Client]
+    HUMBOLDT[Humboldt<br/>MP Telemetry]
+    GRIMM[Grimm<br/>MP OpenAPI]
     VIDOCQ[Vidocq Runtime<br/>orchestrator]
 
     FOY --> CHAPPE
@@ -77,12 +85,25 @@ flowchart LR
     CASSINI --> VAUBAN
     CASSINI --> CHAMPOLLION
     MANSART --> VAUBAN
+    KNOCK --> CASSINI
+    KNOCK --> VAUBAN
+    CERVANTES --> CASSINI
+    CYRANO --> CASSINI
+    GRIMM --> CASSINI
     VIDOCQ --> FOY
     VIDOCQ --> CASSINI
     VIDOCQ --> VAUBAN
     VIDOCQ --> CHAMPOLLION
     VIDOCQ --> CHAPPE
     VIDOCQ --> MANSART
+    VIDOCQ --> RAVEL
+    VIDOCQ --> KNOCK
+    VIDOCQ --> DIRAC
+    VIDOCQ --> HEISENBERG
+    VIDOCQ --> CERVANTES
+    VIDOCQ --> CYRANO
+    VIDOCQ --> HUMBOLDT
+    VIDOCQ --> GRIMM
 ....
 
 Three notable properties:
@@ -90,6 +111,7 @@ Three notable properties:
 . The graph is **acyclic** — no foundational module depends on a downstream one.
 . Chappe, Vauban and Champollion are **foundational bricks**: no dependency on any other Vidocq module.
 . Foy and Cassini are **interchangeable** as far as Vidocq Runtime is concerned: an application can run without Servlet (Cassini directly on Chappe) or without REST (Foy directly on Chappe).
+. The **MicroProfile layer** (Ravel, Knock, Dirac, Heisenberg, Cervantes, Cyrano, Humboldt, Grimm) sits on top of the foundations: each module is an independent implementation, wired into Vidocq Runtime through the extension SPI and, where relevant, exposed over Cassini.
 
 == Cross-cutting choices
 
@@ -125,4 +147,12 @@ Every I/O module uses `Executors.newVirtualThreadPerTaskExecutor()`. No platform
 * xref:foy::index.adoc[Foy — Servlet 6.1]
 * xref:cassini::index.adoc[Cassini — Jakarta REST 4.0]
 * xref:mansart::index.adoc[Mansart — Jakarta Data + JPA]
+* xref:ravel::index.adoc[Ravel — MicroProfile Config 3.1]
+* xref:knock::index.adoc[Knock — MicroProfile Health 4.0]
+* xref:dirac::index.adoc[Dirac — MicroProfile Metrics 5.1]
+* xref:heisenberg::index.adoc[Heisenberg — MicroProfile Fault Tolerance 4.1]
+* xref:cervantes::index.adoc[Cervantes — MicroProfile JWT 2.1]
+* xref:cyrano::index.adoc[Cyrano — MicroProfile Rest Client 4.0]
+* xref:humboldt::index.adoc[Humboldt — MicroProfile Telemetry 2.1]
+* xref:grimm::index.adoc[Grimm — MicroProfile OpenAPI 4.1]
 * xref:vidocq::index.adoc[Vidocq Runtime — orchestrator]
