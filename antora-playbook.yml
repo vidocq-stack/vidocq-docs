@@ -42,6 +42,18 @@ content:
     - url: https://codeberg.org/Vidocq/grimm.git
       branches: [main]
       start_paths: [docs/en, docs/fr]
+    - url: https://codeberg.org/Vidocq/dirac.git
+      branches: [main]
+      start_paths: [docs/en, docs/fr]
+    - url: https://codeberg.org/Vidocq/heisenberg.git
+      branches: [main]
+      start_paths: [docs/en, docs/fr]
+    - url: https://codeberg.org/Vidocq/cervantes.git
+      branches: [main]
+      start_paths: [docs/en, docs/fr]
+    - url: https://codeberg.org/Vidocq/cyrano.git
+      branches: [main]
+      start_paths: [docs/en, docs/fr]
     - url: .
       branches: HEAD
       start_paths: [content/home-en, content/home-fr]
