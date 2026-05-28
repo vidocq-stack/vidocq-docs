@@ -4,9 +4,11 @@
   line-height: 1.5;
   border-right: 1px solid var(--c-rule);
   padding-right: 1.5rem;
-  height: fit-content;
   position: sticky;
   top: 4rem;
+  max-height: calc(100vh - 5rem);
+  overflow-y: auto;
+  scrollbar-gutter: stable;
 }
 
 @media (max-width: 800px) {
@@ -16,6 +18,8 @@
     padding-right: 0;
     padding-bottom: 1rem;
     position: static;
+    max-height: none;
+    overflow-y: visible;
   }
 }
 
@@ -137,4 +141,55 @@
 
 .component-nav-title {
   margin-top: 0;
+}
+
+/* ── Accordéon des sections (details/summary) ─────────────────────── */
+/* Chaque entrée de premier niveau qui a des sous-pages est rendue dans
+   un <details> repliable. Ouverture automatique de la branche contenant
+   la page courante via site.js (setupNavAccordion). */
+.nav .nav-group-details {
+  margin: 0;
+}
+
+.nav .nav-group-details > summary {
+  list-style: none;            /* masque le marker natif WebKit */
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.1rem 0;
+  user-select: none;
+}
+
+.nav .nav-group-details > summary::-webkit-details-marker {
+  display: none;
+}
+
+.nav .nav-group-details > summary::before {
+  content: "›";
+  display: inline-block;
+  width: 0.8em;
+  flex: 0 0 auto;
+  color: var(--c-text-soft);
+  font-size: 1.1em;
+  line-height: 1;
+  transition: transform 0.15s ease-in-out;
+  transform: rotate(0deg);
+}
+
+.nav .nav-group-details[open] > summary::before {
+  transform: rotate(90deg);
+}
+
+/* Le lien à l'intérieur du summary prend toute la largeur restante,
+   reste cliquable pour naviguer vers l'index du module ; cliquer sur le
+   chevron (ou ailleurs sur summary) plie/déplie. */
+.nav .nav-group-details > summary > a,
+.nav .nav-group-details > summary > span {
+  flex: 1 1 auto;
+}
+
+/* La sous-liste hérite déjà du .nav ul ul (border-left + padding). */
+.nav .nav-group-details > ul {
+  margin-top: 0.15rem;
 }

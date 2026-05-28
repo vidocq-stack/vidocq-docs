@@ -60,10 +60,28 @@
     if (meta) document.documentElement.setAttribute('lang', meta.content);
   }
 
+  // Ouvre la branche du sidebar qui contient la page courante. Le template
+  // rend chaque section comme <details> fermé par défaut ; sans cette passe
+  // le visiteur arriverait sur une page dont le parent est replié.
+  function setupNavAccordion() {
+    var current = document.querySelector('.nav .is-current-page');
+    if (!current) return;
+    var d = current.closest('details.nav-group-details');
+    while (d) {
+      d.setAttribute('open', '');
+      d = d.parentNode && d.parentNode.closest('details.nav-group-details');
+    }
+    // Met la page courante en vue dans le sidebar scrollable.
+    if (typeof current.scrollIntoView === 'function') {
+      current.scrollIntoView({ block: 'nearest', behavior: 'auto' });
+    }
+  }
+
   applyStoredTheme();
   document.addEventListener('DOMContentLoaded', function () {
     syncHtmlLang();
     setupThemeToggle();
     setupLangToggle();
+    setupNavAccordion();
   });
 })();
