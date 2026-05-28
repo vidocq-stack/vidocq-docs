@@ -12,7 +12,19 @@
  * composent, et enfin l'orchestrateur — l'ordre que la doc canonique a
  * adopté pour la roadmap et les pages transverses.
  */
-const ORDER_BASE = ['home', 'chappe', 'vauban', 'champollion', 'ravel', 'foy', 'cassini', 'mansart', 'knock', 'vidocq'];
+const ORDER_BASE = [
+  'home',
+  // Fondations
+  'chappe', 'vauban', 'champollion',
+  // Couches Jakarta
+  'foy', 'cassini', 'mansart',
+  // MicroProfile (ravel = Config, knock = Health, dirac = Metrics,
+  // heisenberg = Fault Tolerance, humboldt = Telemetry, cervantes = JWT,
+  // cyrano = Rest Client, grimm = OpenAPI)
+  'ravel', 'knock', 'dirac', 'heisenberg', 'humboldt', 'cervantes', 'cyrano', 'grimm',
+  // Orchestrateur
+  'vidocq',
+];
 
 module.exports = function componentsQuickNav (options) {
   const ctx = (options && options.data && options.data.root) || {};
