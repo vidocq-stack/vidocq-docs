@@ -6,61 +6,63 @@
 
 ## Context
 
-L'écosystème Vidocq compte sept dépôts indépendants (`vidocq`, `vauban`, `cassini`, `champollion`, `chappe`, `foy`, `mansart`), chacun avec son propre cycle de release. Une documentation unifiée doit :
+The Vidocq ecosystem has seven independent repositories (`vidocq`, `vauban`,
+`cassini`, `champollion`, `chappe`, `foy`, `mansart`), each with its own release
+cycle. A unified documentation site must:
 
-* lire le contenu **dans chaque repo** (la doc vit avec le code, pas dans un repo séparé) ;
-* permettre des **versions parallèles** par composant (Vauban 0.1 + Cassini 0.2 sans conflit) ;
-* produire un site statique servi par Chappe ;
-* rester **lisible en l'absence de toute infra runtime** (pas de service backend pour la doc).
+* read content **from each repo** (docs live with code, not in a separate repo);
+* allow **parallel versions** per component (Vauban 0.1 + Cassini 0.2 without conflict);
+* produce a static site served by Chappe;
+* remain **readable with no runtime infrastructure at all** (no backend service for docs).
 
-## Options considérées
+## Considered options
 
 ### MkDocs (Material)
 
-* **+** Excellent thème, écosystème mature.
-* **+** Peu de friction côté contributeur Python.
-* **−** Multi-repo : pas de support natif. Plugin `monorepo` ou `multirepo` mais marginal et bricolé.
-* **−** Versioning par component : possible via `mike`, mais lié à branches Git distinctes par version.
-* **−** AsciiDoc en source : possible via plugin tiers, qualité variable.
+* **+** Excellent theme, mature ecosystem.
+* **+** Low friction for Python contributors.
+* **−** Multi-repo: no native support. `monorepo` / `multirepo` plugins exist but are marginal and hacky.
+* **−** Component versioning: possible via `mike`, but tied to distinct Git branches per version.
+* **−** AsciiDoc source: possible via third-party plugins, quality varies.
 
 ### Docusaurus
 
-* **+** Stack JS familière, beaucoup de templates.
-* **+** Versioning intégré.
-* **−** Pas multi-repo natif (workspaces possibles, mais lourds).
-* **−** Markdown uniquement (pas d'AsciiDoc) — incompatible avec l'écriture Java/Jakarta historique des contributeurs.
-* **−** React / MDX : surface d'attaque importante pour un site qui devrait être statique pur.
+* **+** Familiar JS stack, lots of templates.
+* **+** Built-in versioning.
+* **−** No native multi-repo support (workspaces possible, but heavy).
+* **−** Markdown only (no AsciiDoc) — incompatible with the historic Java/Jakarta writing style of the contributors.
+* **−** React / MDX: large attack surface for a site that should be pure static.
 
 ### Hugo
 
-* **+** Build extrêmement rapide.
-* **+** Statique pur, déploiement trivial.
-* **−** Pas multi-repo, ni multi-component, ni versioning natif.
-* **−** Markdown uniquement.
-* **−** Theming = templates Go, courbe d'apprentissage spécifique.
+* **+** Extremely fast builds.
+* **+** Pure static, trivial deployment.
+* **−** No multi-repo, no multi-component, no native versioning.
+* **−** Markdown only.
+* **−** Theming = Go templates, specific learning curve.
 
 ### Antora
 
-* **+** **Conçu** pour la doc multi-repo (`content.sources` lit N dépôts Git).
-* **+** **Conçu** pour le multi-component versionné (`name: vauban`, `version: 0.1`).
-* **+** AsciiDoc natif — meilleur que Markdown sur les blocs techniques (admonitions, tables, includes).
-* **+** Build statique, sortie HTML pur, pas de JS lourd côté client.
-* **−** Écosystème de plugins moins riche que MkDocs/Docusaurus.
-* **−** Le UI bundle Handlebars demande un investissement initial (mais c'est ce qu'on veut pour le style XIXᵉ).
-* **−** i18n natif : expérimental.
+* **+** **Designed** for multi-repo docs (`content.sources` reads N Git repos).
+* **+** **Designed** for versioned multi-component docs (`name: vauban`, `version: 0.1`).
+* **+** Native AsciiDoc — better than Markdown for technical blocks (admonitions, tables, includes).
+* **+** Static build, pure HTML output, no heavy client-side JS.
+* **−** Smaller plugin ecosystem than MkDocs/Docusaurus.
+* **−** The Handlebars UI bundle requires upfront work (but that is what we want for the 19th-century style).
+* **−** Native i18n: experimental.
 
 ## Decision
 
-Antora 3.x est retenu.
+Antora 3.x is selected.
 
-## Conséquences
+## Consequences
 
-* Chaque repo de module porte un répertoire `docs/` que la *playbook* lit comme source.
-* Le UI bundle (`ui-bundle/`) est custom, écrit à la main : Handlebars + CSS vanilla + ~60 lignes de JS.
-* L'i18n est implémenté **par dédoublement explicite des components** (`vauban` et `vauban-fr`), pas via Antora i18n. Voir [ADR 0002](0002-bilingual-fr-en.md).
-* Le site final est entièrement statique, servi par Chappe.
+* Each module repo carries a `docs/` directory that the playbook reads as a source.
+* The UI bundle (`ui-bundle/`) is custom, hand-written: Handlebars + vanilla CSS + ~60 lines of JS.
+* i18n is implemented **by explicit component duplication** (`vauban` and `vauban-fr`), not via Antora i18n. See [ADR 0002](0002-bilingual-fr-en.md).
+* The final site is fully static, served by Chappe.
 
-## Liens
+## Links
 
 * https://docs.antora.org/
 * https://docs.antora.org/antora/latest/playbook/

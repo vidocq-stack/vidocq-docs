@@ -1,4 +1,4 @@
-# ADR 0002 — Documentation bilingue FR canonique + EN
+# ADR 0002 — Canonical FR documentation + EN translation
 
 * Status: Accepted
 * Date: 2026-05-07
@@ -6,70 +6,76 @@
 
 ## Context
 
-Le projet Vidocq est ancré dans un imaginaire historique français (Vidocq, Vauban, Cassini, Chappe, Foy, Mansart). Le français est la langue de travail première du projet, des commit messages et de la documentation interne. Mais l'écosystème Jakarta vit en anglais : la majorité des consommateurs potentiels d'un runtime MicroProfile / Jakarta REST ne parlent pas français.
+The Vidocq project is rooted in a French historical imagination (Vidocq, Vauban,
+Cassini, Chappe, Foy, Mansart). French is the primary working language of the
+project, of commit messages, and of internal documentation. But the Jakarta
+ecosystem is English-speaking: most potential consumers of a MicroProfile /
+Jakarta REST runtime do not speak French.
 
-La doc doit donc :
+The docs must therefore:
 
-* avoir une **version FR canonique** (qualité native, pas de pidgin) ;
-* avoir une **version EN traduite** complète (pas une traduction partielle) ;
-* permettre la **bascule rapide entre langues** sur n'importe quelle page ;
-* **ne pas privilégier l'EN sur le FR** dans l'URL (donc pas de `/en/` dans l'URL avec FR en deuxième classe).
+* have a **canonical FR version** (native quality, not pidgin);
+* have a **full EN translated version** (not a partial translation);
+* allow a **fast language toggle** on any page;
+* **not privilege EN over FR** in the URL (so no `/en/` URL with FR as second class).
 
-## Options considérées
+## Considered options
 
-### Antora i18n natif
+### Native Antora i18n
 
-L'i18n d'Antora est marqué expérimental dans la documentation officielle. Il fonctionne via des fichiers de traduction superposés au composant principal, mais :
+Antora i18n is marked experimental in the official documentation. It works via
+translation files layered on top of the main component, but:
 
-* la couverture HTML/UI n'est pas complète ;
-* les exemples publics sont rares ;
-* l'évolution future est incertaine.
+* the HTML/UI coverage is incomplete;
+* public examples are rare;
+* future evolution is uncertain.
 
-Risque trop élevé pour une suite documentaire qui veut rester maintenable sur la durée.
+Risk is too high for a documentation suite that must remain maintainable long term.
 
-### Fork par langue (un repo `<module>` et un repo `<module>-docs-en`)
+### Language fork (one `<module>` repo and one `<module>-docs-en` repo)
 
-Trop coûteux. Doublerait le nombre de repos. Désynchronisations garanties dès que la doc d'un module évolue.
+Too expensive. It would double the number of repos. Desynchronization would be
+guaranteed as soon as module docs evolve.
 
-### Sous-domaines `fr.docs.vidocq.dev` et `docs.vidocq.dev`
+### `fr.docs.vidocq.dev` and `docs.vidocq.dev` subdomains
 
-* Possible mais alourdit le déploiement.
-* Le SEO est plus délicat (hreflang, canonicals).
-* Pas de gain par rapport à des paths sur le même domaine.
+* Possible, but deployment becomes heavier.
+* SEO is trickier (`hreflang`, canonicals).
+* No gain over paths on the same domain.
 
-### Composants parallèles `<module>` et `<module>-fr`
+### Parallel `<module>` and `<module>-fr` components
 
-* Chaque module définit deux components Antora distincts dans son `docs/` : `<module>` (EN) et `<module>-fr` (FR).
-* Tous deux sont packagés dans la même playbook.
-* Le toggle FR/EN est implémenté **côté client** par un petit JS (`ui-bundle/src/js/site.js`) : si on est sur `/vauban/page.html`, le toggle FR pointe vers `/vauban-fr/page.html`. Si la page n'existe pas, fallback sur l'`index` du component cible.
-* L'URL **n'a pas de préfixe `/fr` ou `/en`** : la langue est dans le nom du component, ce qui rend l'URL canonique (chaque page a son URL unique sans redirection).
+* Each module defines two distinct Antora components in its `docs/`: `<module>` (EN) and `<module>-fr` (FR).
+* Both are packaged in the same playbook.
+* The FR/EN toggle is implemented **client-side** by a small JS file (`ui-bundle/src/js/site.js`): if the current page is `/vauban/page.html`, the FR toggle points to `/vauban-fr/page.html`. If the page does not exist, it falls back to the target component index.
+* The URL **has no `/fr` or `/en` prefix**: the language is in the component name, which keeps the URL canonical (each page has a unique URL with no redirect).
 
 ## Decision
 
-**Composants parallèles.**
+**Parallel components.**
 
-* Les deux versions co-existent sur un pied d'égalité.
-* Le **français est canonique** : on écrit d'abord en FR, puis on traduit en EN. Pas l'inverse.
-* La structure de pages est **identique** entre les deux versions : même nombre de pages, mêmes ancres, même nav. Cela permet au toggle JS de calculer trivialement l'URL homologue.
-* Les exemples de code, noms d'API, FQN sont **identiques** — seul le texte naturel autour change.
+* Both versions coexist on equal footing.
+* **French is canonical**: we write in FR first, then translate to EN. Never the reverse.
+* The page structure is **identical** between both versions: same number of pages, same anchors, same nav. That lets the JS toggle compute the counterpart URL trivially.
+* Code examples, API names, and FQNs are **identical** — only the surrounding natural language changes.
 
-## Conséquences
+## Consequences
 
-* **Discipline éditoriale** : toute nouvelle page écrite en FR doit être traduite en EN avant merge. Pas de page FR-only ni EN-only.
-* **CI** (à venir) : un linter pourrait vérifier la parité entre `docs/fr/` et `docs/en/` (mêmes fichiers, même nombre d'ancres).
-* **SEO** : les balises `hreflang` doivent être ajoutées dans le `<head>` pour annoncer les versions FR↔EN. *(à implémenter dans le UI bundle)*
-* **Page d'accueil** : `home-fr` est `start_page` par défaut (cohérent avec le positionnement du projet). Le toggle EN renverra vers `home`.
+* **Editorial discipline**: any new page written in FR must be translated into EN before merge. No FR-only or EN-only page.
+* **CI** (to come): a linter could check parity between `docs/fr/` and `docs/en/` (same files, same number of anchors).
+* **SEO**: `hreflang` tags must be added in the `<head>` to announce the FR↔EN versions. *(to be implemented in the UI bundle)*
+* **Home page**: `home-fr` is the default `start_page` (consistent with the project positioning). The EN toggle will link to `home`.
 
-## Alternatives écartées (résumé)
+## Rejected alternatives (summary)
 
-| Option                     | Verdict | Raison |
-|---------------------------|---------|--------|
-| Antora i18n natif         | ✗ | Expérimental, risque sur la durée |
-| Fork par langue           | ✗ | Multiplication des repos, désync |
-| Sous-domaines             | ✗ | Lourd, SEO complexe, pas de gain |
-| **Components parallèles** | ✓ | Stable, simple, sans préfixe URL |
+| Option | Verdict | Reason |
+|---|---|---|
+| Native Antora i18n | ✗ | Experimental, long-term risk |
+| Language fork | ✗ | Repo multiplication, drift |
+| Subdomains | ✗ | Heavy, SEO complexity, no gain |
+| **Parallel components** | ✓ | Stable, simple, no URL prefix |
 
-## Liens
+## Links
 
 * https://docs.antora.org/antora/latest/component-version/
 * https://docs.antora.org/antora/latest/component-with-no-master/
