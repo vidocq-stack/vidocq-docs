@@ -180,6 +180,6 @@ Détail complet par module : xref:roadmap.adoc[Roadmap consolidée].
 
 == Liens utiles
 
-* Forge : https://forge.vidocq.dev/vidocq[forge.vidocq.dev/vidocq]
+* Dépôt : https://codeberg.org/Vidocq[codeberg.org/Vidocq]
 * GitHub mirror : *(à venir)*
 * Matrix / Discord : *(à venir)*

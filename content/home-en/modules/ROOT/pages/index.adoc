@@ -180,6 +180,6 @@ Full per-module breakdown: xref:roadmap.adoc[Consolidated roadmap].
 
 == Useful links
 
-* Forge: https://forge.vidocq.dev/vidocq[forge.vidocq.dev/vidocq]
+* Repository: https://codeberg.org/Vidocq[codeberg.org/Vidocq]
 * GitHub mirror: *(to come)*
 * Matrix / Discord: *(to come)*
