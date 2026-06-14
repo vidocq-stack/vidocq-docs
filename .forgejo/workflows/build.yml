@@ -1,9 +1,12 @@
 name: build
 
+# DÉPRÉCIÉ comme chaîne de publication automatique.
+# La publication de la doc est désormais assurée par `deploy-pages.yaml`
+# (Cloudflare Pages → doc.vidocq.dev). Ce workflow construit et pousse encore
+# l'image conteneur self-hosted (registry.vidocq.dev + Portainer/Foix) et reste
+# disponible en repli MANUEL via `workflow_dispatch`. L'auto-déclenchement sur
+# push/tag est retiré pour éviter un double déploiement avec Cloudflare.
 on:
-  push:
-    branches: [main]
-    tags: ['v*']
   workflow_dispatch:
 
 jobs:

@@ -1,10 +1,17 @@
 #!/usr/bin/env bash
 # Build local complet : UI bundle + site Antora.
 # Usage :
-#   bash scripts/build-local.sh                # tout
+#   bash scripts/build-local.sh                # tout (playbook local)
 #   bash scripts/build-local.sh --ui-only      # juste le UI bundle
 #   bash scripts/build-local.sh --site-only    # juste le site (UI doit être déjà bâti)
 #   bash scripts/build-local.sh --serve        # build + lance un serveur statique sur :8080
+#   bash scripts/build-local.sh --prod         # build avec le playbook de prod (doc.vidocq.dev)
+#   bash scripts/build-local.sh --prod --deploy-cloudflare
+#                                              # build prod + publie sur Cloudflare Pages
+#
+# Déploiement Cloudflare (--deploy-cloudflare) : requiert wrangler (via npx) et les
+# variables d'environnement CLOUDFLARE_API_TOKEN + CLOUDFLARE_ACCOUNT_ID. Publie le
+# contenu de build/site sur le projet Pages « vidocq-docs ».
 #
 # Les fonts (EB Garamond, Cormorant Garamond, JetBrains Mono) sont auto-hébergées
 # via les packages npm @fontsource/*, copiées dans le bundle par la task gulp `fonts`.
@@ -19,15 +26,19 @@ cd "$ROOT"
 UI_ONLY=0
 SITE_ONLY=0
 SERVE=0
+PROD=0
+DEPLOY_CF=0
 
 for arg in "$@"; do
   case "$arg" in
-    --ui-only)    UI_ONLY=1 ;;
-    --site-only)  SITE_ONLY=1 ;;
-    --serve)      SERVE=1 ;;
+    --ui-only)            UI_ONLY=1 ;;
+    --site-only)          SITE_ONLY=1 ;;
+    --serve)              SERVE=1 ;;
+    --prod)               PROD=1 ;;
+    --deploy-cloudflare)  DEPLOY_CF=1 ;;
     --skip-fonts) echo "[build-local] --skip-fonts ignoré (fonts auto-incluses via @fontsource)." >&2 ;;
     -h|--help)
-      sed -n '2,12p' "$0" | sed 's/^# \{0,1\}//'
+      sed -n '2,18p' "$0" | sed 's/^# \{0,1\}//'
       exit 0
       ;;
     *) echo "Argument inconnu : $arg" >&2; exit 2 ;;
@@ -113,8 +124,35 @@ if [[ ! -d node_modules/@antora ]]; then
 fi
 
 # `node_modules/.bin/antora` est présent grâce au package.json racine.
-node_modules/.bin/antora antora-playbook-local.yml
+if [[ "$PROD" -eq 1 ]]; then
+  echo "[build-local] Playbook : antora-playbook.yml (PROD — doc.vidocq.dev)"
+  node_modules/.bin/antora antora-playbook.yml
+else
+  echo "[build-local] Playbook : antora-playbook-local.yml (local)"
+  node_modules/.bin/antora antora-playbook-local.yml
+fi
 echo "[build-local] Site : $ROOT/build/site"
+
+# ------------------------------------------------------------------
+# Déploiement Cloudflare Pages (optionnel)
+# ------------------------------------------------------------------
+if [[ "$DEPLOY_CF" -eq 1 ]]; then
+  echo
+  echo "--- déploiement Cloudflare Pages (projet vidocq-docs) ---"
+  : "${CLOUDFLARE_API_TOKEN:?CLOUDFLARE_API_TOKEN requis pour --deploy-cloudflare}"
+  : "${CLOUDFLARE_ACCOUNT_ID:?CLOUDFLARE_ACCOUNT_ID requis pour --deploy-cloudflare}"
+  if [[ "$PROD" -ne 1 ]]; then
+    echo "[build-local] ⚠️  déploiement d'un build LOCAL (URLs relatives). Pour la prod, ajoutez --prod." >&2
+  fi
+  BRANCH="$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo main)"
+  MSG="local deploy $(date -u +%Y-%m-%dT%H:%M:%SZ) [${BRANCH}]"
+  npx wrangler@latest pages project create vidocq-docs --production-branch=main || true
+  npx wrangler@latest pages deploy build/site \
+    --project-name=vidocq-docs \
+    --branch="$BRANCH" \
+    --commit-message="$MSG"
+  echo "[build-local] Déployé sur Cloudflare Pages (branche $BRANCH)."
+fi
 
 # ------------------------------------------------------------------
 # Serve (optionnel)

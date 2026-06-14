@@ -1,0 +1,84 @@
+name: Deploy to Cloudflare Pages
+
+# Publication de la documentation Antora sur Cloudflare Pages (doc.vidocq.dev).
+# Calqué sur le workflow `deploy-pages.yaml` du projet `pages` (site ROQ), adapté
+# à la chaîne Antora : build du UI bundle, build du site prod, puis `wrangler pages
+# deploy`.
+#
+# Secrets requis (Forgejo → Settings → Secrets) :
+#   CF_API_TOKEN   : token Cloudflare avec la permission « Cloudflare Pages: Edit »
+#   CF_ACCOUNT_ID  : identifiant du compte Cloudflare
+#
+# Modèle de déploiement (identique au projet pages) :
+#   push sur main        → déploiement de production (doc.vidocq.dev)
+#   workflow_dispatch    → déploiement manuel de production
+#   autres branches      → déploiement de prévisualisation (URL *.pages.dev)
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      reason:
+        description: "Raison du déploiement manuel (optionnel)"
+        required: false
+        default: "manual"
+
+jobs:
+  deploy:
+    runs-on: docker
+    # Le label `docker` du runner Forgejo mappe par défaut sur `docker:dind`
+    # (alpine, sans Node). On surcharge avec `catthehacker/ubuntu:act-22.04`
+    # (Node 20 + bash), comme dans build.yml. Aucun démon Docker n'est requis
+    # ici : le déploiement Cloudflare passe uniquement par wrangler (HTTPS).
+    container:
+      image: catthehacker/ubuntu:act-22.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 'lts/*'
+
+      - name: Fetch Chappe version (for the UI bundle footer)
+        run: node scripts/fetch-chappe-version.js
+
+      - name: Build UI bundle
+        working-directory: ui-bundle
+        run: |
+          npm ci
+          npm run build
+
+      - name: Install Antora deps (root)
+        run: npm ci --no-audit --no-fund
+
+      - name: Build Antora site (production)
+        # Playbook de prod : url https://doc.vidocq.dev, sources clonées en HTTPS
+        # depuis Codeberg. SITE_URL / KROKI_SERVER_URL surchargent si définis.
+        run: |
+          ./node_modules/.bin/antora \
+            --url "${SITE_URL:-https://doc.vidocq.dev}" \
+            --attribute kroki-server-url="${KROKI_SERVER_URL:-https://kroki.vidocq.dev}" \
+            antora-playbook.yml
+
+      - name: Create Cloudflare Pages project (idempotent)
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CF_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CF_ACCOUNT_ID }}
+        run: npx wrangler@latest pages project create vidocq-docs --production-branch=main || true
+
+      - name: Deploy to Cloudflare Pages
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CF_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CF_ACCOUNT_ID }}
+        run: |
+          BRANCH="${GITHUB_REF_NAME:-main}"
+          TRIGGER="${{ github.event_name }}"
+          NOTE="${{ github.event.inputs.reason }}"
+          MSG="ci: deploy $(date -u +%Y-%m-%dT%H:%M:%SZ) [${TRIGGER}${NOTE:+ — $NOTE}]"
+          npx wrangler@latest pages deploy build/site \
+            --project-name=vidocq-docs \
+            --branch="$BRANCH" \
+            --commit-message="$MSG"
