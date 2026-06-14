@@ -29,7 +29,7 @@ jobs:
     runs-on: docker
     # Le label `docker` du runner Forgejo mappe par défaut sur `docker:dind`
     # (alpine, sans Node). On surcharge avec `catthehacker/ubuntu:act-22.04`
-    # (Node 20 + bash), comme dans build.yml. Aucun démon Docker n'est requis
+    # (Node 20 + bash). Aucun démon Docker n'est requis
     # ici : le déploiement Cloudflare passe uniquement par wrangler (HTTPS).
     container:
       image: catthehacker/ubuntu:act-22.04
