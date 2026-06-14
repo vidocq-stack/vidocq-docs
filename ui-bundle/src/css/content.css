@@ -20,6 +20,16 @@
   font-size: 0.95rem;
 }
 
+/* Logo de brique centré sur la page d'accueil de chaque module */
+.doc .imageblock.module-logo {
+  text-align: center;
+  margin: 0.5rem auto 2rem;
+}
+
+.doc .imageblock.module-logo img {
+  margin-inline: auto;
+}
+
 /* Card grid sur la home pour les composants */
 .doc .openblock.cards .ulist > ul {
   display: grid;
