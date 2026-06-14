@@ -106,6 +106,12 @@ asciidoc:
     repo-ravel: 'https://forge.vidocq.dev/vidocq/ravel'
     repo-vidocq: 'https://forge.vidocq.dev/vidocq/vidocq'
     repo-knock: 'https://forge.vidocq.dev/vidocq/knock'
+    repo-humboldt: 'https://forge.vidocq.dev/vidocq/humboldt'
+    repo-grimm: 'https://forge.vidocq.dev/vidocq/grimm'
+    repo-dirac: 'https://forge.vidocq.dev/vidocq/dirac'
+    repo-heisenberg: 'https://forge.vidocq.dev/vidocq/heisenberg'
+    repo-cervantes: 'https://forge.vidocq.dev/vidocq/cervantes'
+    repo-cyrano: 'https://forge.vidocq.dev/vidocq/cyrano'
 
     # --- URLs des specs Jakarta / MicroProfile ---
     spec-rest-4: 'https://jakarta.ee/specifications/restful-ws/4.0/'
