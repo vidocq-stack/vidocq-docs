@@ -7,7 +7,7 @@ Documentation Antora de l'écosystème **Vidocq** — multi-component, bilingue 
 Ce dépôt **n'héberge pas le contenu** des modules. Chaque module (`vidocq`, `vauban`, `cassini`, `champollion`, `chappe`, `foy`, `mansart`) garde sa propre documentation dans son répertoire `docs/`. `vidocq-docs` ne contient que :
 
 * la *playbook* Antora (`antora-playbook.yml`) ;
-* le UI bundle XIXᵉ siècle (`ui-bundle/`) ;
+* le UI bundle harmonisé avec le site web (`ui-bundle/`) ;
 * la home (`content/home-{en,fr}/`) ;
 * le `Dockerfile` qui tire `chappe-cli` depuis repolite (cf. link:docs/adr/0003-chappe-cli-from-repolite.md[ADR 0003]) ;
 * le workflow Forgejo Actions et les compose de déploiement Portainer (`deploy/`).

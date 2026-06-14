@@ -18,13 +18,14 @@ const UI = `${BUILD}/ui`;
 // Mapping `<source dans node_modules/@fontsource> -> <nom WOFF2 final attendu par fonts.css>`.
 // Subset `latin` (couvre FR + EN ; latin-ext non nécessaire pour notre périmètre).
 const FONT_MAP = {
-  '@fontsource/eb-garamond/files/eb-garamond-latin-400-normal.woff2':       'eb-garamond-regular.woff2',
-  '@fontsource/eb-garamond/files/eb-garamond-latin-400-italic.woff2':       'eb-garamond-italic.woff2',
-  '@fontsource/eb-garamond/files/eb-garamond-latin-600-normal.woff2':       'eb-garamond-semibold.woff2',
-  '@fontsource/cormorant-garamond/files/cormorant-garamond-latin-600-normal.woff2': 'cormorant-garamond-semibold.woff2',
-  '@fontsource/cormorant-garamond/files/cormorant-garamond-latin-700-normal.woff2': 'cormorant-garamond-bold.woff2',
-  '@fontsource/jetbrains-mono/files/jetbrains-mono-latin-400-normal.woff2': 'jetbrains-mono-regular.woff2',
-  '@fontsource/jetbrains-mono/files/jetbrains-mono-latin-600-normal.woff2': 'jetbrains-mono-semibold.woff2',
+  '@fontsource/fira-sans/files/fira-sans-latin-300-normal.woff2':  'fira-sans-300.woff2',
+  '@fontsource/fira-sans/files/fira-sans-latin-400-normal.woff2':  'fira-sans-400.woff2',
+  '@fontsource/fira-sans/files/fira-sans-latin-500-normal.woff2':  'fira-sans-500.woff2',
+  '@fontsource/fira-sans/files/fira-sans-latin-600-normal.woff2':  'fira-sans-600.woff2',
+  '@fontsource/fira-sans/files/fira-sans-latin-700-normal.woff2':  'fira-sans-700.woff2',
+  '@fontsource/fira-code/files/fira-code-latin-400-normal.woff2':  'fira-code-400.woff2',
+  '@fontsource/fira-code/files/fira-code-latin-600-normal.woff2':  'fira-code-600.woff2',
+  '@fontsource/fira-code/files/fira-code-latin-700-normal.woff2':  'fira-code-700.woff2',
 };
 
 function css() {

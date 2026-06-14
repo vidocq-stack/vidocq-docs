@@ -1,62 +1,66 @@
 /*
- * Polices auto-hébergées en WOFF2.
- * À récupérer via `npm run fetch-fonts` (cf. scripts/fetch-fonts.sh).
+ * Polices auto-hébergées en WOFF2 — identiques au site web Vidocq.
+ * Fira Sans (corps + UI) et Fira Code (titres + code).
+ * Copiées depuis @fontsource au build (cf. gulpfile FONT_MAP).
  * Si les fichiers ne sont pas présents, on tombe sur fonts système.
  */
 
-/* EB Garamond — corps de texte */
+/* Fira Sans — corps de texte & interface */
 @font-face {
-  font-family: "EB Garamond";
+  font-family: "Fira Sans";
+  font-style: normal;
+  font-weight: 300;
+  font-display: swap;
+  src: url("../font/fira-sans-300.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Fira Sans";
   font-style: normal;
   font-weight: 400;
   font-display: swap;
-  src: url("../font/eb-garamond-regular.woff2") format("woff2");
-  unicode-range: U+0000-024F, U+1E00-1EFF, U+2000-206F, U+2074, U+20AC,
-    U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+  src: url("../font/fira-sans-400.woff2") format("woff2");
 }
 @font-face {
-  font-family: "EB Garamond";
-  font-style: italic;
-  font-weight: 400;
+  font-family: "Fira Sans";
+  font-style: normal;
+  font-weight: 500;
   font-display: swap;
-  src: url("../font/eb-garamond-italic.woff2") format("woff2");
+  src: url("../font/fira-sans-500.woff2") format("woff2");
 }
 @font-face {
-  font-family: "EB Garamond";
+  font-family: "Fira Sans";
   font-style: normal;
   font-weight: 600;
   font-display: swap;
-  src: url("../font/eb-garamond-semibold.woff2") format("woff2");
-}
-
-/* Cormorant Garamond — titres */
-@font-face {
-  font-family: "Cormorant Garamond";
-  font-style: normal;
-  font-weight: 600;
-  font-display: swap;
-  src: url("../font/cormorant-garamond-semibold.woff2") format("woff2");
+  src: url("../font/fira-sans-600.woff2") format("woff2");
 }
 @font-face {
-  font-family: "Cormorant Garamond";
+  font-family: "Fira Sans";
   font-style: normal;
   font-weight: 700;
   font-display: swap;
-  src: url("../font/cormorant-garamond-bold.woff2") format("woff2");
+  src: url("../font/fira-sans-700.woff2") format("woff2");
 }
 
-/* JetBrains Mono — code */
+/* Fira Code — titres & code */
 @font-face {
-  font-family: "JetBrains Mono";
+  font-family: "Fira Code";
   font-style: normal;
   font-weight: 400;
   font-display: swap;
-  src: url("../font/jetbrains-mono-regular.woff2") format("woff2");
+  src: url("../font/fira-code-400.woff2") format("woff2");
 }
 @font-face {
-  font-family: "JetBrains Mono";
+  font-family: "Fira Code";
   font-style: normal;
   font-weight: 600;
   font-display: swap;
-  src: url("../font/jetbrains-mono-semibold.woff2") format("woff2");
+  src: url("../font/fira-code-600.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Fira Code";
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("../font/fira-code-700.woff2") format("woff2");
 }

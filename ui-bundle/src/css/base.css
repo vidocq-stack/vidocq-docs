@@ -12,10 +12,9 @@ html {
 
 body {
   margin: 0;
-  font-family: var(--font-serif);
+  font-family: var(--font-body);
   font-size: 1rem;
   line-height: var(--content-line);
-  font-feature-settings: "liga", "onum"; /* ligatures + chiffres elzéviriens */
   color: var(--c-text);
   background: var(--c-bg);
   text-rendering: optimizeLegibility;
@@ -50,11 +49,11 @@ hr {
 }
 
 ::selection {
-  background: var(--c-accent-soft);
-  color: var(--c-bg);
+  background: var(--brand-blue-600);
+  color: #fff;
 }
 
 :focus-visible {
-  outline: 2px solid var(--c-accent);
+  outline: 2px solid var(--brand-blue-500);
   outline-offset: 2px;
 }

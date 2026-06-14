@@ -1,7 +1,7 @@
 {
   "name": "vidocq-docs-ui",
   "version": "0.1.0-SNAPSHOT",
-  "description": "UI bundle Antora pour la documentation Vidocq — typographie XIXᵉ siècle, palette parchemin/bordeaux, toggle FR/EN.",
+  "description": "UI bundle Antora pour la documentation Vidocq — harmonisé avec le site web (Fira Sans / Fira Code, palette EU bleu + or, bandeau identique), toggle FR/EN.",
   "private": true,
   "license": "Apache-2.0",
   "engines": {
@@ -12,9 +12,8 @@
     "build": "gulp bundle"
   },
   "dependencies": {
-    "@fontsource/cormorant-garamond": "^5.0.0",
-    "@fontsource/eb-garamond": "^5.0.0",
-    "@fontsource/jetbrains-mono": "^5.0.0"
+    "@fontsource/fira-code": "^5.2.7",
+    "@fontsource/fira-sans": "^5.2.7"
   },
   "devDependencies": {
     "autoprefixer": "^10.4.0",

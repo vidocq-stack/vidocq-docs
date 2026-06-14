@@ -1,19 +1,21 @@
 :root {
-  /* Palette parchemin / encre (conservée pour le corps du document) */
-  --ink:        #1a1410;
-  --ink-soft:   #3a2e22;
-  --paper:      #faf6ed;
-  --paper-warm: #f4ecd8;
-  --cream:      #ede4cc;
-  --rule:       #c9b896;
+  /* Neutres — repris de la palette gray Tailwind du site web */
+  --gray-50:  #f9fafb;
+  --gray-100: #f3f4f6;
+  --gray-200: #e5e7eb;
+  --gray-300: #d1d5db;
+  --gray-400: #9ca3af;
+  --gray-500: #6b7280;
+  --gray-600: #4b5563;
+  --gray-700: #374151;
+  --gray-800: #1f2937;
+  --gray-900: #111827;
+  --gray-950: #030712;
 
-  /* Mode sombre */
-  --dark-ink:    #e8dcc4;
-  --dark-paper:  #1a1410;
-  --dark-cream:  #2a201a;
-  --dark-rule:  #5a4830;
+  --rule:      var(--gray-200);
+  --dark-rule: rgba(255, 255, 255, 0.08);
 
-  /* Palette de marque Vidocq — EU Bleu + EU Or (harmonisée avec le site web) */
+  /* Palette de marque Vidocq — EU Bleu + EU Or (identique au site web) */
   --brand-blue-50:  #eff6ff;
   --brand-blue-100: #dbeafe;
   --brand-blue-200: #bfdbfe;
@@ -30,37 +32,39 @@
   --brand-gold-400: #fbbf24;
   --brand-gold-500: #f59e0b;
 
-  /* Typographie */
-  --font-serif: "EB Garamond", "Adobe Garamond Pro", Garamond, "Cormorant Garamond",
-    Georgia, "Times New Roman", Times, serif;
-  --font-display: "Cormorant Garamond", "EB Garamond", "Playfair Display",
-    Georgia, "Times New Roman", serif;
-  --font-mono: "JetBrains Mono", "IBM Plex Mono", "SFMono-Regular",
-    "Menlo", "Consolas", "Liberation Mono", monospace;
-  --font-ui: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  /* Typographie — identique au site web (Fira Sans / Fira Code) */
+  --font-body:    "Fira Sans", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-heading: "Fira Code", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+  --font-mono:    "Fira Code", ui-monospace, "SFMono-Regular", Menlo, Consolas, "Liberation Mono", monospace;
+  /* Alias rétro-compatibles (anciens noms utilisés dans les autres CSS) */
+  --font-serif:   var(--font-body);
+  --font-display: var(--font-heading);
+  --font-ui:      var(--font-body);
 
-  --content-max: 38rem;
+  --content-max: 46rem;
   --content-line: 1.7;
 
-  /* Couleurs sémantiques (mode clair par défaut) */
-  --c-bg:        var(--paper);
-  --c-bg-warm:   var(--paper-warm);
-  --c-bg-card:   var(--cream);
-  --c-text:      var(--ink);
-  --c-text-soft: var(--ink-soft);
-  --c-link:      var(--brand-blue-700);
-  --c-link-hover: var(--brand-blue-600);
-  --c-rule:      var(--rule);
-  --c-accent:    var(--brand-gold-500);
+  /* Couleurs sémantiques — mode clair (= site web) */
+  --c-bg:          var(--gray-100); /* fond de page gris clair */
+  --c-bg-warm:     var(--gray-50);
+  --c-bg-card:     #ffffff;
+  --c-page:        #ffffff;         /* panneau de contenu blanc */
+  --c-text:        var(--gray-600);
+  --c-heading:     var(--gray-900);
+  --c-text-soft:   var(--gray-500);
+  --c-link:        var(--brand-blue-700);
+  --c-link-hover:  var(--brand-blue-600);
+  --c-rule:        var(--rule);
+  --c-accent:      var(--brand-gold-500);
   --c-accent-soft: var(--brand-gold-400);
-  --c-warning:   #7a1e1e;
+  --c-warning:     #b45309;
 
-  /* Header / navbar */
+  /* Header / navbar — identique au bandeau du site web */
   --header-height: 4rem;
   --header-bg:     rgba(255, 255, 255, 0.94);
-  --header-border: #e5e7eb;
-  --header-text:   #111827;
-  --header-link:   #374151;
+  --header-border: var(--gray-200);
+  --header-text:   var(--gray-900);
+  --header-link:   var(--gray-700);
   --header-link-hover: var(--brand-blue-700);
   --header-brand-grad-start: var(--brand-blue-700);
   --header-brand-grad-mid:   var(--brand-blue-500);
@@ -69,42 +73,46 @@
 
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --c-bg:        var(--dark-paper);
-    --c-bg-warm:   var(--dark-cream);
-    --c-bg-card:   var(--dark-cream);
-    --c-text:      var(--dark-ink);
-    --c-text-soft: color-mix(in srgb, var(--dark-ink) 80%, var(--dark-paper));
-    --c-link:      var(--brand-blue-300);
-    --c-link-hover: var(--brand-blue-400);
-    --c-rule:      var(--dark-rule);
-    --c-accent:    var(--brand-gold-400);
+    --c-bg:          var(--gray-900);
+    --c-bg-warm:     var(--gray-800);
+    --c-bg-card:     var(--gray-800);
+    --c-page:        var(--gray-900);
+    --c-text:        var(--gray-300);
+    --c-heading:     #f9fafb;
+    --c-text-soft:   var(--gray-400);
+    --c-link:        var(--brand-blue-300);
+    --c-link-hover:  var(--brand-blue-400);
+    --c-rule:        var(--dark-rule);
+    --c-accent:      var(--brand-gold-400);
     --c-accent-soft: var(--brand-gold-300);
-    --c-warning:   #c47a7a;
+    --c-warning:     #fbbf24;
 
     --header-bg:     rgba(7, 10, 24, 0.94);
     --header-border: rgba(255, 255, 255, 0.06);
     --header-text:   #f3f4f6;
-    --header-link:   #d1d5db;
+    --header-link:   var(--gray-300);
     --header-link-hover: var(--brand-blue-300);
   }
 }
 
 [data-theme="dark"] {
-  --c-bg:        var(--dark-paper);
-  --c-bg-warm:   var(--dark-cream);
-  --c-bg-card:   var(--dark-cream);
-  --c-text:      var(--dark-ink);
-  --c-text-soft: color-mix(in srgb, var(--dark-ink) 80%, var(--dark-paper));
-  --c-link:      var(--brand-blue-300);
-  --c-link-hover: var(--brand-blue-400);
-  --c-rule:      var(--dark-rule);
-  --c-accent:    var(--brand-gold-400);
+  --c-bg:          var(--gray-900);
+  --c-bg-warm:     var(--gray-800);
+  --c-bg-card:     var(--gray-800);
+  --c-page:        var(--gray-900);
+  --c-text:        var(--gray-300);
+  --c-heading:     #f9fafb;
+  --c-text-soft:   var(--gray-400);
+  --c-link:        var(--brand-blue-300);
+  --c-link-hover:  var(--brand-blue-400);
+  --c-rule:        var(--dark-rule);
+  --c-accent:      var(--brand-gold-400);
   --c-accent-soft: var(--brand-gold-300);
-  --c-warning:   #c47a7a;
+  --c-warning:     #fbbf24;
 
   --header-bg:     rgba(7, 10, 24, 0.94);
   --header-border: rgba(255, 255, 255, 0.06);
   --header-text:   #f3f4f6;
-  --header-link:   #d1d5db;
+  --header-link:   var(--gray-300);
   --header-link-hover: var(--brand-blue-300);
 }

@@ -1,11 +1,12 @@
 .lang-toggle {
   display: inline-flex;
   align-items: stretch;
-  border: 1px solid var(--c-rule);
-  border-radius: 2px;
-  font-family: var(--font-display);
-  font-size: 0.85rem;
-  letter-spacing: 0.06em;
+  border: 1px solid var(--header-border);
+  border-radius: 0.5rem;
+  font-family: var(--font-body);
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
   text-transform: uppercase;
   overflow: hidden;
 }
@@ -15,38 +16,32 @@
   appearance: none;
   background: transparent;
   border: 0;
-  padding: 0.25rem 0.6rem;
-  color: var(--c-text-soft);
+  padding: 0.3rem 0.6rem;
+  color: var(--header-link);
   text-decoration: none;
   font-family: inherit;
   font-size: inherit;
+  font-weight: inherit;
   letter-spacing: inherit;
   text-transform: inherit;
   cursor: pointer;
+  transition: background 0.12s, color 0.12s;
+}
+
+.lang-toggle a:hover,
+.lang-toggle button:hover {
+  color: var(--header-link-hover);
+  background: color-mix(in srgb, var(--brand-blue-600) 8%, transparent);
 }
 
 .lang-toggle a + a,
 .lang-toggle button + button {
-  border-left: 1px solid var(--c-rule);
+  border-left: 1px solid var(--header-border);
 }
 
 .lang-toggle a.is-current,
 .lang-toggle button.is-current {
-  background: var(--c-link);
-  color: var(--c-bg);
+  background: var(--brand-blue-600);
+  color: #fff;
   font-weight: 700;
 }
-
-.theme-toggle {
-  appearance: none;
-  background: transparent;
-  border: 1px solid var(--c-rule);
-  border-radius: 2px;
-  color: var(--c-text);
-  padding: 0.2rem 0.5rem;
-  font-family: var(--font-display);
-  font-size: 0.85rem;
-  cursor: pointer;
-}
-
-.theme-toggle:hover { color: var(--c-link); border-color: var(--c-link); }
