@@ -62,6 +62,32 @@
   flex-shrink: 0;
 }
 
+.navbar-title {
+  font-weight: 700;
+}
+
+.navbar-section {
+  position: relative;
+  margin-left: 0.7rem;
+  padding-left: 0.8rem;
+  font-weight: 500;
+  font-size: 0.9rem;
+  letter-spacing: 0;
+  color: var(--c-link);
+}
+
+.navbar-section::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 1px;
+  height: 1.1em;
+  background: currentColor;
+  opacity: 0.4;
+}
+
 .navbar-brand .monogram {
   width: 1.8em;
   height: 1.8em;
