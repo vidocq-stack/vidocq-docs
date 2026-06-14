@@ -41,6 +41,30 @@ content:
       branches: HEAD
       worktrees: HEAD
       start_paths: [docs/en, docs/fr]
+    - url: ../humboldt
+      branches: HEAD
+      worktrees: HEAD
+      start_paths: [docs/en, docs/fr]
+    - url: ../grimm
+      branches: HEAD
+      worktrees: HEAD
+      start_paths: [docs/en, docs/fr]
+    - url: ../dirac
+      branches: HEAD
+      worktrees: HEAD
+      start_paths: [docs/en, docs/fr]
+    - url: ../heisenberg
+      branches: HEAD
+      worktrees: HEAD
+      start_paths: [docs/en, docs/fr]
+    - url: ../cervantes
+      branches: HEAD
+      worktrees: HEAD
+      start_paths: [docs/en, docs/fr]
+    - url: ../cyrano
+      branches: HEAD
+      worktrees: HEAD
+      start_paths: [docs/en, docs/fr]
     - url: .
       branches: HEAD
       worktrees: HEAD
