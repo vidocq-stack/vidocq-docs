@@ -54,6 +54,14 @@
   flex-shrink: 0;
 }
 
+.navbar-logo {
+  width: 2.25rem;
+  height: 2.25rem;
+  display: block;
+  border-radius: 6px;
+  flex-shrink: 0;
+}
+
 .navbar-brand .monogram {
   width: 1.8em;
   height: 1.8em;

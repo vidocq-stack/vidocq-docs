@@ -41,7 +41,7 @@
   --font-display: var(--font-heading);
   --font-ui:      var(--font-body);
 
-  --content-max: 46rem;
+  --content-max: 54rem;
   --content-line: 1.7;
 
   /* Couleurs sémantiques — mode clair (= site web) */

@@ -9,9 +9,9 @@
 
 .body main {
   display: grid;
-  grid-template-columns: 17rem minmax(0, 1fr);
-  gap: 2.5rem;
-  max-width: 75rem;
+  grid-template-columns: 14rem minmax(0, 1fr);
+  gap: 2rem;
+  max-width: 78rem;
   width: 100%;
   margin: 0 auto;
   padding: 2.5rem 1.5rem 4rem;
