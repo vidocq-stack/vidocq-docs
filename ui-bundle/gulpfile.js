@@ -55,6 +55,9 @@ function js() {
 }
 
 function copyStatic() {
+  // `encoding: false` est requis en gulp 5 / vinyl-fs 4 : sans ça, les fichiers
+  // binaires (PNG du logo, etc.) sont lus comme de l'UTF-8 et corrompus
+  // (l'octet 0x89 de la signature PNG devient le caractère de remplacement U+FFFD).
   return src(
     [
       `${SRC}/layouts/**/*`,
@@ -63,8 +66,8 @@ function copyStatic() {
       `${SRC}/img/**/*`,
       `${SRC}/data/**/*`,
     ],
-    { base: SRC, allowEmpty: true }
-  ).pipe(dest(UI));
+    { base: SRC, allowEmpty: true, encoding: false }
+  ).pipe(dest(UI, { encoding: false }));
 }
 
 function fonts(cb) {
@@ -94,9 +97,9 @@ function fonts(cb) {
 }
 
 function bundle() {
-  return src(`${UI}/**/*`, { base: UI, dot: true })
+  return src(`${UI}/**/*`, { base: UI, dot: true, encoding: false })
     .pipe(zip('ui-bundle.zip'))
-    .pipe(dest(BUILD));
+    .pipe(dest(BUILD, { encoding: false }));
 }
 
 const build = parallel(css, cssPrint, js, copyStatic, fonts);
