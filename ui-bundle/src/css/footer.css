@@ -1,10 +1,12 @@
+/* Footer — reproduit le footer du site web Vidocq.
+   Bande sombre, copyright à gauche, métadonnées + lien Bluesky à droite. */
+
 .footer {
   background: #0b0f23;
   border-top: 1px solid rgba(255, 255, 255, 0.06);
-  padding: 1.25rem 1.5rem;
+  padding: 1.25rem 0;
   font-size: 0.85rem;
   color: rgba(255, 255, 255, 0.45);
-  text-align: center;
 }
 
 [data-theme="dark"] .footer {
@@ -18,36 +20,52 @@
 }
 
 .footer-inner {
-  max-width: 72rem;
+  max-width: 78rem;
   margin: 0 auto;
+  padding: 0 1.5rem;
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: space-between;
   flex-wrap: wrap;
-  gap: 0.5rem;
+  gap: 0.75rem;
 }
 
-.footer a {
+.footer-copy {
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.35);
+}
+
+.footer-links {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  flex-wrap: wrap;
+}
+
+.footer-meta {
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.35);
+}
+
+.footer-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.85rem;
+  font-weight: 500;
   color: rgba(255, 255, 255, 0.55);
   text-decoration: none;
   transition: color 0.15s;
 }
 
-.footer a:hover {
+.footer-link:hover {
   color: #fff;
 }
 
-.footer-mast {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-  vertical-align: middle;
-  color: var(--brand-gold-400);
-}
-
-.footer-mast svg {
-  width: 1.4em;
-  height: 1.4em;
+.footer-link-icon {
+  width: 1rem;
+  height: 1rem;
+  color: #0085ff;
 }
 
 .footer .snapshot-mark {
@@ -56,6 +74,9 @@
   font-weight: 700;
 }
 
-.footer hr.ornament {
-  display: none;
+@media (max-width: 640px) {
+  .footer-inner {
+    justify-content: center;
+    text-align: center;
+  }
 }

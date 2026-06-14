@@ -1,19 +1,18 @@
 <footer class="footer">
   <div class="footer-inner">
-    <hr class="ornament">
-    <p>
-      <span class="footer-mast" aria-hidden="true">
-        <svg viewBox="0 0 32 32" aria-hidden="true">
-          <line x1="16" y1="4" x2="16" y2="28" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-          <line x1="6" y1="9" x2="26" y2="9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-          <line x1="9" y1="14" x2="14" y2="9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-          <line x1="22" y1="13" x2="18" y2="9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-        </svg>
+    <span class="footer-copy">{{i18n 'footer-rights'}}</span>
+    <div class="footer-links">
+      <span class="footer-meta">
+        {{i18n 'powered-by'}} Chappe&nbsp;{{chappe-version}}{{#if (chappe-is-snapshot)}}<span class="snapshot-mark" title="{{i18n 'snapshot-mark'}}">*</span>{{/if}}
+        &nbsp;·&nbsp; {{i18n 'documentation'}}
+        &nbsp;·&nbsp; Apache&nbsp;2.0
       </span>
-      {{i18n 'powered-by'}} Chappe&nbsp;{{chappe-version}}{{#if (chappe-is-snapshot)}}<span class="snapshot-mark" title="{{i18n 'snapshot-mark'}}">*</span>{{/if}}
-      &nbsp;·&nbsp; {{i18n 'documentation'}}
-      &nbsp;·&nbsp; Apache&nbsp;2.0
-      &nbsp;·&nbsp; {{year-roman}}
-    </p>
+      <a href="https://bsky.app/profile/vidocq.dev" class="footer-link" target="_blank" rel="noopener noreferrer">
+        <svg class="footer-link-icon" viewBox="0 0 600 530" aria-hidden="true">
+          <path fill="currentColor" d="M135.72 44.03C202.216 93.951 273.74 195.17 300 249.49c26.262-54.316 97.782-155.54 164.28-205.46C512.26 8.009 590-19.862 590 68.825c0 17.712-10.155 148.79-16.111 170.07-20.703 73.984-96.144 92.854-163.25 81.433 117.3 19.964 147.14 86.092 82.697 152.22-122.39 125.59-175.91-31.51-189.63-71.766-2.514-7.38-3.69-10.832-3.708-7.896-.017-2.936-1.193.516-3.707 7.896-13.714 40.256-67.233 197.36-189.63 71.766-64.444-66.128-34.605-132.26 82.697-152.22-67.108 11.421-142.55-7.449-163.25-81.433C10.155 217.617 0 86.535 0 68.825c0-88.687 77.742-60.816 135.72-24.795Z"/>
+        </svg>
+        @vidocq.dev
+      </a>
+    </div>
   </div>
 </footer>
