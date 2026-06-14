@@ -1,37 +1,61 @@
 .footer {
-  border-top: 1px solid var(--c-rule);
-  padding: 1.5rem;
+  background: #0b0f23;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  padding: 1.25rem 1.5rem;
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.45);
   text-align: center;
-  font-size: 0.9rem;
-  color: var(--c-text-soft);
-  background: var(--c-bg-warm);
+}
+
+[data-theme="dark"] .footer {
+  background: #050810;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .footer {
+    background: #050810;
+  }
 }
 
 .footer-inner {
   max-width: 72rem;
   margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.footer a {
+  color: rgba(255, 255, 255, 0.55);
+  text-decoration: none;
+  transition: color 0.15s;
+}
+
+.footer a:hover {
+  color: #fff;
 }
 
 .footer-mast {
   display: inline-flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.4rem;
   vertical-align: middle;
-  color: var(--c-accent);
+  color: var(--brand-gold-400);
 }
 
 .footer-mast svg {
-  width: 1.5em;
-  height: 1.5em;
+  width: 1.4em;
+  height: 1.4em;
 }
 
 .footer .snapshot-mark {
-  color: var(--c-accent);
+  color: var(--brand-gold-400);
   cursor: help;
   font-weight: 700;
 }
 
 .footer hr.ornament {
-  margin: 0 auto 1rem;
-  max-width: 12rem;
+  display: none;
 }

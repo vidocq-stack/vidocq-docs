@@ -1,23 +1,34 @@
 :root {
-  /* Palette parchemin / encre / bordeaux / ocre */
+  /* Palette parchemin / encre (conservée pour le corps du document) */
   --ink:        #1a1410;
   --ink-soft:   #3a2e22;
   --paper:      #faf6ed;
   --paper-warm: #f4ecd8;
   --cream:      #ede4cc;
-  --burgundy:   #7a1e1e;
-  --burgundy-soft: #9a3a3a;
-  --ochre:      #a07020;
-  --ochre-soft: #b88848;
   --rule:       #c9b896;
 
-  /* Mode sombre = encre claire sur parchemin assombri */
+  /* Mode sombre */
   --dark-ink:    #e8dcc4;
   --dark-paper:  #1a1410;
   --dark-cream:  #2a201a;
-  --dark-burgundy: #c47a7a;
-  --dark-ochre: #d4a868;
   --dark-rule:  #5a4830;
+
+  /* Palette de marque Vidocq — EU Bleu + EU Or (harmonisée avec le site web) */
+  --brand-blue-50:  #eff6ff;
+  --brand-blue-100: #dbeafe;
+  --brand-blue-200: #bfdbfe;
+  --brand-blue-300: #93c5fd;
+  --brand-blue-400: #60a5fa;
+  --brand-blue-500: #3b82f6;
+  --brand-blue-600: #1d4ed8;
+  --brand-blue-700: #1e40af;
+  --brand-blue-800: #1e3a8a;
+  --brand-blue-900: #172554;
+  --brand-blue-950: #0c1445;
+
+  --brand-gold-300: #fcd34d;
+  --brand-gold-400: #fbbf24;
+  --brand-gold-500: #f59e0b;
 
   /* Typographie */
   --font-serif: "EB Garamond", "Adobe Garamond Pro", Garamond, "Cormorant Garamond",
@@ -26,6 +37,7 @@
     Georgia, "Times New Roman", serif;
   --font-mono: "JetBrains Mono", "IBM Plex Mono", "SFMono-Regular",
     "Menlo", "Consolas", "Liberation Mono", monospace;
+  --font-ui: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
 
   --content-max: 38rem;
   --content-line: 1.7;
@@ -36,12 +48,23 @@
   --c-bg-card:   var(--cream);
   --c-text:      var(--ink);
   --c-text-soft: var(--ink-soft);
-  --c-link:      var(--burgundy);
-  --c-link-hover: var(--burgundy-soft);
+  --c-link:      var(--brand-blue-700);
+  --c-link-hover: var(--brand-blue-600);
   --c-rule:      var(--rule);
-  --c-accent:    var(--ochre);
-  --c-accent-soft: var(--ochre-soft);
-  --c-warning:   var(--burgundy);
+  --c-accent:    var(--brand-gold-500);
+  --c-accent-soft: var(--brand-gold-400);
+  --c-warning:   #7a1e1e;
+
+  /* Header / navbar */
+  --header-height: 4rem;
+  --header-bg:     rgba(255, 255, 255, 0.94);
+  --header-border: #e5e7eb;
+  --header-text:   #111827;
+  --header-link:   #374151;
+  --header-link-hover: var(--brand-blue-700);
+  --header-brand-grad-start: var(--brand-blue-700);
+  --header-brand-grad-mid:   var(--brand-blue-500);
+  --header-brand-grad-end:   var(--brand-gold-400);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -51,12 +74,18 @@
     --c-bg-card:   var(--dark-cream);
     --c-text:      var(--dark-ink);
     --c-text-soft: color-mix(in srgb, var(--dark-ink) 80%, var(--dark-paper));
-    --c-link:      var(--dark-burgundy);
-    --c-link-hover: color-mix(in srgb, var(--dark-burgundy) 70%, white);
+    --c-link:      var(--brand-blue-300);
+    --c-link-hover: var(--brand-blue-400);
     --c-rule:      var(--dark-rule);
-    --c-accent:    var(--dark-ochre);
-    --c-accent-soft: color-mix(in srgb, var(--dark-ochre) 70%, white);
-    --c-warning:   var(--dark-burgundy);
+    --c-accent:    var(--brand-gold-400);
+    --c-accent-soft: var(--brand-gold-300);
+    --c-warning:   #c47a7a;
+
+    --header-bg:     rgba(7, 10, 24, 0.94);
+    --header-border: rgba(255, 255, 255, 0.06);
+    --header-text:   #f3f4f6;
+    --header-link:   #d1d5db;
+    --header-link-hover: var(--brand-blue-300);
   }
 }
 
@@ -66,10 +95,16 @@
   --c-bg-card:   var(--dark-cream);
   --c-text:      var(--dark-ink);
   --c-text-soft: color-mix(in srgb, var(--dark-ink) 80%, var(--dark-paper));
-  --c-link:      var(--dark-burgundy);
-  --c-link-hover: color-mix(in srgb, var(--dark-burgundy) 70%, white);
+  --c-link:      var(--brand-blue-300);
+  --c-link-hover: var(--brand-blue-400);
   --c-rule:      var(--dark-rule);
-  --c-accent:    var(--dark-ochre);
-  --c-accent-soft: color-mix(in srgb, var(--dark-ochre) 70%, white);
-  --c-warning:   var(--dark-burgundy);
+  --c-accent:    var(--brand-gold-400);
+  --c-accent-soft: var(--brand-gold-300);
+  --c-warning:   #c47a7a;
+
+  --header-bg:     rgba(7, 10, 24, 0.94);
+  --header-border: rgba(255, 255, 255, 0.06);
+  --header-text:   #f3f4f6;
+  --header-link:   #d1d5db;
+  --header-link-hover: var(--brand-blue-300);
 }
