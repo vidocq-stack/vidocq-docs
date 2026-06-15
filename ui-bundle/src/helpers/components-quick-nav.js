@@ -36,9 +36,7 @@ module.exports = function componentsQuickNav (options) {
   const site = ctx.site;
   if (!site || !site.components) return [];
 
-  const lang = (ctx.page && ctx.page.attributes && ctx.page.attributes.lang)
-    || (site.attributes && site.attributes['primary-language'])
-    || 'fr';
+  const lang = detectLang(ctx);
 
   const suffix = lang === 'fr' ? '-fr' : '';
 
@@ -67,3 +65,30 @@ module.exports = function componentsQuickNav (options) {
     };
   });
 };
+
+// Détecte la langue de la page courante. Antora n'expose sur `page.attributes`
+// que les attributs préfixés `page-`, donc l'attribut `lang` des antora.yml n'y
+// est PAS visible : on déduit la langue du suffixe `-fr` du nom de component (ou
+// de l'URL), exactement comme i18n.js et page-lang.js. La logique est dupliquée
+// (et non importée) car Antora charge chaque helper isolément depuis le bundle.
+function detectLang(ctx) {
+  const page = ctx.page || {};
+
+  const attrLang = page.attributes && page.attributes.lang;
+  if (attrLang === 'fr' || attrLang === 'en') return attrLang;
+
+  const componentName =
+    (page.componentVersion && page.componentVersion.name) ||
+    (page.component && page.component.name) ||
+    '';
+  if (componentName) return /-fr$/.test(componentName) ? 'fr' : 'en';
+
+  if (typeof page.url === 'string') {
+    const first = page.url.split('/').filter(Boolean)[0] || '';
+    if (first) return /-fr$/.test(first) ? 'fr' : 'en';
+  }
+
+  const primary = ctx.site && ctx.site.attributes && ctx.site.attributes['primary-language'];
+  if (primary === 'fr' || primary === 'en') return primary;
+  return 'fr';
+}
