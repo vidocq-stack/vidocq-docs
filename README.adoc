@@ -98,7 +98,7 @@ trap 'rm -f "$SETTINGS"' EXIT
 # 3. Builder l'image Docker (BuildKit obligatoire pour --secret)
 DOCKER_BUILDKIT=1 docker build \
   --secret "id=mavensettings,src=$SETTINGS" \
-  --build-arg CHAPPE_VERSION=0.1.0-SNAPSHOT \
+  --build-arg CHAPPE_VERSION=0.2.0 \
   --build-arg MAVEN_REPO_URL=https://repo.vidocq.dev/snapshots \
   -t vidocq-docs:test .
 docker run --rm -p 8080:8080 vidocq-docs:test
@@ -129,7 +129,7 @@ Build args du `Dockerfile` :
 |===
 | Build arg | Rôle
 
-| `CHAPPE_VERSION` | Coordonnée Maven de `chappe-cli` (défaut : `0.1.0-SNAPSHOT`)
+| `CHAPPE_VERSION` | Coordonnée Maven de `chappe-cli` (défaut : `0.2.0`)
 | `MAVEN_REPO_URL` | URL repolite (défaut : `https://repo.vidocq.dev/snapshots` ; pointer sur `/releases` pour un tag stable)
 |===
 
@@ -327,7 +327,7 @@ Le Dockerfile tire `chappe-cli-shaded` depuis `https://repo.vidocq.dev/snapshots
 au build. Si le stage échoue :
 
 * vérifier que repolite est accessible depuis le runner (firewall, DNS) ;
-* vérifier qu'une version `chappe-cli:0.1.0-SNAPSHOT:jar:shaded` existe sur
+* vérifier qu'une version `chappe-cli:0.2.0:jar:shaded` existe sur
   repolite (côté chappe : `mvn -pl chappe-cli -am deploy`) ;
 * si repolite est privé en lecture, ajouter un `~/.m2/settings.xml` au stage
   `chappe-fetcher` avec les creds (cf. ADR 0003).
