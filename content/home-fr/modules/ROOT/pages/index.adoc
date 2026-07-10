@@ -7,6 +7,11 @@ image::vidocq-logo.png[Vidocq,360,role=home-logo]
 [.lead]
 Vidocq est une suite de runtimes Jakarta EE et MicroProfile écrite en Java 25 pur, JPMS-natif, fondée sur la génération de code statique (Class-File API + APT) et les virtual threads.
 
+[TIP]
+====
+**Nouveau ici ?** Le xref:vidocq-fr:getting-started.adoc[guide de démarrage rapide] vous mène de l'installation de la CLI à un service REST qui tourne en quelques minutes, et le https://vidocq.dev/posts/how-to-start-your-first-vidocq-app/[tutoriel première app] du blog raconte le même parcours pas à pas.
+====
+
 == L'écosystème en un diagramme
 
 [mermaid]
@@ -156,7 +161,7 @@ Trois raisons :
 
 [CAUTION]
 ====
-La suite est en **0.1.0-SNAPSHOT**. Aucune garantie de stabilité d'API. Aucune release publique. Ne pas utiliser en production.
+La suite est publiée en **0.2.x sur Maven Central** — une **alpha** : les API peuvent encore évoluer et l'usage en production n'est pas encore recommandé. Les retours des premiers utilisateurs sont très bienvenus sur https://codeberg.org/Vidocq[Codeberg].
 ====
 
 Ce qui marche aujourd'hui :
@@ -180,6 +185,8 @@ Détail complet par module : xref:roadmap.adoc[Roadmap consolidée].
 
 == Liens utiles
 
+* Démarrage rapide : xref:vidocq-fr:getting-started.adoc[guide getting started]
+* Blog : https://vidocq.dev/blog[vidocq.dev/blog]
 * Dépôt : https://codeberg.org/Vidocq[codeberg.org/Vidocq]
-* GitHub mirror : *(à venir)*
+* GitHub mirror : https://github.com/vidocq-stack[github.com/vidocq-stack]
 * Matrix / Discord : *(à venir)*

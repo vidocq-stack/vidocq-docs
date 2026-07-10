@@ -2,7 +2,7 @@
 :description: État par module et jalons proches.
 
 [.lead]
-Cette page agrège l'état d'avancement des quinze modules — sept fondations Jakarta EE plus huit implémentations MicroProfile. Chaque section pointe vers la documentation du module pour le détail. La suite est en `0.1.0-SNAPSHOT` — aucune release publique, aucune garantie de stabilité d'API.
+Cette page agrège l'état d'avancement des quinze modules — sept fondations Jakarta EE plus huit implémentations MicroProfile. Chaque section pointe vers la documentation du module pour le détail. La suite est publiée en `0.2.x` sur Maven Central — une alpha, les API peuvent encore évoluer.
 
 == Jalons proches
 

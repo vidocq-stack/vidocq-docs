@@ -2,7 +2,7 @@
 :description: Per-module status and upcoming milestones.
 
 [.lead]
-This page aggregates the progress of all fifteen modules — seven Jakarta EE foundations plus eight MicroProfile implementations. Each section links to the module's documentation for details. The suite is at `0.1.0-SNAPSHOT` — no public release, no API stability guarantee.
+This page aggregates the progress of all fifteen modules — seven Jakarta EE foundations plus eight MicroProfile implementations. Each section links to the module's documentation for details. The suite is released as `0.2.x` on Maven Central — an alpha, APIs may still change.
 
 == Upcoming milestones
 
