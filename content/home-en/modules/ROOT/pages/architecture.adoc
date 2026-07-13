@@ -121,7 +121,7 @@ Four invariants apply across the whole ecosystem.
 
 Only the relevant **Jakarta / MicroProfile specs** are allowed at runtime. No Tomcat, Jetty, Netty, Weld, ArC, Yasson, Hibernate, RESTEasy. Any new runtime dependency must be explicitly justified in the PR.
 
-=== 2. Strict JPMS
+=== 2. Strict Java Modules
 
 Every module ships its own `module-info.java`. Minimal `exports`. No unjustified `opens`. No classpath. No `add-opens` at launch. The integrity of the module graph is checked by the workspace `jpms-guardian` agent.
 

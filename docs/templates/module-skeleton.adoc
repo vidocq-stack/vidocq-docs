@@ -35,7 +35,7 @@ Tout module de l'écosystème Vidocq (chappe, vauban, champollion, foy, cassini,
 | champollion, foy, cassini, mansart, vidocq
 
 | `reference.adoc`
-| Référence complète : config, API publique, CLI, attributs JPMS exportés, propriétés `MicroProfile Config`.
+| Référence complète : config, API publique, CLI, attributs Java Modules exportés, propriétés `MicroProfile Config`.
 | Tous
 
 | `migration.adoc`
@@ -64,7 +64,7 @@ Tout module de l'écosystème Vidocq (chappe, vauban, champollion, foy, cassini,
 | Spec implémentée | {lien spec via attribut, ex. {spec-rest-4}}
 | Repo | {url repo via attribut, ex. {repo-cassini}}
 | Java | 25 (LTS)
-| Module JPMS | `io.vidocq.{nom}`
+| Module Java | `io.vidocq.{nom}`
 | Dépendances runtime | {zéro / specs Jakarta uniquement / etc.}
 | TCK | {✅ XX/YY passés — détails xref:tck.adoc[ici] / ⚠️ partiel / ❌ pas encore exécuté}
 |===

@@ -1,11 +1,11 @@
 = Vidocq
-:description: Suite de runtimes Jakarta EE / MicroProfile, Java 25, JPMS-natif, peu de dépendances.
+:description: Suite de runtimes Jakarta EE / MicroProfile, Java 25, natif Java Modules, peu de dépendances.
 
 [.text-center]
 image::vidocq-logo.png[Vidocq,360,role=home-logo]
 
 [.lead]
-Vidocq est une suite de runtimes Jakarta EE et MicroProfile écrite en Java 25 pur, JPMS-natif, fondée sur la génération de code statique (Class-File API + APT) et les virtual threads.
+Vidocq est une suite de runtimes Jakarta EE et MicroProfile écrite en Java 25 pur, natif Java Modules, fondée sur la génération de code statique (Class-File API + APT) et les virtual threads.
 
 [TIP]
 ====
@@ -78,7 +78,7 @@ Chaque module est un projet indépendant, publié séparément, avec son propre 
 
 Trois raisons :
 
-. **Souveraineté technique.** Le monde Jakarta repose largement sur quelques fondations historiques (Tomcat, Jetty, Netty, Hibernate, Yasson, ArC, RESTEasy). Travail remarquable, dépendances accumulées. Vidocq prend le pari de tout réimplémenter sur Java 25 pur, en s'appuyant sur ce que la JDK propose désormais : virtual threads, scoped values, Class-File API, JPMS strict.
+. **Souveraineté technique.** Le monde Jakarta repose largement sur quelques fondations historiques (Tomcat, Jetty, Netty, Hibernate, Yasson, ArC, RESTEasy). Travail remarquable, dépendances accumulées. Vidocq prend le pari de tout réimplémenter sur Java 25 pur, en s'appuyant sur ce que la JDK propose désormais : virtual threads, scoped values, Class-File API, Java Modules strict.
 
 . **Génération à la compilation.** Pas de réflexion à chaud, pas de proxy dynamique, pas d'ASM, pas de Byte Buddy. Tout ce qu'on peut calculer à `compile-time` est calculé à `compile-time`. Au démarrage, on instancie. Compatible AOT (GraalVM `native-image`, Project Leyden CDS).
 
@@ -95,7 +95,7 @@ Trois raisons :
 | {repo-vidocq}
 
 | xref:vauban::index.adoc[Vauban]
-| Container CDI 4.1 Lite, build-time, JPMS-natif
+| Container CDI 4.1 Lite, build-time, natif Java Modules
 | {repo-vauban}
 
 | xref:cassini::index.adoc[Cassini]
@@ -153,7 +153,7 @@ Trois raisons :
 
 == Pages transverses
 
-* xref:architecture.adoc[Architecture globale] — frontières des modules, matrice de dépendances, choix transverses (zéro-dépendance, JPMS, codegen, virtual threads).
+* xref:architecture.adoc[Architecture globale] — frontières des modules, matrice de dépendances, choix transverses (zéro-dépendance, Java Modules, codegen, virtual threads).
 * xref:compare.adoc[Comparatif] — Vidocq Runtime face à Quarkus, Helidon SE 4 et Spring Boot 4.
 * xref:roadmap.adoc[Roadmap consolidée] — statut par module et jalons proches (M2x, M5, M6c, M7).
 
