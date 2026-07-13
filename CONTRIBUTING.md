@@ -118,3 +118,15 @@ By making a contribution to this project, I certify that:
 See `CLAUDE.md` / `README.md` at the root of this repository for the project's
 coding standards (strict Java Modules, zero runtime dependencies, virtual threads,
 TDD, English-only code and Javadoc).
+
+## Terminology (ecosystem-wide)
+
+This is the canonical terminology reference for the whole Vidocq ecosystem; each
+repository also carries a short pointer in its `AGENTS.md` / `CLAUDE.md`.
+
+Use **Java Modules** when referring to the Java Platform Module System, and
+**Java module** for a single module (its `module-info.java`). Do **not** use the
+abbreviation **JPMS** — in prose, identifiers, artifact ids, package names, or
+documentation. In code identifiers where a spaced term is impossible, use
+`module` (e.g. a module-path integration test is `*-module-it`, package
+`…moduleit`).
