@@ -123,7 +123,7 @@ Seules les **specs Jakarta / MicroProfile** concernées sont autorisées en runt
 
 === 2. Java Modules strict
 
-Chaque module a son `module-info.java`. `exports` minimaux. Pas d'`opens` non justifié. Pas de classpath. Pas d'`add-opens` au lancement. L'intégrité du graphe modulaire est validée par l'agent `jpms-guardian` du workspace.
+Chaque module a son `module-info.java`. `exports` minimaux. Pas d'`opens` non justifié. Pas de classpath. Pas d'`add-opens` au lancement. L'intégrité du graphe modulaire est validée par l'agent `java-modules-guardian` du workspace.
 
 === 3. Codegen statique au lieu de réflexion runtime
 
