@@ -121,9 +121,9 @@ Quatre invariants s'appliquent à tout l'écosystème.
 
 Seules les **specs Jakarta / MicroProfile** concernées sont autorisées en runtime. Pas de Tomcat, Jetty, Netty, Weld, ArC, Yasson, Hibernate, RESTEasy. Toute dépendance runtime nouvelle doit être justifiée explicitement dans la PR.
 
-=== 2. JPMS strict
+=== 2. Java Modules strict
 
-Chaque module a son `module-info.java`. `exports` minimaux. Pas d'`opens` non justifié. Pas de classpath. Pas d'`add-opens` au lancement. L'intégrité du graphe modulaire est validée par l'agent `jpms-guardian` du workspace.
+Chaque module a son `module-info.java`. `exports` minimaux. Pas d'`opens` non justifié. Pas de classpath. Pas d'`add-opens` au lancement. L'intégrité du graphe modulaire est validée par l'agent `java-modules-guardian` du workspace.
 
 === 3. Codegen statique au lieu de réflexion runtime
 

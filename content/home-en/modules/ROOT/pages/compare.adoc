@@ -28,8 +28,8 @@ This page compares Vidocq Runtime to the three contemporary Java runtimes closes
 | Runtime (reflection + ServiceLoader)
 | Runtime (reflection + auto-configuration)
 
-| JPMS
-| JPMS-native, strict, `module-info.java` everywhere
+| Java Modules
+| native Java Modules, strict, `module-info.java` everywhere
 | Classpath; partial MR-JAR modules
 | Classpath; modules in some libs
 | Classpath

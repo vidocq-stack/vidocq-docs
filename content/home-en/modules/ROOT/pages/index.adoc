@@ -1,11 +1,11 @@
 = Vidocq
-:description: A suite of Jakarta EE / MicroProfile runtimes, Java 25, JPMS-native, minimal dependencies.
+:description: A suite of Jakarta EE / MicroProfile runtimes, Java 25, native Java Modules, minimal dependencies.
 
 [.text-center]
 image::vidocq-logo.png[Vidocq,360,role=home-logo]
 
 [.lead]
-Vidocq is a suite of Jakarta EE and MicroProfile runtimes written in pure Java 25, JPMS-native, built on static code generation (Class-File API + APT) and virtual threads.
+Vidocq is a suite of Jakarta EE and MicroProfile runtimes written in pure Java 25, native Java Modules, built on static code generation (Class-File API + APT) and virtual threads.
 
 [TIP]
 ====
@@ -78,7 +78,7 @@ Each module is an independent project, released separately, with its own life-cy
 
 Three reasons:
 
-. **Technical sovereignty.** The Jakarta world rests largely on a handful of historical foundations (Tomcat, Jetty, Netty, Hibernate, Yasson, ArC, RESTEasy). Remarkable work, but accumulated dependencies. Vidocq bets on rebuilding everything on pure Java 25, leaning on what the JDK now offers: virtual threads, scoped values, Class-File API, strict JPMS.
+. **Technical sovereignty.** The Jakarta world rests largely on a handful of historical foundations (Tomcat, Jetty, Netty, Hibernate, Yasson, ArC, RESTEasy). Remarkable work, but accumulated dependencies. Vidocq bets on rebuilding everything on pure Java 25, leaning on what the JDK now offers: virtual threads, scoped values, Class-File API, strict Java Modules.
 
 . **Compile-time generation.** No runtime reflection, no dynamic proxies, no ASM, no Byte Buddy. Anything computable at `compile-time` is computed at `compile-time`. At startup, we instantiate. AOT-compatible (GraalVM `native-image`, Project Leyden CDS).
 
@@ -95,7 +95,7 @@ Three reasons:
 | {repo-vidocq}
 
 | xref:vauban::index.adoc[Vauban]
-| CDI 4.1 Lite container, build-time, JPMS-native
+| CDI 4.1 Lite container, build-time, native Java Modules
 | {repo-vauban}
 
 | xref:cassini::index.adoc[Cassini]
@@ -153,7 +153,7 @@ Three reasons:
 
 == Cross-cutting pages
 
-* xref:architecture.adoc[Overall architecture] — module boundaries, dependency matrix, cross-cutting choices (zero-dependency, JPMS, codegen, virtual threads).
+* xref:architecture.adoc[Overall architecture] — module boundaries, dependency matrix, cross-cutting choices (zero-dependency, Java Modules, codegen, virtual threads).
 * xref:compare.adoc[Comparison] — Vidocq Runtime against Quarkus, Helidon SE 4 and Spring Boot 4.
 * xref:roadmap.adoc[Consolidated roadmap] — module-by-module status and upcoming milestones (M2x, M5, M6c, M7).
 
