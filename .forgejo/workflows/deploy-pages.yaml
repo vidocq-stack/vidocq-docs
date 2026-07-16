@@ -57,8 +57,12 @@ jobs:
       - name: Build Antora site (production)
         # Playbook de prod : url https://doc.vidocq.dev, sources clonées en HTTPS
         # depuis Codeberg. SITE_URL / KROKI_SERVER_URL surchargent si définis.
+        # --fetch est indispensable : sur un runner persistant, le cache Antora
+        # (~/.cache/antora) réutilise les clones existants SANS les rafraîchir —
+        # le site se redéploierait avec les docs d'un main périmé.
         run: |
           ./node_modules/.bin/antora \
+            --fetch \
             --url "${SITE_URL:-https://doc.vidocq.dev}" \
             --attribute kroki-server-url="${KROKI_SERVER_URL:-https://kroki.vidocq.dev}" \
             antora-playbook.yml
