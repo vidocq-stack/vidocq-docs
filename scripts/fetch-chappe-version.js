@@ -1,11 +1,12 @@
 #!/usr/bin/env node
 /* eslint-env node */
 /**
- * Lit la version courante de Chappe depuis :
- *   - ../chappe/pom.xml en build local
- *   - https://forge.vidocq.dev/.../pom.xml en CI (si le clone est absent)
+ * Reads the current Chappe version from:
+ *   - ../../chappe/main/pom.xml for a local build. Under the mani layout every
+ *     repo is cloned as <repo>/main, so chappe sits next to this repo's parent.
+ *   - https://codeberg.org/.../pom.xml in CI (when the local clone is absent)
  *
- * Écrit ui-bundle/src/data/versions.json :
+ * Writes ui-bundle/src/data/versions.json:
  *   { "chappe": "0.1.0-SNAPSHOT", "isSnapshot": true, "buildDate": "..." }
  */
 
@@ -17,8 +18,8 @@ const https = require('https');
 const http = require('http');
 
 const REPO_ROOT = path.resolve(__dirname, '..');
-const LOCAL_POM = path.resolve(REPO_ROOT, '..', 'chappe', 'pom.xml');
-const REMOTE_URL = 'https://forge.vidocq.dev/vidocq/chappe/raw/branch/main/pom.xml';
+const LOCAL_POM = path.resolve(REPO_ROOT, '..', '..', 'chappe', 'main', 'pom.xml');
+const REMOTE_URL = 'https://codeberg.org/Vidocq/chappe/raw/branch/main/pom.xml';
 const OUT_FILE = path.resolve(REPO_ROOT, 'ui-bundle', 'src', 'data', 'versions.json');
 
 function extractRootVersion(pomXml) {

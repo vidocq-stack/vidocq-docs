@@ -5,63 +5,63 @@ site:
 
 content:
   sources:
-    - url: ../vidocq
+    - url: ../../vidocq/main
       branches: HEAD
       worktrees: HEAD
       start_paths: [docs/en, docs/fr]
-    - url: ../vauban
+    - url: ../../vauban/main
       branches: HEAD
       worktrees: HEAD
       start_paths: [docs/en, docs/fr]
-    - url: ../ravel
+    - url: ../../ravel/main
       branches: HEAD
       worktrees: HEAD
       start_paths: [docs/en, docs/fr]
-    - url: ../cassini
+    - url: ../../cassini/main
       branches: HEAD
       worktrees: HEAD
       start_paths: [docs/en, docs/fr]
-    - url: ../champollion
+    - url: ../../champollion/main
       branches: HEAD
       worktrees: HEAD
       start_paths: [docs/en, docs/fr]
-    - url: ../chappe
+    - url: ../../chappe/main
       branches: HEAD
       worktrees: HEAD
       start_paths: [docs/en, docs/fr]
-    - url: ../foy
+    - url: ../../foy/main
       branches: HEAD
       worktrees: HEAD
       start_paths: [docs/en, docs/fr]
-    - url: ../mansart
+    - url: ../../mansart/main
       branches: HEAD
       worktrees: HEAD
       start_paths: [docs/en, docs/fr]
-    - url: ../knock
+    - url: ../../knock/main
       branches: HEAD
       worktrees: HEAD
       start_paths: [docs/en, docs/fr]
-    - url: ../humboldt
+    - url: ../../humboldt/main
       branches: HEAD
       worktrees: HEAD
       start_paths: [docs/en, docs/fr]
-    - url: ../grimm
+    - url: ../../grimm/main
       branches: HEAD
       worktrees: HEAD
       start_paths: [docs/en, docs/fr]
-    - url: ../dirac
+    - url: ../../dirac/main
       branches: HEAD
       worktrees: HEAD
       start_paths: [docs/en, docs/fr]
-    - url: ../heisenberg
+    - url: ../../heisenberg/main
       branches: HEAD
       worktrees: HEAD
       start_paths: [docs/en, docs/fr]
-    - url: ../cervantes
+    - url: ../../cervantes/main
       branches: HEAD
       worktrees: HEAD
       start_paths: [docs/en, docs/fr]
-    - url: ../cyrano
+    - url: ../../cyrano/main
       branches: HEAD
       worktrees: HEAD
       start_paths: [docs/en, docs/fr]
