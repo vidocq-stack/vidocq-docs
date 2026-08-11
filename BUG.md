@@ -188,3 +188,50 @@ zero `xref unresolved` anywhere in `build/site` afterwards.
 - Introduced in `188ca27` and shipped since: an asciidoctor `ERROR` that does
   not fail the build gets normalised as noise. Worth a `--fail-on-error` style
   gate in CI.
+
+---
+
+## DOCS-004 — FR/EN toggle dead outside a web root (file://, sub-path deploys)
+
+- **Date**: 2026-08-11
+- **Status**: FIXED on branch `fix/mani-layout-paths` (not yet merged)
+- **Severity**: medium (the site is unusable in one language when opened from disk)
+- **Affected**: `ui-bundle/src/js/site.js`, `setupLangToggle()`
+
+### Symptom
+
+Opening `file:///…/build/site/champollion-fr/index.html` and clicking **EN**
+does nothing. Only the French half of the site is reachable.
+
+### Root cause
+
+The toggle assumed the component is the **first** path segment and emitted a
+root-absolute href:
+
+```js
+var component = parts[0]
+el.setAttribute('href', '/' + newParts.join('/'))
+```
+
+Over `file://`, `location.pathname` is `/Users/…/build/site/champollion-fr/index.html`,
+so `parts[0]` is `Users` and the computed target is `/Users-fr/…`. The same
+assumption breaks any deployment under a sub-path (`https://host/docs/…`).
+
+### Fix
+
+Derive the page's depth below the site root from the UI asset path Antora
+rewrites per page (`../_/js/site.js`, `../../_/js/site.js`, …), locate the
+component segment by that depth instead of assuming index 0, and emit a
+**relative** href (`../champollion/index.html`).
+
+Verified with a stub-DOM harness driving the built bundle over six cases —
+`file://` at depth 1 and 2, web root, sub-path deploy, directory URL without
+`index.html`, and EN→FR — all previously failing or wrong, all passing after.
+
+### Lessons learned
+
+- **Root-absolute URLs in UI JS are a deployment assumption in disguise.** The
+  generated HTML is careful to use relative asset paths; the JS silently was
+  not, so the two disagreed as soon as the site left `/`.
+- Antora already encodes the answer per page in the UI asset path — prefer
+  reading that over reconstructing the site root from `location`.

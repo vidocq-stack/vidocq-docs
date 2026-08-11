@@ -27,17 +27,43 @@
     });
   }
 
+  // Depth of the current page below the site root, read from the UI asset path
+  // that Antora rewrites per page (`../_/js/site.js`, `../../_/js/site.js`, …).
+  // Returns -1 when it cannot be determined.
+  function siteRootDepth() {
+    var el = document.querySelector('script[src*="_/js/site.js"]');
+    var src = el ? el.getAttribute('src') || '' : '';
+    var marker = src.indexOf('_/js/site.js');
+    if (marker < 0) return -1;
+    var prefix = src.slice(0, marker);
+    if (!/^(\.\.\/)*$/.test(prefix)) return -1;
+    return prefix.split('../').length - 1;
+  }
+
   // Toggle FR/EN : remplace le segment de path correspondant au component.
   // Si on est sur /vauban/page.html, le toggle FR pointe vers /vauban-fr/page.html.
+  //
+  // The href is built RELATIVE to the current page, never as '/'-rooted. An
+  // absolute path assumes the site is served from the web root, which breaks
+  // when the site is opened over file:// (the first path segment is then a
+  // filesystem directory, not the component) and when it is deployed under a
+  // sub-path. The component segment is located using the page depth rather than
+  // assumed to be first, for the same reason.
   function setupLangToggle() {
     var toggle = document.querySelector('.lang-toggle');
     if (!toggle) return;
+    var depth = siteRootDepth();
+    if (depth < 0) return;
     var path = location.pathname;
+    if (path.charAt(path.length - 1) === '/') path += 'index.html';
     var parts = path.split('/').filter(Boolean);
-    if (!parts.length) return;
-    var component = parts[0];
+    var idx = parts.length - 1 - depth;
+    if (idx < 0) return;
+    var component = parts[idx];
     var isFr = /-fr$/.test(component);
     var counterpart = isFr ? component.replace(/-fr$/, '') : component + '-fr';
+    var upToRoot = new Array(depth + 1).join('../') || './';
+    var rest = parts.slice(idx + 1).join('/');
 
     Array.prototype.forEach.call(toggle.querySelectorAll('[data-lang]'), function (el) {
       var lang = el.getAttribute('data-lang');
@@ -46,9 +72,7 @@
         el.classList.add('is-current');
         return;
       }
-      var newParts = parts.slice();
-      newParts[0] = counterpart;
-      el.setAttribute('href', '/' + newParts.join('/') + (location.hash || ''));
+      el.setAttribute('href', upToRoot + counterpart + '/' + rest + (location.hash || ''));
       el.addEventListener('click', function () {
         try { localStorage.setItem(STORAGE_LANG, lang); } catch (e) { /* ignore */ }
       });
