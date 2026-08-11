@@ -3,6 +3,17 @@ site:
   start_page: home-fr::index.adoc
   url: https://staging-doc.vidocq.dev
 
+# LAYOUT INVARIANT — this checkout must sit one level below <workspace>/vidocq-docs,
+# i.e. at the same depth as main/.
+#
+# The content sources below reach the sibling repos by relative path
+# (`../../<repo>/main`), which is correct only at that depth. Worktrees are
+# allowed, but their directory name must be flat: vidocq-docs/fix-foo/, never
+# vidocq-docs/fix/foo/ — a slashed branch name would nest one level deeper and
+# every path here would silently resolve to nothing. `mani run wt-add` flattens
+# the name automatically (project tag 'flat-worktree'), and `npm run build`
+# asserts the invariant via scripts/check-local-layout.sh. See the workspace
+# docs/working-with-mani-and-worktrees.md, section "Exemptions".
 content:
   sources:
     - url: ../../vidocq/main

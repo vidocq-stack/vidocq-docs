@@ -4,6 +4,8 @@
   "private": true,
   "description": "Build harness for vidocq-docs Antora site (Antora CLI + asciidoctor-kroki). Not published.",
   "scripts": {
+    "check:layout": "sh scripts/check-local-layout.sh",
+    "prebuild": "npm run check:layout",
     "build": "antora antora-playbook-local.yml",
     "build:prod": "antora antora-playbook.yml"
   },

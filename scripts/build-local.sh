@@ -100,17 +100,10 @@ if [[ ! -f ui-bundle/build/ui-bundle.zip ]]; then
   exit 1
 fi
 
-# Vérifie que les sept clones frères sont là (sinon Antora va se plaindre).
-MISSING=()
-for sib in vidocq vauban ravel cassini champollion chappe foy mansart; do
-  if [[ ! -d "../$sib/.git" ]]; then
-    MISSING+=("$sib")
-  fi
-done
-if [[ ${#MISSING[@]} -gt 0 ]]; then
-  echo "[build-local] Clones frères manquants : ${MISSING[*]}" >&2
-  echo "[build-local] Antora va échouer sur les sources concernées." >&2
-fi
+# Assert the workspace layout: this checkout must sit one level below
+# vidocq-docs/ so the playbook's ../../<repo>/main sources resolve. Single
+# source of truth — the check reads the repo list from the playbook itself.
+sh "$ROOT/scripts/check-local-layout.sh" || exit 1
 
 # Installe les deps Antora racine (antora CLI + asciidoctor-kroki) si absentes.
 # Le `package.json` racine épingle les versions ; pas de `npm install` ad-hoc.
