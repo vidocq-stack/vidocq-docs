@@ -150,3 +150,41 @@ playbook warning against "correcting" it back.
   local feedback loop should be an error instead.
 - `branches:` and `worktrees:` do not share a vocabulary in Antora — `HEAD` is
   meaningful for the first, meaningless for the second.
+
+---
+
+## DOCS-003 — Four cross-component xrefs unresolved on the landing pages
+
+- **Date**: 2026-08-11
+- **Status**: FIXED on branch `fix/mani-layout-paths` (not yet merged)
+- **Severity**: low (two dead links per language, build still succeeds)
+- **Affected**: `content/home-en/…/index.adoc`, `content/home-fr/…/index.adoc`
+
+### Symptom
+
+```
+ERROR (asciidoctor): target of xref not found: vidocq:getting-started.adoc
+ERROR (asciidoctor): target of xref not found: vidocq-fr:getting-started.adoc
+```
+
+Rendered as `<a href="#vidocq:getting-started.adoc" class="xref unresolved">`
+although `build/site/vidocq/getting-started.html` was generated normally.
+
+### Root cause
+
+`xref:vidocq:getting-started.adoc` — a **single** colon. Antora reads the
+segment before a single colon as a *module* name within the current component,
+so it looked for module `vidocq` inside `home-en`. Cross-component references
+need two colons (empty module = ROOT). Every other cross-component link in the
+same file already used `::`, which is why only these four failed.
+
+### Fix
+
+`xref:vidocq::getting-started.adoc` (and `vidocq-fr::`), 4 occurrences. Verified:
+zero `xref unresolved` anywhere in `build/site` afterwards.
+
+### Lessons learned
+
+- Introduced in `188ca27` and shipped since: an asciidoctor `ERROR` that does
+  not fail the build gets normalised as noise. Worth a `--fail-on-error` style
+  gate in CI.

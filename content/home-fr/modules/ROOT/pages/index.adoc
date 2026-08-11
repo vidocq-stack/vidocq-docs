@@ -9,7 +9,7 @@ Vidocq est une suite de runtimes Jakarta EE et MicroProfile écrite en Java 25 p
 
 [TIP]
 ====
-**Nouveau ici ?** Le xref:vidocq-fr:getting-started.adoc[guide de démarrage rapide] vous mène de l'installation de la CLI à un service REST qui tourne en quelques minutes, et le https://vidocq.dev/posts/how-to-start-your-first-vidocq-app/[tutoriel première app] du blog raconte le même parcours pas à pas.
+**Nouveau ici ?** Le xref:vidocq-fr::getting-started.adoc[guide de démarrage rapide] vous mène de l'installation de la CLI à un service REST qui tourne en quelques minutes, et le https://vidocq.dev/posts/how-to-start-your-first-vidocq-app/[tutoriel première app] du blog raconte le même parcours pas à pas.
 ====
 
 == L'écosystème en un diagramme
@@ -185,7 +185,7 @@ Détail complet par module : xref:roadmap.adoc[Roadmap consolidée].
 
 == Liens utiles
 
-* Démarrage rapide : xref:vidocq-fr:getting-started.adoc[guide getting started]
+* Démarrage rapide : xref:vidocq-fr::getting-started.adoc[guide getting started]
 * Blog : https://vidocq.dev/blog[vidocq.dev/blog]
 * Dépôt : https://codeberg.org/Vidocq[codeberg.org/Vidocq]
 * GitHub mirror : https://github.com/vidocq-stack[github.com/vidocq-stack]

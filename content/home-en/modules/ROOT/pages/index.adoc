@@ -9,7 +9,7 @@ Vidocq is a suite of Jakarta EE and MicroProfile runtimes written in pure Java 2
 
 [TIP]
 ====
-**New here?** The xref:vidocq:getting-started.adoc[Getting started guide] takes you from installing the CLI to a running REST service in minutes, and the https://vidocq.dev/posts/how-to-start-your-first-vidocq-app/[first-app tutorial] on the blog walks through the same journey in story form.
+**New here?** The xref:vidocq::getting-started.adoc[Getting started guide] takes you from installing the CLI to a running REST service in minutes, and the https://vidocq.dev/posts/how-to-start-your-first-vidocq-app/[first-app tutorial] on the blog walks through the same journey in story form.
 ====
 
 == The ecosystem at a glance
@@ -185,7 +185,7 @@ Full per-module breakdown: xref:roadmap.adoc[Consolidated roadmap].
 
 == Useful links
 
-* Quickstart: xref:vidocq:getting-started.adoc[Getting started guide]
+* Quickstart: xref:vidocq::getting-started.adoc[Getting started guide]
 * Blog: https://vidocq.dev/blog[vidocq.dev/blog]
 * Repository: https://codeberg.org/Vidocq[codeberg.org/Vidocq]
 * GitHub mirror: https://github.com/vidocq-stack[github.com/vidocq-stack]
