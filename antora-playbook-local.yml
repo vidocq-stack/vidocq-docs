@@ -14,71 +14,78 @@ site:
 # the name automatically (project tag 'flat-worktree'), and `npm run build`
 # asserts the invariant via scripts/check-local-layout.sh. See the workspace
 # docs/working-with-mani-and-worktrees.md, section "Exemptions".
+#
+# `worktrees: .` — do NOT change this to `HEAD`. Antora treats '.' (or true) as
+# "read the primary worktree"; any other value is matched against the names of
+# *linked* worktrees under .git/worktrees, which `HEAD` never matches. With
+# `worktrees: HEAD` the build silently reads the last commit instead of your
+# working tree, so local edits never show up in the preview.
+# (`branches: HEAD` is unrelated and correct — it means "the current branch".)
 content:
   sources:
     - url: ../../vidocq/main
       branches: HEAD
-      worktrees: HEAD
+      worktrees: .
       start_paths: [docs/en, docs/fr]
     - url: ../../vauban/main
       branches: HEAD
-      worktrees: HEAD
+      worktrees: .
       start_paths: [docs/en, docs/fr]
     - url: ../../ravel/main
       branches: HEAD
-      worktrees: HEAD
+      worktrees: .
       start_paths: [docs/en, docs/fr]
     - url: ../../cassini/main
       branches: HEAD
-      worktrees: HEAD
+      worktrees: .
       start_paths: [docs/en, docs/fr]
     - url: ../../champollion/main
       branches: HEAD
-      worktrees: HEAD
+      worktrees: .
       start_paths: [docs/en, docs/fr]
     - url: ../../chappe/main
       branches: HEAD
-      worktrees: HEAD
+      worktrees: .
       start_paths: [docs/en, docs/fr]
     - url: ../../foy/main
       branches: HEAD
-      worktrees: HEAD
+      worktrees: .
       start_paths: [docs/en, docs/fr]
     - url: ../../mansart/main
       branches: HEAD
-      worktrees: HEAD
+      worktrees: .
       start_paths: [docs/en, docs/fr]
     - url: ../../knock/main
       branches: HEAD
-      worktrees: HEAD
+      worktrees: .
       start_paths: [docs/en, docs/fr]
     - url: ../../humboldt/main
       branches: HEAD
-      worktrees: HEAD
+      worktrees: .
       start_paths: [docs/en, docs/fr]
     - url: ../../grimm/main
       branches: HEAD
-      worktrees: HEAD
+      worktrees: .
       start_paths: [docs/en, docs/fr]
     - url: ../../dirac/main
       branches: HEAD
-      worktrees: HEAD
+      worktrees: .
       start_paths: [docs/en, docs/fr]
     - url: ../../heisenberg/main
       branches: HEAD
-      worktrees: HEAD
+      worktrees: .
       start_paths: [docs/en, docs/fr]
     - url: ../../cervantes/main
       branches: HEAD
-      worktrees: HEAD
+      worktrees: .
       start_paths: [docs/en, docs/fr]
     - url: ../../cyrano/main
       branches: HEAD
-      worktrees: HEAD
+      worktrees: .
       start_paths: [docs/en, docs/fr]
     - url: .
       branches: HEAD
-      worktrees: HEAD
+      worktrees: .
       start_paths: [content/home-en, content/home-fr]
 
 ui:

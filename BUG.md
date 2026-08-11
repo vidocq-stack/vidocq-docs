@@ -96,3 +96,57 @@ After the three fixes:
   (`/_<product>/version`).
 - **Always log the pulled jar content** during the build (`unzip -p ... build.properties`):
   turns a 1h debug into a 30s debug.
+
+---
+
+## DOCS-002 — Local Antora build silently renders the last commit, not the working tree
+
+- **Date**: 2026-08-11
+- **Status**: FIXED on branch `fix/mani-layout-paths` (not yet merged)
+- **Severity**: medium (silent — the build succeeds and looks right)
+- **Affected**: `antora-playbook-local.yml`, all 16 content sources
+
+### Symptom
+
+Editing a page and running `npm run build` produced a site without the edit. No
+warning; the build reported success. Antora's own log gave the clue:
+
+```
+"source":{... "refname":"fix/mani-layout-paths","reftype":"branch","worktree":false}
+```
+
+`worktree: false` — content was read from the git object store, not from disk.
+
+### Minimal repro
+
+```bash
+cd vidocq-docs/main
+sed -i '' 's/Vidocq/VIDOCQ-TEST/' content/home-en/modules/ROOT/pages/index.adoc
+npm run build
+grep -c VIDOCQ-TEST build/site/home/index.html   # 0 — the edit is not in the output
+```
+
+### Root cause
+
+All 16 sources carried `worktrees: HEAD`. In
+`@antora/content-aggregator/lib/aggregate-content.js` (3.1.14) only `'.'` and
+`true` set `usePrimaryWorktree`; any other value is treated as a list of
+patterns matched against the names of **linked** worktrees under
+`.git/worktrees`. `HEAD` never matches one, so the primary worktree was never
+used and Antora fell back to the branch tip.
+
+`branches: HEAD` is a different key and was correct throughout — the two look
+symmetrical but are not, which is what made this easy to write and hard to see.
+
+### Fix
+
+`worktrees: HEAD` → `worktrees: .` on all 16 sources, with a comment in the
+playbook warning against "correcting" it back.
+
+### Lessons learned
+
+- **A preview tool that reads commits is worse than one that fails**: authors
+  saw stale output and assumed their edit was wrong. Any silent fallback in a
+  local feedback loop should be an error instead.
+- `branches:` and `worktrees:` do not share a vocabulary in Antora — `HEAD` is
+  meaningful for the first, meaningless for the second.
