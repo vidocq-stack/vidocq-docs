@@ -123,6 +123,39 @@
   opacity: 0.55;
 }
 
+/* Toolbar — thin bar under the fixed header carrying the version selector */
+.toolbar {
+  border-bottom: 1px solid var(--header-border);
+  background: var(--header-bg);
+}
+
+.toolbar-inner {
+  max-width: 78rem;
+  margin: 0 auto;
+  padding: 0.45rem 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-size: 0.85rem;
+  color: var(--header-link);
+}
+
+.toolbar-component {
+  font-weight: 600;
+  color: var(--header-text);
+}
+
+.toolbar-version-label {
+  margin-left: auto;
+  opacity: 0.75;
+}
+
+@media (max-width: 800px) {
+  .toolbar-inner {
+    padding: 0.4rem 1rem;
+  }
+}
+
 /* Sélecteurs de composant / version */
 .component-version-selector,
 .component-selector {

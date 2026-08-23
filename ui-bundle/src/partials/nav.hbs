@@ -3,13 +3,6 @@
 {{#if page.componentVersion}}
   <h3 class="component-nav-title">{{page.componentVersion.title}}</h3>
 {{/if}}
-{{#if page.versions}}
-  <select class="component-version-selector" aria-label="{{i18n 'version'}}">
-    {{#each page.versions}}
-      <option value="{{relativize url}}"{{#if (eq version ../page.componentVersion.version)}} selected{{/if}}>{{displayVersion}}</option>
-    {{/each}}
-  </select>
-{{/if}}
 {{#each page.navigation}}
   <ul>
     {{#each items}}
