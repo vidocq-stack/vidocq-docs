@@ -14,7 +14,7 @@
       </main>
       {{> footer}}
     </div>
-    <script src="{{{uiRootPath}}}/js/site.js"></script>
+    <script src="{{{uiRootPath}}}/js/site.js{{#if env.GITHUB_SHA}}?v={{env.GITHUB_SHA}}{{/if}}"></script>
     {{#if env.SITE_SEARCH_PROVIDER}}{{> search-scripts}}{{/if}}
   </body>
 </html>
