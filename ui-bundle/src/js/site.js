@@ -26,14 +26,61 @@
     });
   }
 
-  // Navigate to the same page in the selected component version (option values
-  // are relative URLs rendered by nav.hbs).
+  // Global version selector.
+  // - On a versioned page: navigate to the same page in the chosen version
+  //   (each option carries its data-url) and remember the choice.
+  // - On a versionless page (home, tutorials): no navigation — the choice is
+  //   a browsing preference: it is stored and every link on the page that
+  //   targets a versioned component is rewritten to that version (when the
+  //   component publishes it; e.g. a dev-only component keeps its dev link).
+  var STORAGE_VERSION = 'vidocq-docs-version';
+
+  function rewriteVersionedLinks(map, pref) {
+    var links = document.querySelectorAll('.nav a, article.doc a');
+    Array.prototype.forEach.call(links, function (a) {
+      try {
+        var href = a.getAttribute('href');
+        if (!href || href.charAt(0) === '#') return;
+        var u = new URL(href, window.location.href);
+        if (u.origin !== window.location.origin) return;
+        var m = u.pathname.match(/^\/([\w-]+)\/([^/]+)(\/.*)?$/);
+        if (!m) return;
+        var versions = map[m[1]];
+        if (!versions || versions.indexOf(m[2]) < 0) return;   // not a versioned URL
+        if (versions.indexOf(pref) < 0 || m[2] === pref) return;
+        a.setAttribute('href', '/' + m[1] + '/' + pref + (m[3] || '/') + u.search + u.hash);
+      } catch (e) { /* ignore malformed hrefs */ }
+    });
+  }
+
   function setupVersionSelector() {
     var sel = document.querySelector('.component-version-selector');
     if (!sel) return;
-    sel.addEventListener('change', function () {
-      if (this.value) window.location.href = this.value;
-    });
+    var map = {};
+    try { map = JSON.parse(sel.getAttribute('data-site-versions') || '{}'); } catch (e) { /* ignore */ }
+    var contextSwitch = sel.hasAttribute('data-context-switch');
+
+    if (contextSwitch) {
+      var pref = null;
+      try { pref = localStorage.getItem(STORAGE_VERSION); } catch (e) { /* ignore */ }
+      if (pref && sel.querySelector('option[value="' + pref + '"]')) {
+        sel.value = pref;
+        rewriteVersionedLinks(map, pref);
+      }
+      sel.addEventListener('change', function () {
+        try { localStorage.setItem(STORAGE_VERSION, this.value); } catch (e) { /* ignore */ }
+        rewriteVersionedLinks(map, this.value);
+      });
+    } else {
+      // Remember the version being browsed so versionless pages follow it.
+      try { localStorage.setItem(STORAGE_VERSION, sel.value); } catch (e) { /* ignore */ }
+      sel.addEventListener('change', function () {
+        var opt = this.options[this.selectedIndex];
+        try { localStorage.setItem(STORAGE_VERSION, this.value); } catch (e) { /* ignore */ }
+        var url = opt && opt.getAttribute('data-url');
+        if (url) window.location.href = url;
+      });
+    }
   }
 
   // Opens the sidebar branch containing the current page. Each section is

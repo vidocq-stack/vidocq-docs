@@ -45,18 +45,17 @@ module.exports = function versionOptions (options) {
   if (!siteVersions.length) return [];
 
   if (!current) {
-    // Versionless page (home, tutorials): act as a context switch into the
-    // runtime component; preselect the latest release (the site default).
-    const runtime = site.components.vidocq;
+    // Versionless page (home, tutorials): the selector is a browsing
+    // preference, handled client-side (site.js) — no navigation, links on the
+    // page are rewritten instead. Preselect the latest release; the stored
+    // preference overrides it on load.
     const latestRelease = siteVersions.find((sv) => semverKey(sv.version) !== null) || siteVersions[0];
-    return siteVersions.map((sv) => {
-      const rv = runtime && (runtime.versions || []).find((x) => x.version === sv.version);
-      return {
-        label: sv.label,
-        url: (rv && rv.url) || '/home/index.html',
-        selected: sv.version === latestRelease.version,
-      };
-    });
+    return siteVersions.map((sv) => ({
+      version: sv.version,
+      label: sv.label,
+      url: '',
+      selected: sv.version === latestRelease.version,
+    }));
   }
 
   // page.versions is only populated when the component has several versions;
@@ -67,6 +66,7 @@ module.exports = function versionOptions (options) {
     let url = pv && pv.url;
     if (!url && sv.version === current) url = page.url;
     return {
+      version: sv.version,
       label: sv.label,
       url: url || '/home/index.html',
       selected: sv.version === current,

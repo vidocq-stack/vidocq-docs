@@ -279,6 +279,11 @@ Insert, query, transaction commit — all through code generated at build time. 
 
 == Step 8 — Named datasources
 
+[IMPORTANT]
+====
+**Version note.** On the released `{release-version}` artifacts this tutorial uses, `@Repository(dataStore = ...)` does **not** route — the repository silently targets the *default* datasource (known bug MANSART-005, fixed on the `dev` line). `@Inject @Named` datasource injection works fine. Follow this step for real routing only on the development line (`0.3.0-SNAPSHOT` artifacts), or wait for the next release.
+====
+
 One database is rarely the whole story. Mansart routes repositories to *named* datasources: declare a second pool and point a repository at it.
 
 [source,properties]

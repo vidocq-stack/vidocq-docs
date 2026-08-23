@@ -9,9 +9,10 @@
       {{#if (version-options)}}
       <div class="version-switch" title="{{i18n 'version'}}">
         <span class="version-switch-label">{{i18n 'version'}}</span>
-        <select class="component-version-selector" aria-label="{{i18n 'version'}}">
+        <select class="component-version-selector" aria-label="{{i18n 'version'}}"
+                data-site-versions='{{site-versions-json}}'{{#unless page.componentVersion.version}} data-context-switch{{/unless}}>
           {{#each (version-options)}}
-            <option value="{{relativize url}}"{{#if selected}} selected{{/if}}>{{label}}</option>
+            <option value="{{version}}"{{#if url}} data-url="{{relativize url}}"{{/if}}{{#if selected}} selected{{/if}}>{{label}}</option>
           {{/each}}
         </select>
       </div>
