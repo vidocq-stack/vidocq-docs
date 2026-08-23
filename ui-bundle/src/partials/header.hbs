@@ -6,8 +6,8 @@
       <span class="navbar-section">Documentation</span>
     </a>
     <div class="navbar-tools">
-      {{#if page.componentVersion.version}}
-      <div class="version-switch" title="{{page.componentVersion.title}} — {{i18n 'version'}}">
+      {{#if (version-options)}}
+      <div class="version-switch" title="{{i18n 'version'}}">
         <span class="version-switch-label">{{i18n 'version'}}</span>
         <select class="component-version-selector" aria-label="{{i18n 'version'}}">
           {{#each (version-options)}}

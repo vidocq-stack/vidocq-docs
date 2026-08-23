@@ -116,19 +116,47 @@ for (const r of versioned) {
         sh(`git worktree remove --force ${wt}`, repoDir);
       });
     }
-    act(`${r.name}: bump main to ${NEXT} (release-version ${VERSION}), push`, () => {
+    act(`${r.name}: bump main to ${NEXT}, clear {tag-new} badges, reset whats-new, push`, () => {
       const wt2 = fs.mkdtempSync(path.join(os.tmpdir(), `cutmain-${r.name}-`));
       sh(`git worktree add -q ${wt2} origin/main`, repoDir);
       const yml = path.join(wt2, 'docs/en/antora.yml');
       const before = fs.readFileSync(yml, 'utf8');
       const after = bumpMain(before);
-      if (after !== before) {
-        fs.writeFileSync(yml, after);
-        sh('git add docs/en/antora.yml', wt2);
+      let dirty = after !== before;
+      if (dirty) fs.writeFileSync(yml, after);
+      // New cycle: the frozen docs/<VERSION> keeps its NEW badges; main drops
+      // them and restarts the what's-new page empty.
+      const stripNew = (dir) => {
+        for (const e of fs.readdirSync(dir, { withFileTypes: true })) {
+          const p = path.join(dir, e.name);
+          if (e.isDirectory()) stripNew(p);
+          else if (e.name.endsWith('.adoc')) {
+            const t = fs.readFileSync(p, 'utf8');
+            const t2 = t.replace(/ ?\[\.tag-new\]#NEW# ?/g, '');
+            if (t2 !== t) { fs.writeFileSync(p, t2); dirty = true; }
+          }
+        }
+      };
+      const pagesDir = path.join(wt2, 'docs/en/modules');
+      if (fs.existsSync(pagesDir)) stripNew(pagesDir);
+      const wn = path.join(wt2, 'docs/en/modules/ROOT/pages/whats-new.adoc');
+      if (fs.existsSync(wn)) {
+        fs.writeFileSync(wn, `= What's new
+:description: Everything that changed across the Vidocq ecosystem since the {release-version} release.
+
+[.lead]
+New in the \`{project-version}\` development line — everything listed here landed **after the {release-version} release** and is not part of it. Sections carrying the [.tag-new]#NEW# badge across the documentation point to these features. When the next release train ships, this page is frozen with it and restarts empty on the dev line.
+
+_Nothing documented yet for this cycle. Add entries here (and place [.tag-new]#NEW# badges on the relevant pages) as features land on main._
+`);
+        dirty = true;
+      }
+      if (dirty) {
+        sh('git add docs/en', wt2);
         sh(`git commit -q -s -m "docs: dev line moves to ${NEXT} (last release: ${VERSION})"`, wt2);
         sh('git push -q origin HEAD:main', wt2);
       } else {
-        console.log(`${r.name}: main antora.yml already up to date`);
+        console.log(`${r.name}: main docs already up to date`);
       }
       sh(`git worktree remove --force ${wt2}`, repoDir);
     });

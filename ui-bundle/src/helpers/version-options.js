@@ -8,15 +8,16 @@
  * current component lacks one of them (e.g. erasmus has no 0.2.0), picking it
  * falls back to the site root (home) instead of a dead end.
  *
- * Returns [] on versionless pages (home, tutorials) — the header hides the
- * selector there.
+ * On versionless pages (home, tutorials) the selector is still shown: the
+ * latest release is preselected and picking a version jumps to the Vidocq
+ * Runtime component in that version.
  */
 module.exports = function versionOptions (options) {
   const ctx = (options && options.data && options.data.root) || {};
   const site = ctx.site;
   const page = ctx.page || {};
   const current = page.componentVersion && page.componentVersion.version;
-  if (!site || !site.components || !current) return [];
+  if (!site || !site.components) return [];
 
   // Union of the site's real versions. Stable order regardless of component
   // iteration: named versions (dev) first, then releases, newest first.
@@ -40,6 +41,23 @@ module.exports = function versionOptions (options) {
     if (kb === null) return 1;
     return kb - ka;
   });
+
+  if (!siteVersions.length) return [];
+
+  if (!current) {
+    // Versionless page (home, tutorials): act as a context switch into the
+    // runtime component; preselect the latest release (the site default).
+    const runtime = site.components.vidocq;
+    const latestRelease = siteVersions.find((sv) => semverKey(sv.version) !== null) || siteVersions[0];
+    return siteVersions.map((sv) => {
+      const rv = runtime && (runtime.versions || []).find((x) => x.version === sv.version);
+      return {
+        label: sv.label,
+        url: (rv && rv.url) || '/home/index.html',
+        selected: sv.version === latestRelease.version,
+      };
+    });
+  }
 
   // page.versions is only populated when the component has several versions;
   // on single-version components the current version maps to the page itself.

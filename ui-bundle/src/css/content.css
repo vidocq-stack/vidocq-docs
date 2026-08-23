@@ -45,3 +45,25 @@
   padding: 1rem;
   border-radius: 2px;
 }
+
+/* "NEW" badge — marks features added since the previous release (dev docs).
+   Written as [.tag-new]#NEW# in AsciiDoc, usually via the {tag-new} attribute.
+   Works in body text, section titles and the sidebar nav. */
+.tag-new {
+  display: inline-block;
+  background: #dc2626;
+  color: #fff;
+  font-family: var(--font-ui);
+  font-size: 0.62em;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  line-height: 1;
+  padding: 0.28em 0.5em;
+  border-radius: 0.6em;
+  vertical-align: middle;
+  transform: translateY(-0.1em);
+}
+
+.nav .tag-new {
+  font-size: 0.6rem;
+}

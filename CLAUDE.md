@@ -82,6 +82,15 @@ Follow Vauban's `index.adoc`: page title (`= <Project>`), `:description:`, a cen
 ### Logo
 Provide `modules/ROOT/images/<project>-logo.png` (PNG), referenced from `index.adoc`.
 
+### NEW badges and What's new (dev docs)
+Features added since the last release are flagged with the red badge
+`[.tag-new]#NEW#` written literally next to the section title or phrase
+(never via an attribute: inline roles are substituted before attributes, an
+attribute value would render as plain text; nav entries cannot carry it), and
+summarized in `vidocq`'s `whats-new.adoc` page with a link. Only on `main`: the release cut freezes them in `docs/<version>` and
+`cut-docs-release.js` strips the badges and resets the what's-new page on
+`main` for the next cycle.
+
 ### Diagrams
 Mermaid via kroki (self-hosted, SVGs fetched at build time). Quote any edge
 label containing `@`, commas or periods (`-->|"@Inject"|`), never embed
