@@ -28,10 +28,17 @@ Never hardcode artifact versions in pages: use `{project-version}` (the version
 the page documents) or `{release-version}` (latest release, for install flows).
 Source blocks containing attributes need `subs=attributes+`.
 
-**Release runbook** (on release train X): create `docs/X` from `main`, edit the
-branch's `antora.yml` (version + attributes, drop `prerelease`), bump `main`'s
-`project-version` to the next SNAPSHOT, add the new branch to the `branches:`
-list of both playbooks (`antora-playbook.yml`, `antora-playbook-local.yml`).
+**Release runbook** (on release train X): run
+`node scripts/cut-docs-release.js --version X --next <snapshot>` from
+vidocq-docs, then push. It cuts `docs/X` from every versioned repo's `main`
+(freezing the dev docs), pins the branch's `antora.yml`, bumps `main` to the
+next SNAPSHOT, and applies the retention window (**last 3 releases + dev**)
+to both playbooks — the version dropdown follows the playbook automatically.
+`--include <repo>` for a brick's first release, `--dry-run` to preview.
+Dropped versions keep their `docs/*` branch (re-add to the playbook to
+republish). Cut the docs at the same commit as the release itself: main's
+docs then describe exactly the released code — never write docs on `main`
+for unmerged features.
 
 Never-released components (e.g. erasmus) build from `main` only.
 

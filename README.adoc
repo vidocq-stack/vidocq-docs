@@ -56,18 +56,34 @@ reference but no workflow uses them.
 
 == Versioned docs — release runbook
 
-Released bricks build two doc lines: branch `docs/<version>` (site default,
-no URL segment) and `main` (Antora version `dev`, `prerelease: true`, served
-under `/<component>/dev/`). Artifact versions in pages come from the
-`project-version` / `release-version` attributes set per branch in
-`docs/en/antora.yml`.
+Released bricks build one doc line per published version: branches
+`docs/<version>` plus `main` (Antora version `dev`, `prerelease: true`,
+served under `/<component>/dev/`). Every page is published under its version
+segment; segment-less URLs 301-redirect to the latest release. Artifact
+versions in pages come from the `project-version` / `release-version`
+attributes set per branch in `docs/en/antora.yml`. The site keeps the **last
+3 releases + dev** — the version dropdown follows the playbook automatically.
 
-On release train X:
+On release train X, one command does all of it (cut `docs/X` from every
+versioned repo's `main` — that is what "freezing the dev docs" means — pin
+the branch, move `main` to the next SNAPSHOT, and apply the retention window
+to both playbooks):
 
-. in each released repo: `git branch docs/X main`, then on that branch set
-  `version: 'X'`, `project-version: X`, drop `prerelease: true`;
-. on `main`: bump `project-version` to the next SNAPSHOT;
-. here: add `docs/X` to the `branches:` list of both playbooks.
+[source,bash]
+----
+node scripts/cut-docs-release.js --version 0.3.0 --next 0.4.0-SNAPSHOT
+git push        # triggers the deploy
+----
+
+Add `--dry-run` to preview, `--include <repo>` the first time a new brick
+(e.g. erasmus) joins the train, `--keep N` to change the retention window.
+Branches dropped from the window are kept in git — re-add one to the
+`branches:` lists to republish that version.
+
+Two caveats the script reminds you about: `cli-version` (vidocq) is bumped by
+hand when the CLI ships, and a docs fix that must also appear in a released
+line is cherry-picked onto its `docs/<version>` branch (`notify-docs`
+rebuilds on `docs/*` pushes too).
 
 == Adding a new component
 

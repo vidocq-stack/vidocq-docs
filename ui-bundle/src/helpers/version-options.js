@@ -18,7 +18,12 @@ module.exports = function versionOptions (options) {
   const current = page.componentVersion && page.componentVersion.version;
   if (!site || !site.components || !current) return [];
 
-  // Union of the site's real versions, in Antora's order (prerelease first).
+  // Union of the site's real versions. Stable order regardless of component
+  // iteration: named versions (dev) first, then releases, newest first.
+  const semverKey = (v) => {
+    const m = v.match(/^(\d+)\.(\d+)\.(\d+)$/);
+    return m ? (+m[1] * 1e6 + +m[2] * 1e3 + +m[3]) : null;
+  };
   const siteVersions = [];
   const seen = new Set();
   for (const c of Object.values(site.components)) {
@@ -28,6 +33,13 @@ module.exports = function versionOptions (options) {
       siteVersions.push({ version: v.version, label: v.displayVersion || v.version });
     }
   }
+  siteVersions.sort((a, b) => {
+    const ka = semverKey(a.version), kb = semverKey(b.version);
+    if (ka === null && kb === null) return a.version.localeCompare(b.version);
+    if (ka === null) return -1;
+    if (kb === null) return 1;
+    return kb - ka;
+  });
 
   // page.versions is only populated when the component has several versions;
   // on single-version components the current version maps to the page itself.
