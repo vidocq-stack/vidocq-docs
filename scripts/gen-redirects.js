@@ -31,7 +31,7 @@ const semverKey = (v) => {
 };
 
 for (const comp of fs.readdirSync(SITE, { withFileTypes: true })) {
-  if (!comp.isDirectory() || comp.name.startsWith('_') || comp.name === 'home' || comp.name === 'tutorials') continue;
+  if (!comp.isDirectory() || comp.name.startsWith('_') || comp.name === 'home') continue;
   const root = path.join(SITE, comp.name);
   const versions = fs.readdirSync(root, { withFileTypes: true }).filter((e) => e.isDirectory()).map((e) => e.name);
   // target: the latest released version if any, else the only (dev) version

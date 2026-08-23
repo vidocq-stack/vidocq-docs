@@ -165,6 +165,47 @@ _Nothing documented yet for this cycle. Add entries here (and place [.tag-new]#N
   }
 }
 
+// ---- this repo: the versioned tutorials component --------------------------
+// content/tutorials builds from this repo's own docs/<version> branches.
+try {
+  sh('git fetch -q origin main', ROOT);
+  const alreadySelf = sh(`git ls-remote --heads origin docs/${VERSION}`, ROOT) !== '';
+  if (alreadySelf) {
+    console.log(`vidocq-docs: docs/${VERSION} already exists on origin — skipping the cut`);
+  } else {
+    act(`vidocq-docs: branch docs/${VERSION} (tutorials), pin antora.yml, push`, () => {
+      const wt = fs.mkdtempSync(path.join(os.tmpdir(), 'cutdocs-self-'));
+      sh(`git worktree add -q ${wt} origin/main`, ROOT);
+      const yml = path.join(wt, 'content/tutorials/antora.yml');
+      let y = pinRelease(fs.readFileSync(yml, 'utf8'));
+      y = y.replace(/docs-line: dev/, 'docs-line: release');
+      fs.writeFileSync(yml, y);
+      sh('git add content/tutorials/antora.yml', wt);
+      sh(`git commit -q -s -m "docs: pin the ${VERSION} tutorials line"`, wt);
+      sh(`git push -q origin HEAD:refs/heads/docs/${VERSION}`, wt);
+      sh(`git worktree remove --force ${wt}`, ROOT);
+    });
+  }
+  act(`vidocq-docs: bump tutorials on main to ${NEXT}, clear badges (committed with the playbooks below)`, () => {
+    const yml = path.join(ROOT, 'content/tutorials/antora.yml');
+    fs.writeFileSync(yml, bumpMain(fs.readFileSync(yml, 'utf8')));
+    const stripSelf = (dir) => {
+      for (const e of fs.readdirSync(dir, { withFileTypes: true })) {
+        const p = path.join(dir, e.name);
+        if (e.isDirectory()) stripSelf(p);
+        else if (e.name.endsWith('.adoc')) {
+          const t = fs.readFileSync(p, 'utf8');
+          const t2 = t.replace(/ ?\[\.tag-new\]#NEW# ?/g, '');
+          if (t2 !== t) fs.writeFileSync(p, t2);
+        }
+      }
+    };
+    stripSelf(path.join(ROOT, 'content/tutorials/modules'));
+  });
+} catch (e) {
+  failures.push('vidocq-docs (tutorials): ' + e.message.split('\n')[0]);
+}
+
 // ---- playbooks: retention window -------------------------------------------
 const kept = (branches) => {
   const releases = [...new Set(branches.filter((b) => b.startsWith('docs/')).map((b) => b.slice(5)).concat(VERSION))]
@@ -181,11 +222,13 @@ for (const file of ['antora-playbook.yml', 'antora-playbook-local.yml']) {
   let sample = null;
   for (let i = 0; i < lines.length; i++) {
     const m = lines[i].match(/-\s*url:\s*(?:https:\/\/codefloe\.com\/Vidocq\/([\w-]+)\.git|\.\.\/([\w-]+))\s*$/);
+    const self = /-\s*url:\s*\.\s*$/.test(lines[i]) && /content\/tutorials/.test(lines[i + 2] || '');
     const name = m && (m[1] || m[2]);
-    if (!name || !versioned.some((r) => r.name === name)) continue;
+    if (!self && (!name || !versioned.some((r) => r.name === name))) continue;
     const bm = (lines[i + 1] || '').match(/^(\s*)branches:\s*\[([^\]]*)\]/);
     if (!bm) continue;
     const newList = kept(bm[2].split(',').map((s) => s.trim()));
+    if (self) newList[0] = 'HEAD';
     if (!sample) sample = newList;
     lines[i + 1] = `${bm[1]}branches: [${newList.join(', ')}]`;
     touched++;
@@ -195,8 +238,8 @@ for (const file of ['antora-playbook.yml', 'antora-playbook-local.yml']) {
   });
 }
 
-act('vidocq-docs: commit playbooks (push it yourself to trigger the deploy)', () => {
-  sh('git add antora-playbook.yml antora-playbook-local.yml', ROOT);
+act('vidocq-docs: commit playbooks + tutorials bump (push it yourself to trigger the deploy)', () => {
+  sh('git add antora-playbook.yml antora-playbook-local.yml content/tutorials', ROOT);
   sh(`git commit -q -s -m "docs-site: publish the ${VERSION} release line (retention: last ${KEEP} + dev)"`, ROOT);
 });
 

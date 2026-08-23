@@ -18,6 +18,27 @@ The `todo` project from xref:your-first-app.adoc[the first tutorial] (or any sca
 
 == Step 1 — Add the Mansart extensions
 
+ifeval::["{docs-line}" == "dev"]
+[IMPORTANT]
+====
+**You are reading the `dev` version of this tutorial** — it targets the `{project-version}` artifacts. First point the scaffolded app at the dev line: set the parent (and every Vidocq/Mansart dependency below) to `{project-version}`, and declare the snapshots repository in your `pom.xml`:
+
+[source,xml]
+----
+<repositories>
+    <repository>
+        <id>central-snapshots</id>
+        <url>https://central.sonatype.com/repository/maven-snapshots/</url>
+        <snapshots><enabled>true</enabled></snapshots>
+        <releases><enabled>false</enabled></releases>
+    </repository>
+</repositories>
+----
+
+Prefer the released artifacts? Switch this page to the `{release-version}` version with the selector in the header.
+====
+endif::[]
+
 Add the three Mansart extensions, the H2 dialect and the H2 driver to your `pom.xml` dependencies:
 
 [source,xml,subs=attributes+]
@@ -25,22 +46,22 @@ Add the three Mansart extensions, the H2 dialect and the H2 driver to your `pom.
 <dependency>
     <groupId>io.vidocq.runtime.extensions.jakartaee.web</groupId>
     <artifactId>vidocq-runtime-mansart-pool-extension</artifactId>
-    <version>{release-version}</version>
+    <version>{project-version}</version>
 </dependency>
 <dependency>
     <groupId>io.vidocq.runtime.extensions.jakartaee.web</groupId>
     <artifactId>vidocq-runtime-mansart-data-extension</artifactId>
-    <version>{release-version}</version>
+    <version>{project-version}</version>
 </dependency>
 <dependency>
     <groupId>io.vidocq.runtime.extensions.jakartaee.web</groupId>
     <artifactId>vidocq-runtime-mansart-transactions-extension</artifactId>
-    <version>{release-version}</version>
+    <version>{project-version}</version>
 </dependency>
 <dependency>
     <groupId>io.vidocq.mansart</groupId>
     <artifactId>mansart-data-dialect-h2</artifactId>
-    <version>{release-version}</version>
+    <version>{project-version}</version>
 </dependency>
 <dependency>
     <groupId>com.h2database</groupId>
@@ -58,13 +79,13 @@ Then let the Mansart code generators run during compilation — append their bun
     <path>
         <groupId>io.vidocq.runtime.extensions.jakartaee.web</groupId>
         <artifactId>vidocq-runtime-mansart-data-extension-codegen</artifactId>
-        <version>{release-version}</version>
+        <version>{project-version}</version>
         <type>pom</type>
     </path>
     <path>
         <groupId>io.vidocq.runtime.extensions.jakartaee.web</groupId>
         <artifactId>vidocq-runtime-mansart-transactions-extension-codegen</artifactId>
-        <version>{release-version}</version>
+        <version>{project-version}</version>
         <type>pom</type>
     </path>
 </annotationProcessorPaths>
@@ -261,7 +282,7 @@ public class ProductResource {
 [source,bash,subs=attributes+]
 ----
 mvn package
-sh target/todo-{release-version}/bin/todo.sh &
+sh target/todo-{project-version}/bin/todo.sh &
 
 curl -X POST http://localhost:8080/products \
      -H 'Content-Type: application/json' \
@@ -279,10 +300,15 @@ Insert, query, transaction commit — all through code generated at build time. 
 
 == Step 8 — Named datasources
 
+ifeval::["{docs-line}" == "release"]
 [IMPORTANT]
 ====
-**Version note.** On the released `{release-version}` artifacts this tutorial uses, `@Repository(dataStore = ...)` does **not** route — the repository silently targets the *default* datasource (known bug MANSART-005, fixed on the `dev` line). `@Inject @Named` datasource injection works fine. Follow this step for real routing only on the development line (`0.3.0-SNAPSHOT` artifacts), or wait for the next release.
+**Version note.** On the released `{release-version}` artifacts this tutorial uses, `@Repository(dataStore = ...)` does **not** route — the repository silently targets the *default* datasource (known bug MANSART-005, fixed on the `dev` line). `@Inject @Named` datasource injection works fine. For real routing, switch this page to the `dev` version with the selector in the header and follow its instructions.
 ====
+endif::[]
+ifeval::["{docs-line}" == "dev"]
+NOTE: Named-datasource routing works end to end on the `{project-version}` line ([.tag-new]#NEW# since {release-version} — MANSART-005).
+endif::[]
 
 One database is rarely the whole story. Mansart routes repositories to *named* datasources: declare a second pool and point a repository at it.
 

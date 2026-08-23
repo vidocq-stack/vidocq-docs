@@ -16,7 +16,10 @@ name: Deploy to Cloudflare Pages
 
 on:
   push:
-    branches: [main]
+    # docs/* included: the versioned tutorials component builds from this
+    # repo's own docs/<version> branches, so a fix cherry-picked there must
+    # redeploy too (the build itself always runs from main — see checkout).
+    branches: [main, 'docs/*']
   workflow_dispatch:
     inputs:
       reason:
@@ -36,6 +39,13 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          # Always build the site from main, even when triggered by a push on
+          # a docs/* branch (that content is pulled in by the playbook).
+          ref: main
+
+      - name: Fetch this repo's docs/* branches (versioned tutorials source)
+        run: git fetch --no-tags origin '+refs/heads/docs/*:refs/heads/docs/*'
 
       - name: Setup Node.js
         uses: actions/setup-node@v4

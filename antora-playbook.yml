@@ -81,7 +81,12 @@ content:
       start_paths: [docs/en]
     - url: .
       branches: HEAD
-      start_paths: [content/home, content/tutorials]
+      start_paths: [content/home]
+    # tutorials is versioned like the bricks: HEAD (dev) + the release branches
+    # of THIS repo (content/tutorials only differs between them).
+    - url: .
+      branches: [HEAD, docs/0.2.0]
+      start_paths: [content/tutorials]
 
 ui:
   bundle:
