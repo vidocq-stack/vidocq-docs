@@ -41,6 +41,15 @@ for (const comp of fs.readdirSync(SITE, { withFileTypes: true })) {
   rules.push(`/${comp.name}/ /${comp.name}/${target}/ 301`);
   for (const page of listHtml(path.join(root, target))) {
     rules.push(`/${comp.name}/${page} /${comp.name}/${target}/${page} 301`);
+    // Cloudflare Pages serves pretty URLs (page.html -> /page, index.html ->
+    // directory), and that is what visitors copy — cover that form too.
+    if (page.endsWith('index.html')) {
+      const dir = page.slice(0, -'index.html'.length);
+      if (dir) rules.push(`/${comp.name}/${dir} /${comp.name}/${target}/${dir} 301`);
+    } else {
+      const pretty = page.slice(0, -'.html'.length);
+      rules.push(`/${comp.name}/${pretty} /${comp.name}/${target}/${pretty} 301`);
+    }
   }
 }
 
