@@ -66,6 +66,10 @@ jobs:
             --url "${SITE_URL:-https://doc.vidocq.dev}" \
             --attribute kroki-server-url="${KROKI_SERVER_URL:-https://kroki.vidocq.dev}" \
             antora-playbook.yml
+          # Cloudflare Pages cache policy (must-revalidate) + legacy-URL
+          # redirects (segment-less pages -> released version, page by page).
+          cp _headers build/site/_headers
+          node scripts/gen-redirects.js
 
       - name: Create Cloudflare Pages project (idempotent)
         env:

@@ -4,9 +4,13 @@ site:
   url: https://doc.vidocq.dev
 
 urls:
-  # Released docs stay at /<component>/ (no version segment) so pre-versioning
-  # URLs keep resolving; development docs live under /<component>/dev/.
+  # Every page is published under its version segment (/<component>/0.2.0/,
+  # /<component>/dev/) so the version is always visible in the URL. The
+  # pre-versioning URLs (no segment) 301-redirect to the released version via
+  # the Cloudflare Pages _redirects file (netlify format).
   latest_version_segment: ''
+  latest_version_segment_strategy: redirect:from
+  redirect_facility: netlify
 
 antora:
   extensions:

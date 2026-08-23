@@ -6,6 +6,16 @@
       <span class="navbar-section">Documentation</span>
     </a>
     <div class="navbar-tools">
+      {{#if page.componentVersion.version}}
+      <div class="version-switch" title="{{page.componentVersion.title}} — {{i18n 'version'}}">
+        <span class="version-switch-label">{{i18n 'version'}}</span>
+        <select class="component-version-selector" aria-label="{{i18n 'version'}}">
+          {{#each page.versions}}
+            <option value="{{relativize url}}"{{#if (eq version ../page.componentVersion.version)}} selected{{/if}}>{{displayVersion}}</option>
+          {{/each}}
+        </select>
+      </div>
+      {{/if}}
       {{#if env.SITE_SEARCH_PROVIDER}}
       <div class="search-box">
         <input id="search-input" type="search" placeholder="{{i18n 'search'}}" aria-label="{{i18n 'search'}}" autocomplete="off">

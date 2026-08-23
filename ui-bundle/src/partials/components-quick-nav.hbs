@@ -1,18 +1,52 @@
 {{#with (components-quick-nav)}}
-  {{#if length}}
-    <nav class="components-quick-nav" aria-label="{{i18n 'modules'}}">
-      <h3>{{i18n 'modules'}}</h3>
-      <ul>
-        {{#each this}}
-          <li class="components-quick-nav__item{{#if isHome}} is-home{{/if}}{{#if (eq name ../../page.componentVersion.name)}} is-current{{/if}}">
-            {{#if url}}
-              <a href="{{relativize url}}">{{title}}{{#if isHome}} <span class="components-quick-nav__hint">{{i18n 'overview'}}</span>{{/if}}</a>
-            {{else}}
-              <span>{{title}}</span>
-            {{/if}}
-          </li>
-        {{/each}}
-      </ul>
-    </nav>
-  {{/if}}
+  <nav class="components-quick-nav" aria-label="{{i18n 'modules'}}">
+    <h3>{{i18n 'modules'}}</h3>
+    <ul>
+      {{#each top}}
+        <li class="components-quick-nav__item{{#if isHome}} is-home{{/if}}{{#if isCurrent}} is-current{{/if}}">
+          {{#if url}}
+            <a href="{{relativize url}}">{{title}}{{#if isHome}} <span class="components-quick-nav__hint">{{i18n 'overview'}}</span>{{/if}}</a>
+          {{else}}
+            <span>{{title}}</span>
+          {{/if}}
+        </li>
+      {{/each}}
+      {{#if categories}}
+        <li class="components-quick-nav__group">
+          <details class="cqn-details"{{#if componentsOpen}} open{{/if}}>
+            <summary class="cqn-summary">{{i18n 'components'}}</summary>
+            <ul>
+              {{#each categories}}
+                <li class="components-quick-nav__group">
+                  <details class="cqn-details"{{#if open}} open{{/if}}>
+                    <summary class="cqn-summary cqn-summary--category">{{label}}</summary>
+                    <ul>
+                      {{#each items}}
+                        <li class="components-quick-nav__item{{#if isCurrent}} is-current{{/if}}">
+                          {{#if url}}
+                            <a href="{{relativize url}}">{{title}}</a>
+                          {{else}}
+                            <span>{{title}}</span>
+                          {{/if}}
+                        </li>
+                      {{/each}}
+                    </ul>
+                  </details>
+                </li>
+              {{/each}}
+            </ul>
+          </details>
+        </li>
+      {{/if}}
+      {{#each extra}}
+        <li class="components-quick-nav__item{{#if isCurrent}} is-current{{/if}}">
+          {{#if url}}
+            <a href="{{relativize url}}">{{title}}</a>
+          {{else}}
+            <span>{{title}}</span>
+          {{/if}}
+        </li>
+      {{/each}}
+    </ul>
+  </nav>
 {{/with}}

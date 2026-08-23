@@ -1,0 +1,12 @@
+# Cloudflare Pages cache policy for doc.vidocq.dev.
+# Antora does not fingerprint UI assets (site.css/site.js keep stable names),
+# so everything must revalidate on each request — the edge still answers 304s
+# fast, but a redeploy is picked up immediately (no stale -fr ghosts, no stale
+# CSS after a UI change).
+/*
+  Cache-Control: public, max-age=0, must-revalidate
+
+# Fonts are immutable in practice (fira-*.woff2 only change with a deliberate
+# font upgrade) — cache them for a day.
+/_/font/*
+  Cache-Control: public, max-age=86400

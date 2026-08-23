@@ -15,6 +15,7 @@ const STRINGS = {
   'next':               'Next',
   'toggle-theme':       'Toggle light/dark theme',
   'modules':            'Modules',
+  'components':         'Components',
   'overview':           'Overview',
 };
 
