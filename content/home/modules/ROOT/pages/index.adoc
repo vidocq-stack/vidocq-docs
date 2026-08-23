@@ -9,7 +9,7 @@ Vidocq is a suite of Jakarta EE and MicroProfile runtimes written in pure Java 2
 
 [TIP]
 ====
-**New here?** The xref:vidocq:getting-started.adoc[Getting started guide] takes you from installing the CLI to a running REST service in minutes, and the https://vidocq.dev/posts/how-to-start-your-first-vidocq-app/[first-app tutorial] on the blog walks through the same journey in story form.
+**New here?** The xref:tutorials::your-first-app.adoc[Your first Vidocq application] tutorial takes you from installing the CLI to a running REST service in minutes. Prefer the condensed version? See the xref:vidocq::getting-started.adoc[runtime getting-started guide].
 ====
 
 == The ecosystem at a glance
@@ -30,8 +30,9 @@ flowchart TB
     subgraph DI["Dependency injection"]
         VAUBAN[Vauban<br/>CDI 4.1 Lite build-time]
     end
-    subgraph Persistence["Persistence"]
+    subgraph Persistence["Persistence &amp; validation"]
         MANSART[Mansart<br/>Jakarta Data 1.0 + JPA 3.2]
+        ERASMUS[Erasmus<br/>Jakarta Validation 3.1 - in development]
     end
     subgraph MicroProfile["MicroProfile"]
         RAVEL[Ravel<br/>Config 3.1]
@@ -70,6 +71,7 @@ flowchart TB
     FOY --> CHAPPE
     FOY --> VAUBAN
     MANSART --> VAUBAN
+    ERASMUS -.-> VAUBAN
 ....
 
 Each module is an independent project, released separately, with its own life-cycle. Vidocq Runtime assembles them through a Quarkus-inspired extension SPI.
@@ -114,6 +116,14 @@ Three reasons:
 | Jakarta Servlet 6.1 implementation
 | {repo-foy}
 
+| xref:mansart::index.adoc[Mansart]
+| Jakarta Data 1.0 + Jakarta Persistence 3.2 *(JPA pending)*
+| {repo-mansart}
+
+| xref:erasmus::index.adoc[Erasmus]
+| Jakarta Validation 3.1 implementation *(in development, not released yet)*
+| {repo-erasmus}
+
 | xref:ravel::index.adoc[Ravel]
 | MicroProfile Config 3.1 implementation
 | {repo-ravel}
@@ -145,48 +155,48 @@ Three reasons:
 | xref:grimm::index.adoc[Grimm]
 | MicroProfile OpenAPI 4.1 implementation
 | {repo-grimm}
-
-| xref:mansart::index.adoc[Mansart]
-| Jakarta Data 1.0 + Jakarta Persistence 3.2 *(M7 pending)*
-| {repo-mansart}
 |===
 
 == Cross-cutting pages
 
 * xref:architecture.adoc[Overall architecture] — module boundaries, dependency matrix, cross-cutting choices (zero-dependency, Java Modules, codegen, virtual threads).
 * xref:compare.adoc[Comparison] — Vidocq Runtime against Quarkus, Helidon SE 4 and Spring Boot 4.
-* xref:roadmap.adoc[Consolidated roadmap] — module-by-module status and upcoming milestones (M2x, M5, M6c, M7).
+* xref:roadmap.adoc[Consolidated roadmap] — module-by-module status and upcoming milestones.
 
 == Status
 
 [CAUTION]
 ====
-The suite is released as **0.2.x on Maven Central** — an **alpha**: APIs may still change and production use is not recommended yet. Bug reports from early adopters are very welcome on https://codeberg.org/Vidocq[Codeberg].
+The suite is released as **0.2.x on Maven Central** — an **alpha**: APIs may still change and production use is not recommended yet. Bug reports from early adopters are very welcome on https://codefloe.com/Vidocq[Codefloe].
 ====
+
+The documentation you are reading is versioned: the default pages describe the
+**0.2.0 release**, and the `dev` version of each component (version selector in
+the sidebar) tracks the current `0.3.0-SNAPSHOT` development line.
 
 What works today:
 
 * Chappe — HTTP/1.1, HTTP/2, virtual threads, RFC 9110/9112/9113 conformance.
-* Vauban — build-time CDI 4.1 Lite, Maven plugin, JUnit integration.
-* Cassini — REST 4.0, partial TCK pass (see `cassini/cassini-migration.md`).
-* Champollion — JSON-P 2.1 + JSON-B 3.0, APT generation, partial TCK suites (see `champollion/JSON-ROADMAP.md`).
-* Foy — Servlet 6.1, partial TCK pass.
-* Vidocq — initial orchestrator with Mansart H2 + transactions extensions.
-* MicroProfile — Config (Ravel), Health (Knock), Metrics (Dirac), Fault Tolerance (Heisenberg), JWT (Cervantes), Rest Client (Cyrano), Telemetry (Humboldt), OpenAPI (Grimm), each wired into Vidocq Runtime through an extension.
+* Vauban — build-time CDI 4.1 Lite, official CDI Lite TCK **774/774**.
+* Cassini — Jakarta REST 4.0, official TCK at **2538 tests green**.
+* Champollion — JSON-P 2.1 (**178/179**) + JSON-B 3.0 (**289/295**), APT generation.
+* Foy — Servlet 6.1, ~95 % of the official TCK `api.*` packages (web fragments pending).
+* Vidocq Runtime — orchestrator and CLI; the assembled runtime passes **1837 official MicroProfile 7.1 TCK tests** across all eight component specs (Config, Health, Metrics, Fault Tolerance, JWT, Rest Client, Telemetry, OpenAPI), with Jakarta Core Profile 11 certification in preparation.
+* MicroProfile bricks — Config (Ravel), Health (Knock), Metrics (Dirac), Fault Tolerance (Heisenberg), JWT (Cervantes), Rest Client (Cyrano), Telemetry (Humboldt), OpenAPI (Grimm), each wired into Vidocq Runtime through an extension and covered by its own TCK page.
 
 Work in progress:
 
-* Mansart — Jakarta Data 1.0 SPI, JPA 3.2 planned.
+* Mansart — Jakarta Persistence 3.2 (Jakarta Data 1.0 already ships).
+* Erasmus — Jakarta Validation 3.1 (engine and built-in constraints working, first release upcoming).
 * WebSocket — Chappe + Foy.
 * HTTP/3 / QUIC — Chappe.
-* MicroProfile — TCK hardening and cross-cutting integration in Vidocq Runtime.
 
 Full per-module breakdown: xref:roadmap.adoc[Consolidated roadmap].
 
 == Useful links
 
-* Quickstart: xref:vidocq:getting-started.adoc[Getting started guide]
+* Tutorials: xref:tutorials::index.adoc[step-by-step guides]
+* Quickstart: xref:vidocq::getting-started.adoc[Getting started guide]
 * Blog: https://vidocq.dev/blog[vidocq.dev/blog]
-* Repository: https://codeberg.org/Vidocq[codeberg.org/Vidocq]
+* Repository: https://codefloe.com/Vidocq[codefloe.com/Vidocq]
 * GitHub mirror: https://github.com/vidocq-stack[github.com/vidocq-stack]
-* Matrix / Discord: *(to come)*

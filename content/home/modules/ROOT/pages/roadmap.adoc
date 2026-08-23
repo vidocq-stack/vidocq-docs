@@ -2,7 +2,7 @@
 :description: Per-module status and upcoming milestones.
 
 [.lead]
-This page aggregates the progress of all fifteen modules — seven Jakarta EE foundations plus eight MicroProfile implementations. Each section links to the module's documentation for details. The suite is released as `0.2.x` on Maven Central — an alpha, APIs may still change.
+This page aggregates the progress of all sixteen modules — eight Jakarta EE bricks (including the Vidocq Runtime orchestrator) plus eight MicroProfile implementations. Each section links to the module's documentation for details. The suite is released as `0.2.x` on Maven Central — an alpha, APIs may still change.
 
 == Upcoming milestones
 
@@ -35,18 +35,21 @@ This page aggregates the progress of all fifteen modules — seven Jakarta EE fo
 | `mansart-persistence` — Jakarta Persistence 3.2 (classic JPA)
 | pending
 
+| M3–M8
+| xref:erasmus::index.adoc[Erasmus]
+| Jakarta Validation 3.1 — cascade/groups, value extractors, executables, APT codegen, official TCK
+| in progress
+
 | —
 | MicroProfile layer
 | Config (Ravel), Health (Knock), Metrics (Dirac), Fault Tolerance (Heisenberg), JWT (Cervantes), Rest Client (Cyrano), Telemetry (Humboldt), OpenAPI (Grimm)
-| implemented, TCK hardening
+| implemented, TCKs green
 
 | —
 | xref:vidocq::index.adoc[Vidocq Runtime]
-| MicroProfile extension wiring and packaging
-| in progress
+| Jakarta Core Profile 11 certification (composite TCK 10/13 on JDK 25, filing planned with the next release)
+| pre-filing
 |===
-
-// TODO@user: confirm milestone numbering (M2a/M2b/M2h for Chappe, M5 for Cassini/Foy) — extracted from module index pages but should be cross-checked against the full ROADMAP.md of each repo.
 
 == Detailed status by module
 
@@ -59,8 +62,8 @@ This page aggregates the progress of all fifteen modules — seven Jakarta EE fo
 
 === Vauban — CDI 4.1 Lite
 
-* **Done**: build-time injection graph resolution, Maven plugin, JUnit integration, Class-File API + APT generation.
-* **In progress**: full CDI 4.1 Lite TCK coverage, decorator support, `ScopedValue` propagation for scoped contexts.
+* **Done**: build-time injection graph resolution, Maven plugin, JUnit integration, Class-File API + APT generation, official CDI 4.1 Lite TCK **774/774**.
+* **In progress**: `ScopedValue` propagation for scoped contexts, class-loading layers for dev mode.
 * **Coming up**: Full profile (beyond Lite).
 * Details: xref:vauban::index.adoc[Vauban].
 
@@ -80,30 +83,39 @@ This page aggregates the progress of all fifteen modules — seven Jakarta EE fo
 
 === Cassini — Jakarta REST 4.0
 
-* **Done**: 2535/2535 applicable REST 4.0 TCK tests (100%), Chappe transport integration, Champollion entity providers, optional Vauban CDI.
+* **Done**: 2538 applicable REST 4.0 TCK tests green (100%), SSE real-time streaming, Chappe transport integration, Champollion entity providers, optional Vauban CDI.
 * **In progress**: MicroProfile (Config, Health) integration hardening, advanced filters and interceptors.
 * **Coming up**: MicroProfile JWT `@RolesAllowed` integration on Cassini (via xref:cervantes::index.adoc[Cervantes]).
 * Details: xref:cassini::index.adoc[Cassini].
 
 === Mansart — Jakarta Data + Transactions + JPA
 
-* **Done**: Jakarta Data 1.0 — TCK 73/73 (M7), virtual-thread-native JDBC pool, Jakarta Transactions 2.0 transaction manager (smoke 5/5), `@Transactional` via Vauban.
+* **Done**: Jakarta Data 1.0 — official TCK **74/74**, virtual-thread-native JDBC pool, named datasources (`dataStore` routing), Jakarta Transactions 2.0 transaction manager, `@Transactional` via Vauban.
 * **In progress (M6c)**: full Jakarta Transactions 2.0 TCK suite.
 * **Pending (M7)**: `mansart-persistence` — classic Jakarta Persistence 3.2 implementation. `mansart-jakarta-data` already covers everyday needs in Vidocq.
 * Details: xref:mansart::index.adoc[Mansart].
+
+=== Erasmus — Jakarta Validation 3.1
+
+* **Done**: bootstrap (`Validation.buildDefaultValidatorFactory()`), the 21 built-in constraints, custom and composed constraints, message interpolation (EL subset, EN/FR bundles).
+* **In progress**: cascaded validation and groups, `ValueExtractor` SPI, executable validation.
+* **Coming up**: APT static codegen, CDI (Vauban) and Jakarta REST (Cassini) integration, official TCK, first release.
+* Details: xref:erasmus::index.adoc[Erasmus].
 
 === MicroProfile layer
 
 Eight independent MicroProfile implementations, each wired into Vidocq Runtime through the extension SPI and, where relevant, exposed over Cassini.
 
-* xref:ravel::index.adoc[Ravel] — MicroProfile Config 3.1. Implemented; TCK hardening.
-* xref:knock::index.adoc[Knock] — MicroProfile Health 4.0. Implemented; TCK hardening.
-* xref:dirac::index.adoc[Dirac] — MicroProfile Metrics 5.1. Implemented; TCK hardening.
-* xref:heisenberg::index.adoc[Heisenberg] — MicroProfile Fault Tolerance 4.1. Implemented; TCK hardening.
-* xref:cervantes::index.adoc[Cervantes] — MicroProfile JWT 2.1. Implemented; `@RolesAllowed` integration into Cassini in progress.
-* xref:cyrano::index.adoc[Cyrano] — MicroProfile Rest Client 4.0. Implemented; TCK hardening.
-* xref:humboldt::index.adoc[Humboldt] — MicroProfile Telemetry 2.1. Implemented (OTel API); SDK and gRPC export under design.
-* xref:grimm::index.adoc[Grimm] — MicroProfile OpenAPI 4.1. Implemented; TCK hardening.
+The assembled runtime passes **1837 official MicroProfile 7.1 TCK tests** across these eight specs (see the xref:vidocq::tck.adoc[runtime TCK page]).
+
+* xref:ravel::index.adoc[Ravel] — MicroProfile Config 3.1. TCK green (349 tests on the assembled runtime).
+* xref:knock::index.adoc[Knock] — MicroProfile Health 4.0. TCK green.
+* xref:dirac::index.adoc[Dirac] — MicroProfile Metrics 5.1. TCK green.
+* xref:heisenberg::index.adoc[Heisenberg] — MicroProfile Fault Tolerance 4.1. TCK green (463 tests).
+* xref:cervantes::index.adoc[Cervantes] — MicroProfile JWT 2.1. TCK 206/206; `@RolesAllowed` wired into Cassini.
+* xref:cyrano::index.adoc[Cyrano] — MicroProfile Rest Client 4.0. TCK 235/235 (SSL and SSE included).
+* xref:humboldt::index.adoc[Humboldt] — MicroProfile Telemetry 2.1. Implemented (trace/metric/log SDKs, OTLP-HTTP exporter, W3C propagation); gRPC export post-MVP.
+* xref:grimm::index.adoc[Grimm] — MicroProfile OpenAPI 4.1. TCK green (344 tests).
 
 === Vidocq Runtime — orchestrator
 

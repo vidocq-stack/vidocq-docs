@@ -1,0 +1,23 @@
+= Tutorials
+:description: Step-by-step, end-to-end guides for building applications with the Vidocq runtime.
+
+[.lead]
+These tutorials walk you through building real applications with Vidocq, one step at a time. Each one is self-contained, starts from an empty directory (or from the previous tutorial), and every command has been run against the released artifacts.
+
+[cols="1,2",options="header"]
+|===
+| Tutorial | You will build
+
+| xref:your-first-app.adoc[Your first Vidocq application]
+| A REST service scaffolded with the CLI: install, create, write a resource, run it, use dev mode, and package it for production. *Start here.*
+
+| xref:rest-and-database.adoc[REST + database]
+| The same application extended with persistence: a Jakarta Data repository (Mansart) over a pooled datasource, transactions included — and a look at named datasources and PostgreSQL Dev Services.
+|===
+
+[NOTE]
+====
+Tutorials are *learning-oriented*: they take you somewhere, in order. If you are
+looking for the reference material instead, each component of the sidebar has its
+own documentation — start with the xref:vidocq::index.adoc[Vidocq Runtime] pages.
+====

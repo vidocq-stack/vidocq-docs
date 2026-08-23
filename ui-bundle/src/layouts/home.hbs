@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="{{page-lang}}" data-theme="auto">
+<html lang="en" data-theme="auto">
   {{> head}}
   <body class="home">
     <div class="body">
@@ -12,5 +12,6 @@
       {{> footer}}
     </div>
     <script src="{{{uiRootPath}}}/js/site.js"></script>
+    {{#if env.SITE_SEARCH_PROVIDER}}{{> search-scripts}}{{/if}}
   </body>
 </html>

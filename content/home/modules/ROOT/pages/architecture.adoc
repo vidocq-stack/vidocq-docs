@@ -25,6 +25,7 @@ System_Boundary(vidocq, "Vidocq ecosystem") {
   Container(vauban, "Vauban", "Java 25", "CDI 4.1 Lite container, build-time")
   Container(champollion, "Champollion", "Java 25", "JSON-P 2.1 + JSON-B 3.0, APT codegen")
   Container(mansart, "Mansart", "Java 25", "Jakarta Data 1.0 + Transactions 2.0 + JPA 3.2 (M7)")
+  Container(erasmus, "Erasmus", "Java 25", "Jakarta Validation 3.1 (in development)")
 }
 
 ContainerDb_Ext(db, "JDBC datasource", "H2, PostgreSQL")
@@ -69,6 +70,7 @@ flowchart LR
     FOY[Foy<br/>Servlet]
     CASSINI[Cassini<br/>REST]
     MANSART[Mansart<br/>Data]
+    ERASMUS[Erasmus<br/>Validation - in dev]
     RAVEL[Ravel<br/>MP Config]
     KNOCK[Knock<br/>MP Health]
     DIRAC[Dirac<br/>MP Metrics]
@@ -85,6 +87,7 @@ flowchart LR
     CASSINI --> VAUBAN
     CASSINI --> CHAMPOLLION
     MANSART --> VAUBAN
+    ERASMUS -.-> VAUBAN
     KNOCK --> CASSINI
     KNOCK --> VAUBAN
     CERVANTES --> CASSINI

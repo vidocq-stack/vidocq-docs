@@ -1,74 +1,75 @@
 site:
   title: Vidocq
-  start_page: home-fr::index.adoc
+  start_page: home::index.adoc
   url: https://staging-doc.vidocq.dev
+
+urls:
+  latest_version_segment: ''
+
+antora:
+  extensions:
+    - '@antora/lunr-extension'
+
+# Local build: sources are the sibling clones of the workspace
+# (/Users/.../vidocq/<repo>, vidocq-docs being one of them). Antora reads the
+# `main` and `docs/0.2.0` refs from each local .git; when a repo has `main`
+# checked out, the working tree (including uncommitted changes) is used for it,
+# which is exactly what you want to preview docs edits.
 
 content:
   sources:
-    - url: ../../vidocq/main
-      branches: HEAD
-      worktrees: HEAD
-      start_paths: [docs/en, docs/fr]
-    - url: ../../vauban/main
-      branches: HEAD
-      worktrees: HEAD
-      start_paths: [docs/en, docs/fr]
-    - url: ../../ravel/main
-      branches: HEAD
-      worktrees: HEAD
-      start_paths: [docs/en, docs/fr]
-    - url: ../../cassini/main
-      branches: HEAD
-      worktrees: HEAD
-      start_paths: [docs/en, docs/fr]
-    - url: ../../champollion/main
-      branches: HEAD
-      worktrees: HEAD
-      start_paths: [docs/en, docs/fr]
-    - url: ../../chappe/main
-      branches: HEAD
-      worktrees: HEAD
-      start_paths: [docs/en, docs/fr]
-    - url: ../../foy/main
-      branches: HEAD
-      worktrees: HEAD
-      start_paths: [docs/en, docs/fr]
-    - url: ../../mansart/main
-      branches: HEAD
-      worktrees: HEAD
-      start_paths: [docs/en, docs/fr]
-    - url: ../../knock/main
-      branches: HEAD
-      worktrees: HEAD
-      start_paths: [docs/en, docs/fr]
-    - url: ../../humboldt/main
-      branches: HEAD
-      worktrees: HEAD
-      start_paths: [docs/en, docs/fr]
-    - url: ../../grimm/main
-      branches: HEAD
-      worktrees: HEAD
-      start_paths: [docs/en, docs/fr]
-    - url: ../../dirac/main
-      branches: HEAD
-      worktrees: HEAD
-      start_paths: [docs/en, docs/fr]
-    - url: ../../heisenberg/main
-      branches: HEAD
-      worktrees: HEAD
-      start_paths: [docs/en, docs/fr]
-    - url: ../../cervantes/main
-      branches: HEAD
-      worktrees: HEAD
-      start_paths: [docs/en, docs/fr]
-    - url: ../../cyrano/main
-      branches: HEAD
-      worktrees: HEAD
-      start_paths: [docs/en, docs/fr]
+    - url: ../vidocq
+      branches: [main, docs/0.2.0]
+      start_paths: [docs/en]
+    - url: ../vauban
+      branches: [main, docs/0.2.0]
+      start_paths: [docs/en]
+    - url: ../ravel
+      branches: [main, docs/0.2.0]
+      start_paths: [docs/en]
+    - url: ../cassini
+      branches: [main, docs/0.2.0]
+      start_paths: [docs/en]
+    - url: ../champollion
+      branches: [main, docs/0.2.0]
+      start_paths: [docs/en]
+    - url: ../chappe
+      branches: [main, docs/0.2.0]
+      start_paths: [docs/en]
+    - url: ../foy
+      branches: [main, docs/0.2.0]
+      start_paths: [docs/en]
+    - url: ../mansart
+      branches: [main, docs/0.2.0]
+      start_paths: [docs/en]
+    - url: ../knock
+      branches: [main, docs/0.2.0]
+      start_paths: [docs/en]
+    - url: ../humboldt
+      branches: [main, docs/0.2.0]
+      start_paths: [docs/en]
+    - url: ../grimm
+      branches: [main, docs/0.2.0]
+      start_paths: [docs/en]
+    - url: ../dirac
+      branches: [main, docs/0.2.0]
+      start_paths: [docs/en]
+    - url: ../heisenberg
+      branches: [main, docs/0.2.0]
+      start_paths: [docs/en]
+    - url: ../cervantes
+      branches: [main, docs/0.2.0]
+      start_paths: [docs/en]
+    - url: ../cyrano
+      branches: [main, docs/0.2.0]
+      start_paths: [docs/en]
+    # erasmus has never been released: dev docs only.
+    - url: ../erasmus
+      branches: [main]
+      start_paths: [docs/en]
     - url: .
       branches: HEAD
-      worktrees: HEAD
-      start_paths: [content/home-en, content/home-fr]
+      start_paths: [content/home, content/tutorials]
 
 ui:
   bundle:
@@ -84,36 +85,30 @@ asciidoc:
     idseparator: '-'
     source-highlighter: highlight.js
     chappe-version: '@'
-    primary-language: fr
 
-    # --- Kroki ---
-    # En local : pointe vers le Kroki self-hosted (kroki.vidocq.dev). En cas de
-    # panne ou de dev offline, override : `npx antora --attribute kroki-server-url=…`.
-    # `kroki-fetch-diagram: false` → blocs convertis en <img src="kroki.vidocq.dev/…">,
-    # rendu paresseux côté navigateur — le build local reste rapide et ne bloque
-    # pas si Kroki est inaccessible. (En prod, true côté antora-playbook.yml.)
+    # Local builds default to the public Kroki mirror so a build works without
+    # the Foix VPN; override with --attribute kroki-server-url=... if needed.
     kroki-server-url: https://kroki.vidocq.dev
-    kroki-fetch-diagram: false
+    kroki-fetch-diagram: true
     kroki-default-format: svg
 
-    # --- URLs des repos ---
-    repo-chappe: 'https://codeberg.org/Vidocq/chappe'
-    repo-vauban: 'https://codeberg.org/Vidocq/vauban'
-    repo-champollion: 'https://codeberg.org/Vidocq/champollion'
-    repo-foy: 'https://codeberg.org/Vidocq/foy'
-    repo-cassini: 'https://codeberg.org/Vidocq/cassini'
-    repo-mansart: 'https://codeberg.org/Vidocq/mansart'
-    repo-ravel: 'https://codeberg.org/Vidocq/ravel'
-    repo-vidocq: 'https://codeberg.org/Vidocq/vidocq'
-    repo-knock: 'https://codeberg.org/Vidocq/knock'
-    repo-humboldt: 'https://codeberg.org/Vidocq/humboldt'
-    repo-grimm: 'https://codeberg.org/Vidocq/grimm'
-    repo-dirac: 'https://codeberg.org/Vidocq/dirac'
-    repo-heisenberg: 'https://codeberg.org/Vidocq/heisenberg'
-    repo-cervantes: 'https://codeberg.org/Vidocq/cervantes'
-    repo-cyrano: 'https://codeberg.org/Vidocq/cyrano'
+    repo-chappe: 'https://codefloe.com/Vidocq/chappe'
+    repo-vauban: 'https://codefloe.com/Vidocq/vauban'
+    repo-champollion: 'https://codefloe.com/Vidocq/champollion'
+    repo-foy: 'https://codefloe.com/Vidocq/foy'
+    repo-cassini: 'https://codefloe.com/Vidocq/cassini'
+    repo-mansart: 'https://codefloe.com/Vidocq/mansart'
+    repo-ravel: 'https://codefloe.com/Vidocq/ravel'
+    repo-vidocq: 'https://codefloe.com/Vidocq/vidocq'
+    repo-knock: 'https://codefloe.com/Vidocq/knock'
+    repo-humboldt: 'https://codefloe.com/Vidocq/humboldt'
+    repo-grimm: 'https://codefloe.com/Vidocq/grimm'
+    repo-cervantes: 'https://codefloe.com/Vidocq/cervantes'
+    repo-cyrano: 'https://codefloe.com/Vidocq/cyrano'
+    repo-dirac: 'https://codefloe.com/Vidocq/dirac'
+    repo-heisenberg: 'https://codefloe.com/Vidocq/heisenberg'
+    repo-erasmus: 'https://codefloe.com/Vidocq/erasmus'
 
-    # --- URLs des specs Jakarta / MicroProfile ---
     spec-rest-4: 'https://jakarta.ee/specifications/restful-ws/4.0/'
     spec-servlet-6-1: 'https://jakarta.ee/specifications/servlet/6.1/'
     spec-jsonp-2-1: 'https://jakarta.ee/specifications/jsonp/2.1/'
@@ -121,11 +116,15 @@ asciidoc:
     spec-cdi-4-1: 'https://jakarta.ee/specifications/cdi/4.1/'
     spec-data-1: 'https://jakarta.ee/specifications/data/1.0/'
     spec-jpa-3-2: 'https://jakarta.ee/specifications/persistence/3.2/'
+    spec-validation-3-1: 'https://jakarta.ee/specifications/bean-validation/3.1/'
     spec-mp-config: 'https://microprofile.io/specifications/microprofile-config/'
     spec-mp-health: 'https://microprofile.io/specifications/microprofile-health/'
     spec-mp-metrics: 'https://microprofile.io/specifications/microprofile-metrics/'
     spec-mp-openapi: 'https://microprofile.io/specifications/microprofile-open-api/'
+    spec-mp-jwt: 'https://microprofile.io/specifications/microprofile-jwt-auth/'
+    spec-mp-rest-client: 'https://microprofile.io/specifications/microprofile-rest-client/'
+    spec-mp-fault-tolerance: 'https://microprofile.io/specifications/microprofile-fault-tolerance/'
+    spec-mp-telemetry: 'https://microprofile.io/specifications/microprofile-telemetry/'
 
-    # --- Bases d'URLs supplémentaires ---
     url-jep: 'https://openjdk.org/jeps'
     url-jakarta: 'https://jakarta.ee'

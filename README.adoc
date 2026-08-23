@@ -1,384 +1,101 @@
 = vidocq-docs
-:toc: macro
-:source-highlighter: highlight.js
 
-Documentation Antora de l'écosystème **Vidocq** — multi-component, bilingue (FR canonique + EN), servie par xref:../chappe[Chappe].
+The documentation site of the Vidocq ecosystem — https://doc.vidocq.dev.
 
-Ce dépôt **n'héberge pas le contenu** des modules. Chaque module (`vidocq`, `vauban`, `cassini`, `champollion`, `chappe`, `foy`, `mansart`) garde sa propre documentation dans son répertoire `docs/`. `vidocq-docs` ne contient que :
+An https://antora.org[Antora] site aggregating the `docs/en` component of every
+sub-project (16 bricks), plus two site-level components hosted in this repo:
+`content/home` (landing) and `content/tutorials` (cross-brick guides). The
+shared UI bundle (`ui-bundle/`) carries the visual identity, the version
+selector and the search box — never customise the UI per project.
 
-* la *playbook* Antora (`antora-playbook.yml`) ;
-* le UI bundle harmonisé avec le site web (`ui-bundle/`) ;
-* la home (`content/home-{en,fr}/`) ;
-* le `Dockerfile` qui tire `chappe-cli` depuis repolite (cf. link:docs/adr/0003-chappe-cli-from-repolite.md[ADR 0003]) ;
-* le workflow Forgejo Actions et les compose de déploiement Portainer (`deploy/`).
+The site is **English-only** and **versioned** — see
+`docs/adr/0004-english-only-versioned-search.md`.
 
-toc::[]
+== Prerequisites
 
-== Pré-requis
+* Node.js 20+ (`npm`)
+* network access to the sibling clones (local build) or codefloe.com (prod build)
+* optional: access to https://kroki.vidocq.dev (mermaid diagrams; any kroki
+  server works via `--attribute kroki-server-url=...`)
 
-* **Node LTS** (≥ 20) — pour Antora et le UI bundle.
-* **Java 25** + **Maven** — uniquement pour le build Docker (le `chappe-fetcher` qui tire `chappe-cli` depuis repolite).
-* Accès à `https://repo.vidocq.dev/snapshots` (lecture) — d'où vient `chappe-cli`.
-* Accès aux **clones frères** des sept modules pour le build local :
-+
-[source,text]
-----
-parent/
-├── vidocq-docs/         (ce repo)
-├── vidocq/
-├── vauban/
-├── cassini/
-├── champollion/
-├── chappe/
-├── foy/
-└── mansart/
-----
-
-== Build local
-
-Le plus court — un script pilote tout :
+== Local build
 
 [source,bash]
 ----
-bash scripts/build-local.sh                # UI bundle + Antora + fetch version Chappe + fetch fonts
-bash scripts/build-local.sh --skip-fonts   # idem, sans tenter de télécharger les WOFF2
-bash scripts/build-local.sh --ui-only      # juste le UI bundle
-bash scripts/build-local.sh --site-only    # juste Antora (UI déjà bâti)
-bash scripts/build-local.sh --serve        # build + serve sur http://localhost:8080
+# 1. build the UI bundle (once, or after any ui-bundle/src change)
+cd ui-bundle && npm ci && npx gulp bundle && cd ..
+
+# 2. build the site from the local sibling clones
+npm ci
+npx antora antora-playbook-local.yml       # reads ../<repo> refs main + docs/0.2.0
+
+# 3. serve it
+npx http-server build/site -p 8080
 ----
 
-Ou à la main, étape par étape :
-
-[source,bash]
-----
-# 1. UI bundle (CSS + JS + helpers + fonts + zip)
-cd ui-bundle
-npm install
-node ../scripts/fetch-chappe-version.js   # met à jour src/data/versions.json
-bash ../scripts/fetch-fonts.sh             # télécharge les WOFF2 (optionnel)
-npm run build
-cd ..
-
-# 2. Site Antora à partir des clones frères
-npx antora@^3.1.0 antora-playbook-local.yml
-
-# Sortie : ./build/site
-----
-
-== Build Docker (avec Chappe)
-
-[IMPORTANT]
-====
-Le `docker build` **n'est pas self-contained** : il consomme `./build/site`
-qui doit avoir été produit avant par Antora (le runner CI le fait,
-`scripts/build-local.sh` aussi). Cf. link:docs/adr/0003-chappe-cli-from-repolite.md[ADR 0003].
-====
-
-[source,bash]
-----
-# 1. Builder le site Antora (UI bundle + Antora pull les 7 repos modules)
-bash scripts/build-local.sh        # produit ./build/site
-
-# 2. Préparer un settings.xml temporaire avec les creds repolite (lecture)
-SETTINGS=$(mktemp)
-cat > "$SETTINGS" <<XML
-<?xml version="1.0" encoding="UTF-8"?>
-<settings xmlns="http://maven.apache.org/SETTINGS/1.2.0">
-  <servers>
-    <server>
-      <id>vidocq-repolite</id>
-      <username>${MAVEN_REPO_USER:?}</username>
-      <password>${MAVEN_REPO_TOKEN:?}</password>
-    </server>
-  </servers>
-</settings>
-XML
-trap 'rm -f "$SETTINGS"' EXIT
-
-# 3. Builder l'image Docker (BuildKit obligatoire pour --secret)
-DOCKER_BUILDKIT=1 docker build \
-  --secret "id=mavensettings,src=$SETTINGS" \
-  --build-arg CHAPPE_VERSION=0.2.0 \
-  --build-arg MAVEN_REPO_URL=https://repo.vidocq.dev/snapshots \
-  -t vidocq-docs:test .
-docker run --rm -p 8080:8080 vidocq-docs:test
-# → http://localhost:8080
-----
-
-Le contexte de build est uniquement ce repo. Plus besoin de cloner `chappe`
-en frère : le `Dockerfile` tire `chappe-cli-shaded` depuis repolite, et le
-site est pré-bâti par Antora côté runner / build local (où les credentials
-git sont disponibles).
-
-Variables d'environnement reconnues par l'`entrypoint.sh` du container :
-
-[cols="1,3"]
-|===
-| Variable | Rôle
-
-| `CHAPPE_DOCROOT` | Répertoire racine du site (défaut : `/var/www/vidocq-docs`)
-| `CHAPPE_PORT`    | Port d'écoute (défaut : `8080`)
-| `CHAPPE_BIND`    | Adresse de bind (défaut : `0.0.0.0`)
-| `CHAPPE_GZIP`    | Active `--gzip` côté CLI (défaut : `true`)
-| `STAGING`        | Loggué pour info ; le header `X-Robots-Tag` sera injecté quand la CLI Chappe exposera `--header-if-env`
-|===
-
-Build args du `Dockerfile` :
-
-[cols="1,3"]
-|===
-| Build arg | Rôle
-
-| `CHAPPE_VERSION` | Coordonnée Maven de `chappe-cli` (défaut : `0.2.0`)
-| `MAVEN_REPO_URL` | URL repolite (défaut : `https://repo.vidocq.dev/snapshots` ; pointer sur `/releases` pour un tag stable)
-|===
-
-== Déploiement (Portainer + Nginx Proxy Manager)
-
-L'image est buildée par le workflow Forgejo Actions (`.forgejo/workflows/build.yml`)
-et publiée sur la **container registry Forgejo** (intégrée à Forgejo ≥ 1.20) :
-
-* `forge.vidocq.dev/vidocq/vidocq-docs:snapshot` — écrasé à chaque push sur `main`
-* `forge.vidocq.dev/vidocq/vidocq-docs:latest`   — écrasé à chaque tag `v*`
-* `forge.vidocq.dev/vidocq/vidocq-docs:0.1.0`    — tag immutable par version
-
-Portainer consomme cette image via une **Stack-from-Git** qui pointe sur ce repo
-et lit `deploy/compose.staging.yml` ou `deploy/compose.prod.yml`.
-
-=== 1. Côté Forgejo — token registry
-
-Sur Forgejo, *Settings → Applications → Generate Token* :
-
-* Nom : `vidocq-docs-ci` (ou ce qu'on veut)
-* Scopes : `write:package`, `read:package`
-
-Le scope `read:repository` n'est plus nécessaire depuis l'ADR 0003 (le
-Dockerfile ne clone plus `vidocq/chappe`, il tire `chappe-cli` depuis repolite).
-
-Le token est utilisé par le workflow Forgejo Actions (secret `REGISTRY_TOKEN`)
-et par Portainer pour pull l'image (cf. étape suivante). Côté secrets de repo :
-
-[cols="1,2"]
-|===
-| Secret | Valeur
-
-| `REGISTRY_USER`             | utilisateur Forgejo (push/pull container registry, `write:package`)
-| `REGISTRY_TOKEN`            | token Forgejo associé
-| `MAVEN_REPO_USER`           | utilisateur lecture sur repolite `https://repo.vidocq.dev/snapshots` (souvent identique à REGISTRY_USER)
-| `MAVEN_REPO_TOKEN`          | token associé (lecture des artefacts Chappe)
-| `PORTAINER_WEBHOOK_STAGING` | URL de webhook Portainer (étape 3)
-| `PORTAINER_WEBHOOK_PROD`    | URL de webhook Portainer (étape 3)
-|===
-
-NOTE: Forgejo Actions **réserve le préfixe `FORGEJO_`** pour les secrets internes ;
-on utilise donc `REGISTRY_*` côté secrets utilisateur.
-
-=== 2. Côté Portainer — déclarer la registry Forgejo
-
-*Settings → Registries → Add registry → Custom* :
-
-* URL : `forge.vidocq.dev`
-* Authentification : *Yes*
-* Username / Password : le couple `REGISTRY_USER` / `REGISTRY_TOKEN`
-
-C'est ce qui permet à Portainer de tirer les images privées.
-
-=== 3. Côté Portainer — créer la stack (staging et prod)
-
-*Stacks → Add stack → Repository* :
-
-[cols="1,2"]
-|===
-| Champ | Valeur
-
-| Repository URL          | `https://forge.vidocq.dev/vidocq/vidocq-docs`
-| Repository reference    | `refs/heads/main`
-| Compose path            | `deploy/compose.staging.yml` (ou `deploy/compose.prod.yml`)
-| Authentification        | token Forgejo si le repo est privé
-| GitOps updates          | *Polling*, intervalle `5m` (recommandé) **ou** *Webhook*
-| Environment variables   | `IMAGE_TAG=snapshot`, `CONTAINER_NAME=vidocq-docs-staging`
-|===
-
-Dans la même page, copier le **webhook URL** affiché par Portainer et le coller
-dans les secrets Forgejo (`PORTAINER_WEBHOOK_STAGING` ou `_PROD`). Le workflow
-poke ce webhook après chaque `docker push`, ce qui force Portainer à re-pull
-l'image et à `docker compose up -d`.
-
-=== 4. Authentification OIDC via Forgejo
-
-Le site est protégé par un sidecar `oauth2-proxy` qui délègue l'auth à Forgejo
-(seuls les utilisateurs loggés sur `forge.vidocq.dev` peuvent voir le site).
-Cf. les composes `deploy/compose.{staging,prod}.yml`.
-
-==== a. Créer une *OAuth2 Application* côté Forgejo
-
-*User Settings → Applications → OAuth2 Applications → Create*
-
-[cols="1,2"]
-|===
-| Champ | Valeur
-
-| Application Name | `vidocq-docs-staging` (et un autre pour prod : `vidocq-docs-prod`)
-| Redirect URI     | `https://staging-doc.vidocq.dev/oauth2/callback` (resp. `https://doc.vidocq.dev/oauth2/callback`)
-| Confidential Client | ✓
-|===
-
-Forgejo retourne **Client ID** et **Client Secret**. Refais l'opération pour
-chaque environnement (staging et prod) — chaque app a sa redirect URI.
-
-==== b. Variables Portainer à ajouter sur chaque stack
-
-[cols="1,2"]
-|===
-| Variable | Valeur
-
-| `OIDC_CLIENT_ID`     | Client ID donné par Forgejo
-| `OIDC_CLIENT_SECRET` | Client Secret de la même app
-| `OIDC_COOKIE_SECRET` | exactement 16, 24 ou 32 bytes (= chars ASCII). Générer avec `openssl rand -hex 16` (= 32 chars). **Ne pas** utiliser `openssl rand -base64 32` qui sort 44 chars et fait planter `oauth2-proxy`
-|===
-
-==== c. Forwarder NPM vers le sidecar (et plus vers Chappe directement)
-
-Le compose isole maintenant Chappe sur un réseau `internal` ; il n'est plus
-joignable depuis NPM. C'est `oauth2-proxy:4180` qui prend le relais sur
-`reverseproxy_default`.
-
-*Hosts → Proxy Hosts → Add Proxy Host* :
-
-[cols="1,2"]
-|===
-| Champ | Valeur staging / prod
-
-| Domain Names         | `staging-doc.vidocq.dev` / `doc.vidocq.dev`
-| Scheme               | `http`
-| Forward Hostname     | `vidocq-docs-staging-oauth` / `vidocq-docs-prod-oauth`
-| Forward Port         | `4180`
-| Block Common Exploits | activé
-| Websockets Support    | activé *(oauth2-proxy en utilise pour le auth-status)*
-| SSL → Force SSL       | activé (Let's Encrypt)
-|===
-
-==== d. Test du flow
-
-. Naviguer (en privé) vers `https://staging-doc.vidocq.dev`
-. Redirection automatique vers `https://forge.vidocq.dev/login/oauth/authorize?...`
-. Login Forgejo (et Consent au premier passage)
-. Redirection `/oauth2/callback` → cookie posé → site
-. Le cookie domain est `.vidocq.dev` → la session est partagée entre staging et prod (un seul login pour les deux)
-
-NPM résout `vidocq-docs-staging-oauth` via le DNS Docker du réseau partagé.
-
-=== 5. Vérifier
-
-[source,bash]
-----
-# Healthcheck interne
-docker exec vidocq-docs-staging wget -qO- http://localhost:8080/healthz
-# → ok
-
-# Healthcheck externe (depuis n'importe où)
-curl -s https://staging-doc.vidocq.dev/healthz
-# → ok
-
-# Vérifier le X-Robots-Tag en staging
-curl -sI https://staging-doc.vidocq.dev/ | grep -i x-robots-tag
-# → X-Robots-Tag: noindex, nofollow
-----
-
-=== Rollback
-
-Trois niveaux, du plus rapide au plus propre :
-
-. **Tag immutable.** Sur la stack Portainer prod, surcharger
-  `IMAGE_TAG=0.1.0` (ou la version stable précédente) → *Update the stack*.
-. **Git revert.** `git revert <commit>` puis `git push`. Portainer redéploie
-  via polling ou webhook.
-. **Rebuild from tag.** Re-tagger un commit ancien (`git tag v0.0.x` puis push)
-  → le workflow rebuilde et republie `:latest`.
-
-=== Troubleshooting CI
-
-==== `node: executable file not found in $PATH`
-
-Le runner Forgejo par défaut tourne sur `docker:dind` (Alpine, pas de Node).
-Le workflow surcharge déjà `container:` avec `catthehacker/ubuntu:act-22.04`
-(Node 20 + Docker CLI). Si l'erreur revient, vérifier que la modif est en place.
-
-==== `[/var/run/docker.sock] is not a valid volume, will be ignored`
-
-Le bind-mount est filtré par la config `act_runner` parce que `valid_volumes`
-est restrictif par défaut. Sur l'hôte qui héberge le runner, ajouter à la config :
-
-[source,yaml]
-----
-# /etc/forgejo-runner/config.yaml (ou équivalent)
-container:
-  privileged: true                       # nécessaire pour docker build à l'intérieur
-  valid_volumes:
-    - /var/run/docker.sock
-----
-
-Puis redémarrer le service runner. Sans ce mount, `docker build/push` du workflow
-échoueront en `Cannot connect to the Docker daemon`.
-
-==== Échec du `mvn dependency:copy` (stage `chappe-fetcher`)
-
-Le Dockerfile tire `chappe-cli-shaded` depuis `https://repo.vidocq.dev/snapshots`
-au build. Si le stage échoue :
-
-* vérifier que repolite est accessible depuis le runner (firewall, DNS) ;
-* vérifier qu'une version `chappe-cli:0.2.0:jar:shaded` existe sur
-  repolite (côté chappe : `mvn -pl chappe-cli -am deploy`) ;
-* si repolite est privé en lecture, ajouter un `~/.m2/settings.xml` au stage
-  `chappe-fetcher` avec les creds (cf. ADR 0003).
-
-==== `denied: requested access to the resource is denied` au push image
-
-Le `REGISTRY_USER` / `REGISTRY_TOKEN` n'a pas `write:package` sur le namespace
-`vidocq/`. Régénérer un token avec ce scope, ou demander à un admin Forgejo
-d'ajouter l'utilisateur comme `Write` membre de l'organisation.
-
-== Ajouter un nouveau component
-
-. Dans le repo du module concerné, créer la structure :
-+
-[source,text]
-----
-<module>/docs/
-├── en/
-│   ├── antora.yml                 # name: <module>,    title: <Module>
-│   └── modules/ROOT/
-│       ├── nav.adoc
-│       └── pages/{index,getting-started,concepts,reference,migration}.adoc
-└── fr/
-    ├── antora.yml                 # name: <module>-fr, title: <Module>
-    └── modules/ROOT/
-        ├── nav.adoc
-        └── pages/{index,getting-started,concepts,reference,migration}.adoc
-----
-
-. Ajouter la source dans `vidocq-docs/antora-playbook.yml` (et `antora-playbook-local.yml` pour le build local).
-
-. Ajouter une référence depuis la home (`content/home-fr/modules/ROOT/pages/index.adoc` et `content/home-en/...`).
-
-== Contribuer à la doc d'un module existant
-
-**Pas ici.** La doc d'un module vit dans ce module. Une PR sur `vauban/docs/` (par exemple) sera automatiquement reprise au prochain build du site.
-
-== Convention bilingue
-
-* **Le français est canonique.** Tu écris d'abord en FR, puis tu traduis en EN.
-* Pas de mélange de langues dans une même page.
-* Les exemples de code, noms d'API, FQN sont **identiques** dans les deux langues — seul le texte autour change.
-* Les titres de pages sont traduits, mais les ancres Asciidoc (`[#getting-started]`) restent stables (anglais).
-* Le toggle FR/EN du UI bundle calcule l'URL homologue côté client : si on est sur `/vauban/page.html`, le toggle pointe vers `/vauban-fr/page.html`.
-
-== Décisions documentées
-
-* link:docs/adr/0001-antora-multi-component.md[ADR 0001] — Antora multi-component.
-* link:docs/adr/0002-bilingual-fr-en.md[ADR 0002] — Bilingue FR canonique + EN.
-* link:docs/adr/0003-chappe-cli-from-repolite.md[ADR 0003] — `chappe-cli` tiré depuis repolite (Maven), suppression du stage `chappe-builder` et du launcher Java custom.
-
-== Licence
-
-EPL-2.0 OR EUPL-1.2 OR GPL-2.0-or-later — voir link:LICENSE[`LICENSE`].
+The local playbook reads each sibling repo's `main` and `docs/0.2.0` refs
+directly from `.git`; a repo whose working tree has `main` checked out is read
+from the working tree (uncommitted docs edits show up — handy for preview).
+Always `rm -rf build/site` before rebuilding if components were removed.
+
+The prod playbook (`antora-playbook.yml`) is the same site built from
+`https://codefloe.com/Vidocq/*` over anonymous HTTPS.
+
+== Deployment
+
+`.forgejo/workflows/deploy-pages.yaml` builds the UI bundle and the site on
+every push to `main`, then deploys `build/site` to **Cloudflare Pages**
+(project `vidocq-docs`) with `wrangler pages deploy` — secrets
+`CF_API_TOKEN` / `CF_ACCOUNT_ID`. Every sub-project carries a
+`notify-docs.yml` workflow that triggers this deploy whenever a push to its
+`main` or `docs/*` branches touches `docs/**`.
+
+NOTE: The `Dockerfile`, `chappe-config.yml` and `deploy/` compose files are
+the legacy self-hosted serving path (Chappe + Portainer); they are kept for
+reference but no workflow uses them.
+
+== Versioned docs — release runbook
+
+Released bricks build two doc lines: branch `docs/<version>` (site default,
+no URL segment) and `main` (Antora version `dev`, `prerelease: true`, served
+under `/<component>/dev/`). Artifact versions in pages come from the
+`project-version` / `release-version` attributes set per branch in
+`docs/en/antora.yml`.
+
+On release train X:
+
+. in each released repo: `git branch docs/X main`, then on that branch set
+  `version: 'X'`, `project-version: X`, drop `prerelease: true`;
+. on `main`: bump `project-version` to the next SNAPSHOT;
+. here: add `docs/X` to the `branches:` list of both playbooks.
+
+== Adding a new component
+
+. In the sub-project: create `docs/en/antora.yml` + `modules/ROOT/{nav.adoc,pages/}`
+  following the **Vauban** gold-reference layout (see `CLAUDE.md` for the
+  canonical page order and rules).
+. Add the repo to `content.sources` of both playbooks (`branches: [main]`
+  until its first release).
+. Add its name to `ORDER_BASE` in `ui-bundle/src/helpers/components-quick-nav.js`
+  to position it in the sidebar (otherwise it lands alphabetically at the tail).
+. Add a row to the components table of `content/home/modules/ROOT/pages/index.adoc`
+  and a repo attribute (`repo-<name>`) to both playbooks.
+. Give the sub-project a `.forgejo/workflows/notify-docs.yml` (copy from any brick).
+
+== Contributing to a module's docs
+
+Edit `docs/en` in the module's own repo — this repo only aggregates. Keep the
+canonical section order; never hardcode artifact versions (use the
+attributes); test any new mermaid block against kroki (a syntax error makes
+kroki *silently* skip the diagram). Conventions live in `CLAUDE.md` / `AGENTS.md`.
+
+== Documented decisions
+
+* `docs/adr/0001-antora-multi-component.md`
+* `docs/adr/0002-bilingual-fr-en.md` *(superseded by 0004)*
+* `docs/adr/0003-chappe-cli-from-repolite.md`
+* `docs/adr/0004-english-only-versioned-search.md`
+
+== License
+
+EPL-2.0 OR EUPL-1.2 OR GPL-2.0-or-later — like the rest of the ecosystem.

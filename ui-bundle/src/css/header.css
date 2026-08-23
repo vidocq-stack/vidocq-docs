@@ -101,6 +101,28 @@
   font-size: 0.9rem;
 }
 
+/* Search (Lunr) — the extension appends its dropdown to .search-box */
+.search-box {
+  position: relative;
+}
+
+.search-box input[type="search"] {
+  background: transparent;
+  border: 1px solid var(--header-border);
+  border-radius: 6px;
+  color: var(--header-link);
+  font-family: var(--font-ui);
+  font-size: 0.85rem;
+  padding: 0.3rem 0.6rem;
+  width: 14rem;
+  max-width: 40vw;
+}
+
+.search-box input[type="search"]::placeholder {
+  color: var(--header-link);
+  opacity: 0.55;
+}
+
 /* Sélecteurs de composant / version */
 .component-version-selector,
 .component-selector {

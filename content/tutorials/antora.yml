@@ -1,0 +1,10 @@
+name: tutorials
+title: Tutorials
+version: ~
+nav:
+  - modules/ROOT/nav.adoc
+asciidoc:
+  attributes:
+    lang: en
+    release-version: 0.2.0
+    cli-version: 0.2.3

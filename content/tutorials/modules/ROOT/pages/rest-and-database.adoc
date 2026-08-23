@@ -1,0 +1,318 @@
+= REST + database
+:description: Add persistence to a Vidocq application — a Jakarta Data repository (Mansart) over a pooled datasource, transactions included, plus named datasources and PostgreSQL Dev Services.
+
+[.lead]
+This tutorial continues from xref:your-first-app.adoc[Your first Vidocq application] and gives the app a real database: a `Product` entity, a Jakarta Data repository generated at compile time by Mansart, a virtual-thread-native connection pool, and `@Transactional` methods — first on in-memory H2, then a look at named datasources and PostgreSQL Dev Services.
+
+== What you will build
+
+* `GET /products` and `POST /products` backed by an H2 database;
+* a `ProductRepository` interface — its implementation is *generated at compile time*, no runtime proxies;
+* transactions handled by Mansart's Jakarta Transactions manager through Vauban interceptors.
+
+The reference for everything here is the runnable example shipped in the runtime repo: `vidocq-runtime-examples/vidocq-runtime-mansart-h2-example` ({repo-vidocq}[Vidocq/vidocq]).
+
+== Prerequisites
+
+The `todo` project from xref:your-first-app.adoc[the first tutorial] (or any scaffolded `cassini-rest` project).
+
+== Step 1 — Add the Mansart extensions
+
+Add the three Mansart extensions, the H2 dialect and the H2 driver to your `pom.xml` dependencies:
+
+[source,xml,subs=attributes+]
+----
+<dependency>
+    <groupId>io.vidocq.runtime.extensions.jakartaee.web</groupId>
+    <artifactId>vidocq-runtime-mansart-pool-extension</artifactId>
+    <version>{release-version}</version>
+</dependency>
+<dependency>
+    <groupId>io.vidocq.runtime.extensions.jakartaee.web</groupId>
+    <artifactId>vidocq-runtime-mansart-data-extension</artifactId>
+    <version>{release-version}</version>
+</dependency>
+<dependency>
+    <groupId>io.vidocq.runtime.extensions.jakartaee.web</groupId>
+    <artifactId>vidocq-runtime-mansart-transactions-extension</artifactId>
+    <version>{release-version}</version>
+</dependency>
+<dependency>
+    <groupId>io.vidocq.mansart</groupId>
+    <artifactId>mansart-data-dialect-h2</artifactId>
+    <version>{release-version}</version>
+</dependency>
+<dependency>
+    <groupId>com.h2database</groupId>
+    <artifactId>h2</artifactId>
+    <version>2.3.232</version>
+</dependency>
+----
+
+Then let the Mansart code generators run during compilation — append their bundles to the `annotationProcessorPaths` of the compiler plugin (the `combine.children="append"` attribute is already on the scaffolded block; keep it, it preserves the inherited Vauban indexer):
+
+[source,xml,subs=attributes+]
+----
+<annotationProcessorPaths combine.children="append">
+    <!-- (scaffolded) cassini-rest codegen path is already here -->
+    <path>
+        <groupId>io.vidocq.runtime.extensions.jakartaee.web</groupId>
+        <artifactId>vidocq-runtime-mansart-data-extension-codegen</artifactId>
+        <version>{release-version}</version>
+        <type>pom</type>
+    </path>
+    <path>
+        <groupId>io.vidocq.runtime.extensions.jakartaee.web</groupId>
+        <artifactId>vidocq-runtime-mansart-transactions-extension-codegen</artifactId>
+        <version>{release-version}</version>
+        <type>pom</type>
+    </path>
+</annotationProcessorPaths>
+----
+
+Finally declare the new modules in `module-info.java`:
+
+[source,java]
+----
+    requires java.sql;
+    requires jakarta.persistence;
+    requires jakarta.data;
+    requires jakarta.transaction;
+
+    requires io.vidocq.runtime.extensions.jakartaee.web.mansart.pool;
+    requires io.vidocq.runtime.extensions.jakartaee.web.mansart.data;
+    requires io.vidocq.runtime.extensions.jakartaee.web.mansart.transactions;
+    requires io.vidocq.mansart.data.core;
+----
+
+== Step 2 — Configure the pool
+
+In `src/main/resources/vidocq.properties`:
+
+[source,properties]
+----
+# Mansart pool -- @Default datasource, H2 in-memory.
+# DB_CLOSE_DELAY=-1 keeps the in-mem DB alive for the whole JVM lifetime.
+vidocq.pool.url=jdbc:h2:mem:todo;DB_CLOSE_DELAY=-1
+vidocq.pool.username=sa
+vidocq.pool.maxSize=8
+vidocq.pool.acquireTimeout=PT5S
+----
+
+The pool is Mansart's own, built for virtual threads (no `synchronized` around I/O). All keys live under `vidocq.pool.*` — see xref:mansart::usage.adoc[Mansart usage] for sizing, validation and leak detection.
+
+== Step 3 — The entity
+
+Create `src/main/java/com/acme/todo/Product.java`:
+
+[source,java]
+----
+package com.acme.todo;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+
+@Entity
+@Table(name = "products")
+public class Product {
+
+    @Id
+    @GeneratedValue
+    private Long id;
+
+    @Column(nullable = false)
+    private String name;
+
+    @Column(nullable = false)
+    private double price;
+
+    public Product() {}
+
+    public Product(String name, double price) {
+        this.name  = name;
+        this.price = price;
+    }
+
+    public Long   getId()            { return id;      }
+    public void   setId(Long id)     { this.id = id;   }
+    public String getName()          { return name;    }
+    public void   setName(String n)  { this.name = n;  }
+    public double getPrice()         { return price;   }
+    public void   setPrice(double p) { this.price = p; }
+}
+----
+
+Mansart implements Jakarta Data 1.0 and reads the standard Jakarta Persistence annotations for its entity model — at *compile time*, through APT.
+
+== Step 4 — The repository
+
+Create `src/main/java/com/acme/todo/ProductRepository.java`:
+
+[source,java]
+----
+package com.acme.todo;
+
+import jakarta.data.repository.BasicRepository;
+import jakarta.data.repository.Repository;
+import jakarta.transaction.Transactional;
+
+import java.util.List;
+
+@Transactional
+@Repository
+public interface ProductRepository extends BasicRepository<Product, Long> {
+
+    long count();
+
+    List<Product> findByNameLike(String pattern);
+}
+----
+
+You write the interface; the Mansart annotation processor generates `ProductRepositoryImpl` during compilation and wires it into Vauban as a bean. `findByNameLike` is a *derived query* — the SQL comes from the method name. `@Transactional` on the interface makes every method run in a transaction, through the Vauban-generated interceptor chain.
+
+== Step 5 — Create the schema
+
+For this tutorial, plain DDL at startup is enough. Create `src/main/java/com/acme/todo/SchemaInitializer.java`:
+
+[source,java]
+----
+package com.acme.todo;
+
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.enterprise.context.Initialized;
+import jakarta.enterprise.event.Observes;
+import jakarta.inject.Inject;
+
+import javax.sql.DataSource;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.sql.Statement;
+
+@ApplicationScoped
+public class SchemaInitializer {
+
+    @Inject
+    DataSource dataSource;
+
+    void onStart(@Observes @Initialized(ApplicationScoped.class) Object event) {
+        try (Connection c = dataSource.getConnection(); Statement s = c.createStatement()) {
+            s.execute("""
+                CREATE TABLE IF NOT EXISTS products (
+                    id    BIGINT AUTO_INCREMENT PRIMARY KEY,
+                    name  VARCHAR(255) NOT NULL,
+                    price DOUBLE PRECISION NOT NULL
+                )""");
+        } catch (SQLException e) {
+            throw new IllegalStateException("Schema initialization failed", e);
+        }
+    }
+}
+----
+
+`@Inject DataSource` hands you the pooled `@Default` datasource configured in Step 2.
+
+NOTE: For real applications, prefer versioned migrations: the runtime ships a Flyway extension (`vidocq-runtime-flyway-migration-extension`) that migrates the `@Default` datasource from `db/migration/*.sql` at boot — that is what the reference example uses.
+
+== Step 6 — The resource
+
+Create `src/main/java/com/acme/todo/ProductResource.java`:
+
+[source,java]
+----
+package com.acme.todo;
+
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
+import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.MediaType;
+
+import java.util.List;
+
+@Path("/products")
+@ApplicationScoped
+@Produces(MediaType.APPLICATION_JSON)
+@Consumes(MediaType.APPLICATION_JSON)
+public class ProductResource {
+
+    @Inject
+    ProductRepository products;
+
+    @GET
+    public List<Product> list() {
+        return products.findAll().toList();
+    }
+
+    @POST
+    public Product add(Product product) {
+        return products.save(product);
+    }
+}
+----
+
+== Step 7 — Run it
+
+[source,bash,subs=attributes+]
+----
+mvn package
+sh target/todo-{release-version}/bin/todo.sh &
+
+curl -X POST http://localhost:8080/products \
+     -H 'Content-Type: application/json' \
+     -d '{"name":"Optical telegraph","price":1794.0}'
+
+curl http://localhost:8080/products
+----
+
+[source,json]
+----
+[{"id":1,"name":"Optical telegraph","price":1794.0}]
+----
+
+Insert, query, transaction commit — all through code generated at build time. Check the boot log: the pool, the transaction manager and the repositories are reported as they come up, still well under a second.
+
+== Step 8 — Named datasources
+
+One database is rarely the whole story. Mansart routes repositories to *named* datasources: declare a second pool and point a repository at it.
+
+[source,properties]
+----
+vidocq.pool.audit.url=jdbc:h2:mem:todo-audit;DB_CLOSE_DELAY=-1
+vidocq.pool.audit.username=sa
+vidocq.pool.audit.maxSize=4
+----
+
+[source,java]
+----
+@Repository(dataStore = "audit")
+public interface AuditEntryRepository extends BasicRepository<AuditEntry, Long> { }
+----
+
+The datasource itself can be injected anywhere with `@Inject @Named("audit") DataSource`. Named datasources need one extra codegen path (`vidocq-runtime-mansart-pool-datasources-codegen`, plain jar) in `annotationProcessorPaths` — see xref:mansart::usage.adoc[Mansart usage] for the full walkthrough.
+
+== Step 9 — PostgreSQL and Dev Services
+
+Swapping H2 for PostgreSQL is a dependency change (`mansart-data-dialect-postgresql` + the PostgreSQL driver) and a URL change. In *dev mode*, you do not even need a database: the runtime ships a PostgreSQL Dev Service that starts a disposable container (Testcontainers, default image `postgres:16-alpine`) and injects the connection coordinates into the application — nothing to configure.
+
+[source,properties]
+----
+# Optional tuning -- everything has sensible defaults:
+vidocq.dev.postgres.image=postgres:16-alpine
+vidocq.dev.reuse=true              # reuse the container across restarts
+vidocq.dev.devServices=false       # global opt-out
+----
+
+Dev Services run from the Maven plugin (`mvn vidocq:dev`), never from your packaged application: Testcontainers is not on your module path and nothing container-related ships to production. An explicitly configured URL (`-D` or environment) always wins over the Dev Service. The full behaviour — multi-datasource containers, connection-info resolution, Docker daemon detection — is documented in `DEV_SERVICES.md` at the root of the {repo-vidocq}[runtime repo].
+
+== Where to next
+
+* xref:mansart::usage.adoc[Mansart usage] — derived queries, JDQL, pagination, pool sizing, named datasources.
+* xref:mansart::concepts.adoc[Mansart concepts] — how the repository implementations are generated.
+* xref:vidocq::usage.adoc[Runtime usage] — packaging (jlink, Docker), configuration profiles.
+* The complete runnable example: `vidocq-runtime-examples/vidocq-runtime-mansart-h2-example` in {repo-vidocq}[Vidocq/vidocq] — adds Flyway migrations, XA transactions, OpenAPI and a small UI on top of what you just built.

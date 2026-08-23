@@ -144,6 +144,12 @@
 
 .component-nav-title {
   margin-top: 0;
+  margin-bottom: 0.25rem;
+}
+
+/* Version selector rendered right below the component title */
+.nav .component-version-selector {
+  margin-bottom: 0.75rem;
 }
 
 /* ── Accordéon des sections (details/summary) ─────────────────────── */

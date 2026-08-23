@@ -1,34 +1,34 @@
 'use strict';
 
 /**
- * Liste ordonnée des composants pour la langue courante, à afficher dans le
- * sidebar comme accès rapide à chaque module de l'écosystème.
+ * Ordered list of components displayed in the sidebar as a quick access to
+ * every module of the ecosystem.
  *
- * - lang = 'fr' → composants `home-fr`, `chappe-fr`, …, `vidocq-fr`
- * - lang = 'en' → composants `home`,    `chappe`,    …, `vidocq`
+ * Hybrid mode:
+ *   1. Components present in ORDER_BASE are rendered in the curated business
+ *      order (home → tutorials → runtime → foundations → Jakarta layers →
+ *      MicroProfile).
+ *   2. Components auto-discovered in `site.components` but absent from
+ *      ORDER_BASE are appended at the tail, sorted alphabetically by title.
  *
- * Mode hybride :
- *   1. Composants présents dans ORDER_BASE rendus dans l'ordre métier curated
- *      (home → fondations → couches Jakarta → MicroProfile → orchestrateur).
- *   2. Composants auto-découverts dans `site.components` mais absents de
- *      ORDER_BASE appended en queue, triés alphabétiquement par titre.
- *
- * Conséquence : un nouveau module câblé dans `antora-playbook.yml` apparaît
- * automatiquement dans la sidebar sans toucher ce helper. Pour le
- * repositionner explicitement dans l'ordre métier, l'ajouter à ORDER_BASE.
+ * Consequence: a new module wired into `antora-playbook.yml` shows up in the
+ * sidebar automatically without touching this helper. To position it
+ * explicitly in the business order, add it to ORDER_BASE.
  */
 const ORDER_BASE = [
   'home',
-  // Fondations
+  'tutorials',
+  // The runtime — the entry point most readers came for
+  'vidocq',
+  // Foundations
   'chappe', 'vauban', 'champollion',
-  // Couches Jakarta
-  'foy', 'cassini', 'mansart',
+  // Jakarta layers (foy = Servlet, cassini = REST, mansart = Data,
+  // erasmus = Validation)
+  'foy', 'cassini', 'mansart', 'erasmus',
   // MicroProfile (ravel = Config, knock = Health, dirac = Metrics,
   // heisenberg = Fault Tolerance, humboldt = Telemetry, cervantes = JWT,
   // cyrano = Rest Client, grimm = OpenAPI)
   'ravel', 'knock', 'dirac', 'heisenberg', 'humboldt', 'cervantes', 'cyrano', 'grimm',
-  // Orchestrateur
-  'vidocq',
 ];
 
 module.exports = function componentsQuickNav (options) {
@@ -36,22 +36,15 @@ module.exports = function componentsQuickNav (options) {
   const site = ctx.site;
   if (!site || !site.components) return [];
 
-  const lang = detectLang(ctx);
-
-  const suffix = lang === 'fr' ? '-fr' : '';
-
-  // Étape 1 — composants curated dans l'ordre métier de ORDER_BASE.
+  // Step 1 — curated components in ORDER_BASE business order.
   const known = ORDER_BASE
-    .map((base) => site.components[base + suffix])
+    .map((base) => site.components[base])
     .filter(Boolean);
   const knownNames = new Set(known.map((c) => c.name));
 
-  // Étape 2 — auto-découverte. Tout composant de la langue courante absent
-  // de ORDER_BASE est appended en queue, trié alphabétiquement par titre.
-  const isLangMatch = (c) =>
-    suffix === '-fr' ? c.name.endsWith('-fr') : !c.name.endsWith('-fr');
+  // Step 2 — auto-discovery: any component absent from ORDER_BASE is appended
+  // at the tail, sorted alphabetically by title.
   const unknown = Object.values(site.components)
-    .filter(isLangMatch)
     .filter((c) => !knownNames.has(c.name))
     .sort((a, b) => (a.title || a.name).localeCompare(b.title || b.name));
 
@@ -61,34 +54,7 @@ module.exports = function componentsQuickNav (options) {
       name: c.name,
       title: c.title || c.name,
       url:  v && v.url ? v.url : null,
-      isHome: /^home(-fr)?$/.test(c.name),
+      isHome: c.name === 'home',
     };
   });
 };
-
-// Détecte la langue de la page courante. Antora n'expose sur `page.attributes`
-// que les attributs préfixés `page-`, donc l'attribut `lang` des antora.yml n'y
-// est PAS visible : on déduit la langue du suffixe `-fr` du nom de component (ou
-// de l'URL), exactement comme i18n.js et page-lang.js. La logique est dupliquée
-// (et non importée) car Antora charge chaque helper isolément depuis le bundle.
-function detectLang(ctx) {
-  const page = ctx.page || {};
-
-  const attrLang = page.attributes && page.attributes.lang;
-  if (attrLang === 'fr' || attrLang === 'en') return attrLang;
-
-  const componentName =
-    (page.componentVersion && page.componentVersion.name) ||
-    (page.component && page.component.name) ||
-    '';
-  if (componentName) return /-fr$/.test(componentName) ? 'fr' : 'en';
-
-  if (typeof page.url === 'string') {
-    const first = page.url.split('/').filter(Boolean)[0] || '';
-    if (first) return /-fr$/.test(first) ? 'fr' : 'en';
-  }
-
-  const primary = ctx.site && ctx.site.attributes && ctx.site.attributes['primary-language'];
-  if (primary === 'fr' || primary === 'en') return primary;
-  return 'fr';
-}

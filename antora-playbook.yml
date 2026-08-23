@@ -1,64 +1,83 @@
 site:
   title: Vidocq
-  start_page: home-fr::index.adoc
+  start_page: home::index.adoc
   url: https://doc.vidocq.dev
 
-# Antora ne supporte que http(s) ou des chemins filesystem — pas ssh://.
-# Les sources sont des repos PUBLICS sur Codeberg (org Vidocq) : Antora les
-# clone en HTTPS anonyme, aucun `~/.git-credentials` n'est nécessaire.
+urls:
+  # Released docs stay at /<component>/ (no version segment) so pre-versioning
+  # URLs keep resolving; development docs live under /<component>/dev/.
+  latest_version_segment: ''
+
+antora:
+  extensions:
+    # Client-side full-text search: static Lunr index generated at build time,
+    # no external service involved.
+    - '@antora/lunr-extension'
+
+# Antora only supports http(s) or filesystem paths -- not ssh://.
+# Sources are PUBLIC repos on Codefloe (Vidocq org): Antora clones them over
+# anonymous HTTPS, no ~/.git-credentials needed.
+#
+# Every released component is built twice: `main` carries the in-development
+# docs (Antora version `dev`, prerelease) and `docs/0.2.0` carries the docs of
+# the released 0.2.0 train (the default version shown on the site). On the next
+# release train: create docs/<version> branches from main, bump antora.yml
+# there, and add the branch below.
 
 content:
   sources:
-    - url: https://codeberg.org/Vidocq/vidocq.git
+    - url: https://codefloe.com/Vidocq/vidocq.git
+      branches: [main, docs/0.2.0]
+      start_paths: [docs/en]
+    - url: https://codefloe.com/Vidocq/vauban.git
+      branches: [main, docs/0.2.0]
+      start_paths: [docs/en]
+    - url: https://codefloe.com/Vidocq/ravel.git
+      branches: [main, docs/0.2.0]
+      start_paths: [docs/en]
+    - url: https://codefloe.com/Vidocq/cassini.git
+      branches: [main, docs/0.2.0]
+      start_paths: [docs/en]
+    - url: https://codefloe.com/Vidocq/champollion.git
+      branches: [main, docs/0.2.0]
+      start_paths: [docs/en]
+    - url: https://codefloe.com/Vidocq/chappe.git
+      branches: [main, docs/0.2.0]
+      start_paths: [docs/en]
+    - url: https://codefloe.com/Vidocq/foy.git
+      branches: [main, docs/0.2.0]
+      start_paths: [docs/en]
+    - url: https://codefloe.com/Vidocq/mansart.git
+      branches: [main, docs/0.2.0]
+      start_paths: [docs/en]
+    - url: https://codefloe.com/Vidocq/knock.git
+      branches: [main, docs/0.2.0]
+      start_paths: [docs/en]
+    - url: https://codefloe.com/Vidocq/humboldt.git
+      branches: [main, docs/0.2.0]
+      start_paths: [docs/en]
+    - url: https://codefloe.com/Vidocq/grimm.git
+      branches: [main, docs/0.2.0]
+      start_paths: [docs/en]
+    - url: https://codefloe.com/Vidocq/dirac.git
+      branches: [main, docs/0.2.0]
+      start_paths: [docs/en]
+    - url: https://codefloe.com/Vidocq/heisenberg.git
+      branches: [main, docs/0.2.0]
+      start_paths: [docs/en]
+    - url: https://codefloe.com/Vidocq/cervantes.git
+      branches: [main, docs/0.2.0]
+      start_paths: [docs/en]
+    - url: https://codefloe.com/Vidocq/cyrano.git
+      branches: [main, docs/0.2.0]
+      start_paths: [docs/en]
+    # erasmus has never been released: dev docs only.
+    - url: https://codefloe.com/Vidocq/erasmus.git
       branches: [main]
-      start_paths: [docs/en, docs/fr]
-    - url: https://codeberg.org/Vidocq/vauban.git
-      branches: [main]
-      start_paths: [docs/en, docs/fr]
-    - url: https://codeberg.org/Vidocq/ravel.git
-      branches: [main]
-      start_paths: [docs/en, docs/fr]
-    - url: https://codeberg.org/Vidocq/cassini.git
-      branches: [main]
-      start_paths: [docs/en, docs/fr]
-    - url: https://codeberg.org/Vidocq/champollion.git
-      branches: [main]
-      start_paths: [docs/en, docs/fr]
-    - url: https://codeberg.org/Vidocq/chappe.git
-      branches: [main]
-      start_paths: [docs/en, docs/fr]
-    - url: https://codeberg.org/Vidocq/foy.git
-      branches: [main]
-      start_paths: [docs/en, docs/fr]
-    - url: https://codeberg.org/Vidocq/mansart.git
-      branches: [main]
-      start_paths: [docs/en, docs/fr]
-    - url: https://codeberg.org/Vidocq/knock.git
-      branches: [main]
-      start_paths: [docs/en, docs/fr]
-    - url: https://codeberg.org/Vidocq/humboldt.git
-      branches: [main]
-      start_paths: [docs/en, docs/fr]
-    - url: https://codeberg.org/Vidocq/grimm.git
-      branches: [main]
-      start_paths: [docs/en, docs/fr]
-    - url: https://codeberg.org/Vidocq/dirac.git
-      branches: [main]
-      start_paths: [docs/en, docs/fr]
-    - url: https://codeberg.org/Vidocq/heisenberg.git
-      branches: [main]
-      start_paths: [docs/en, docs/fr]
-    - url: https://codeberg.org/Vidocq/cervantes.git
-      branches: [main]
-      start_paths: [docs/en, docs/fr]
-    - url: https://codeberg.org/Vidocq/cyrano.git
-      branches: [main]
-      start_paths: [docs/en, docs/fr]
+      start_paths: [docs/en]
     - url: .
       branches: HEAD
-      start_paths: [content/home-en, content/home-fr]
-
-# Quand les premières releases sortent, ajouter aux branches : tags: ['v*']
+      start_paths: [content/home, content/tutorials]
 
 ui:
   bundle:
@@ -67,9 +86,9 @@ ui:
 
 asciidoc:
   extensions:
-    # Diagrammes mermaid / plantuml / etc. via Kroki public.
-    # `kroki-fetch-diagram: true` télécharge les SVG au build → aucune dépendance
-    # runtime à kroki.io ; le site servi par Chappe est 100 % statique.
+    # Mermaid / plantuml / etc. diagrams via Kroki.
+    # `kroki-fetch-diagram: true` downloads the SVGs at build time -> no runtime
+    # dependency on kroki; the served site stays 100% static.
     - asciidoctor-kroki
   attributes:
     experimental: ''
@@ -77,35 +96,33 @@ asciidoc:
     idseparator: '-'
     source-highlighter: highlight.js
     chappe-version: '@'
-    primary-language: fr
 
     # --- Kroki ---
-    # Kroki self-hosted (Foix) par défaut. Overridable via :
-    # `npx antora --attribute kroki-server-url=https://kroki.example …`.
-    # `kroki-fetch-diagram: true` télécharge les SVG au build → site servi par
-    # Chappe = 100 % statique, aucune dépendance runtime à kroki.
+    # Self-hosted Kroki (Foix) by default. Overridable with:
+    # `npx antora --attribute kroki-server-url=https://kroki.example ...`.
     kroki-server-url: https://kroki.vidocq.dev
     kroki-fetch-diagram: true
     kroki-default-format: svg
 
-    # --- URLs des repos (centralises : changer ici, pas dans les modules) ---
-    repo-chappe: 'https://codeberg.org/Vidocq/chappe'
-    repo-vauban: 'https://codeberg.org/Vidocq/vauban'
-    repo-champollion: 'https://codeberg.org/Vidocq/champollion'
-    repo-foy: 'https://codeberg.org/Vidocq/foy'
-    repo-cassini: 'https://codeberg.org/Vidocq/cassini'
-    repo-mansart: 'https://codeberg.org/Vidocq/mansart'
-    repo-ravel: 'https://codeberg.org/Vidocq/ravel'
-    repo-vidocq: 'https://codeberg.org/Vidocq/vidocq'
-    repo-knock: 'https://codeberg.org/Vidocq/knock'
-    repo-humboldt: 'https://codeberg.org/Vidocq/humboldt'
-    repo-grimm: 'https://codeberg.org/Vidocq/grimm'
-    repo-cervantes: 'https://codeberg.org/Vidocq/cervantes'
-    repo-cyrano: 'https://codeberg.org/Vidocq/cyrano'
-    repo-dirac: 'https://codeberg.org/Vidocq/dirac'
-    repo-heisenberg: 'https://codeberg.org/Vidocq/heisenberg'
+    # --- Repo URLs (centralized: change here, not in the modules) ---
+    repo-chappe: 'https://codefloe.com/Vidocq/chappe'
+    repo-vauban: 'https://codefloe.com/Vidocq/vauban'
+    repo-champollion: 'https://codefloe.com/Vidocq/champollion'
+    repo-foy: 'https://codefloe.com/Vidocq/foy'
+    repo-cassini: 'https://codefloe.com/Vidocq/cassini'
+    repo-mansart: 'https://codefloe.com/Vidocq/mansart'
+    repo-ravel: 'https://codefloe.com/Vidocq/ravel'
+    repo-vidocq: 'https://codefloe.com/Vidocq/vidocq'
+    repo-knock: 'https://codefloe.com/Vidocq/knock'
+    repo-humboldt: 'https://codefloe.com/Vidocq/humboldt'
+    repo-grimm: 'https://codefloe.com/Vidocq/grimm'
+    repo-cervantes: 'https://codefloe.com/Vidocq/cervantes'
+    repo-cyrano: 'https://codefloe.com/Vidocq/cyrano'
+    repo-dirac: 'https://codefloe.com/Vidocq/dirac'
+    repo-heisenberg: 'https://codefloe.com/Vidocq/heisenberg'
+    repo-erasmus: 'https://codefloe.com/Vidocq/erasmus'
 
-    # --- URLs des specs Jakarta / MicroProfile (canoniques jakarta.ee) ---
+    # --- Jakarta / MicroProfile spec URLs (canonical jakarta.ee) ---
     spec-rest-4: 'https://jakarta.ee/specifications/restful-ws/4.0/'
     spec-servlet-6-1: 'https://jakarta.ee/specifications/servlet/6.1/'
     spec-jsonp-2-1: 'https://jakarta.ee/specifications/jsonp/2.1/'
@@ -113,6 +130,7 @@ asciidoc:
     spec-cdi-4-1: 'https://jakarta.ee/specifications/cdi/4.1/'
     spec-data-1: 'https://jakarta.ee/specifications/data/1.0/'
     spec-jpa-3-2: 'https://jakarta.ee/specifications/persistence/3.2/'
+    spec-validation-3-1: 'https://jakarta.ee/specifications/bean-validation/3.1/'
     spec-mp-config: 'https://microprofile.io/specifications/microprofile-config/'
     spec-mp-health: 'https://microprofile.io/specifications/microprofile-health/'
     spec-mp-metrics: 'https://microprofile.io/specifications/microprofile-metrics/'
@@ -122,6 +140,6 @@ asciidoc:
     spec-mp-fault-tolerance: 'https://microprofile.io/specifications/microprofile-fault-tolerance/'
     spec-mp-telemetry: 'https://microprofile.io/specifications/microprofile-telemetry/'
 
-    # --- Bases d'URLs supplémentaires ---
+    # --- Extra URL bases ---
     url-jep: 'https://openjdk.org/jeps'
     url-jakarta: 'https://jakarta.ee'

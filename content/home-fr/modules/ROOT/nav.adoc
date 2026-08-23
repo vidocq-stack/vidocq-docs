@@ -1,4 +1,0 @@
-* xref:index.adoc[Accueil]
-** xref:architecture.adoc[Architecture]
-** xref:compare.adoc[Comparatif]
-** xref:roadmap.adoc[Roadmap]

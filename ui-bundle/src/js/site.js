@@ -1,9 +1,8 @@
-/* Vidocq UI — JS minimal (toggle thème + bascule FR/EN). */
+/* Vidocq UI — minimal JS (theme toggle + version selector + nav accordion). */
 'use strict';
 
 (function () {
   var STORAGE_THEME = 'vidocq-theme';
-  var STORAGE_LANG = 'vidocq-lang';
 
   function applyStoredTheme() {
     try {
@@ -27,42 +26,19 @@
     });
   }
 
-  // Toggle FR/EN : remplace le segment de path correspondant au component.
-  // Si on est sur /vauban/page.html, le toggle FR pointe vers /vauban-fr/page.html.
-  function setupLangToggle() {
-    var toggle = document.querySelector('.lang-toggle');
-    if (!toggle) return;
-    var path = location.pathname;
-    var parts = path.split('/').filter(Boolean);
-    if (!parts.length) return;
-    var component = parts[0];
-    var isFr = /-fr$/.test(component);
-    var counterpart = isFr ? component.replace(/-fr$/, '') : component + '-fr';
-
-    Array.prototype.forEach.call(toggle.querySelectorAll('[data-lang]'), function (el) {
-      var lang = el.getAttribute('data-lang');
-      var wantsFr = lang === 'fr';
-      if ((wantsFr && isFr) || (!wantsFr && !isFr)) {
-        el.classList.add('is-current');
-        return;
-      }
-      var newParts = parts.slice();
-      newParts[0] = counterpart;
-      el.setAttribute('href', '/' + newParts.join('/') + (location.hash || ''));
-      el.addEventListener('click', function () {
-        try { localStorage.setItem(STORAGE_LANG, lang); } catch (e) { /* ignore */ }
-      });
+  // Navigate to the same page in the selected component version (option values
+  // are relative URLs rendered by nav.hbs).
+  function setupVersionSelector() {
+    var sel = document.querySelector('.component-version-selector');
+    if (!sel) return;
+    sel.addEventListener('change', function () {
+      if (this.value) window.location.href = this.value;
     });
   }
 
-  function syncHtmlLang() {
-    var meta = document.querySelector('meta[name="vidocq:lang"]');
-    if (meta) document.documentElement.setAttribute('lang', meta.content);
-  }
-
-  // Ouvre la branche du sidebar qui contient la page courante. Le template
-  // rend chaque section comme <details> fermé par défaut ; sans cette passe
-  // le visiteur arriverait sur une page dont le parent est replié.
+  // Opens the sidebar branch containing the current page. Each section is
+  // rendered as a closed <details> by default; without this pass the visitor
+  // would land on a page whose parent group is folded.
   function setupNavAccordion() {
     var current = document.querySelector('.nav .is-current-page');
     if (!current) return;
@@ -71,7 +47,7 @@
       d.setAttribute('open', '');
       d = d.parentNode && d.parentNode.closest('details.nav-group-details');
     }
-    // Met la page courante en vue dans le sidebar scrollable.
+    // Bring the current page into view inside the scrollable sidebar.
     if (typeof current.scrollIntoView === 'function') {
       current.scrollIntoView({ block: 'nearest', behavior: 'auto' });
     }
@@ -79,9 +55,8 @@
 
   applyStoredTheme();
   document.addEventListener('DOMContentLoaded', function () {
-    syncHtmlLang();
     setupThemeToggle();
-    setupLangToggle();
+    setupVersionSelector();
     setupNavAccordion();
   });
 })();
