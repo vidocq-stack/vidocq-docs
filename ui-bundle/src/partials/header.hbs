@@ -10,8 +10,8 @@
       <div class="version-switch" title="{{page.componentVersion.title}} — {{i18n 'version'}}">
         <span class="version-switch-label">{{i18n 'version'}}</span>
         <select class="component-version-selector" aria-label="{{i18n 'version'}}">
-          {{#each page.versions}}
-            <option value="{{relativize url}}"{{#if (eq version ../page.componentVersion.version)}} selected{{/if}}>{{displayVersion}}</option>
+          {{#each (version-options)}}
+            <option value="{{relativize url}}"{{#if selected}} selected{{/if}}>{{label}}</option>
           {{/each}}
         </select>
       </div>
