@@ -27,6 +27,13 @@ on:
         required: false
         default: "manual"
 
+# Serialize deploys: notify-docs bursts (several repos pushing at once) used to
+# race — an older wrangler upload could land after a newer one and serve stale
+# content. One deploy at a time, keeping only the latest pending run.
+concurrency:
+  group: pages-deploy
+  cancel-in-progress: false
+
 jobs:
   deploy:
     runs-on: docker
