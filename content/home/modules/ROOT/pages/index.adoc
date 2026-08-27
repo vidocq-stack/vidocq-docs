@@ -181,7 +181,7 @@ What works today:
 * Cassini — Jakarta REST 4.0, official TCK at **2538 tests green**.
 * Champollion — JSON-P 2.1 (**178/179**) + JSON-B 3.0 (**289/295**), APT generation.
 * Foy — Servlet 6.1, ~95 % of the official TCK `api.*` packages (web fragments pending).
-* Vidocq Runtime — orchestrator and CLI; the assembled runtime passes **1837 official MicroProfile 7.1 TCK tests** across all eight component specs (Config, Health, Metrics, Fault Tolerance, JWT, Rest Client, Telemetry, OpenAPI), with Jakarta Core Profile 11 certification in preparation.
+* Vidocq Runtime — orchestrator and CLI; the assembled runtime passes **1868 official MicroProfile 7.1 TCK tests** across all eight component specs (Config, Health, Metrics, Fault Tolerance, JWT, Rest Client, Telemetry, OpenAPI), with Jakarta Core Profile 11 certification in preparation.
 * MicroProfile bricks — Config (Ravel), Health (Knock), Metrics (Dirac), Fault Tolerance (Heisenberg), JWT (Cervantes), Rest Client (Cyrano), Telemetry (Humboldt), OpenAPI (Grimm), each wired into Vidocq Runtime through an extension and covered by its own TCK page.
 
 Work in progress:

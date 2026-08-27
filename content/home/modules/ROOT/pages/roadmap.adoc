@@ -106,7 +106,7 @@ This page aggregates the progress of all sixteen modules — eight Jakarta EE br
 
 Eight independent MicroProfile implementations, each wired into Vidocq Runtime through the extension SPI and, where relevant, exposed over Cassini.
 
-The assembled runtime passes **1837 official MicroProfile 7.1 TCK tests** across these eight specs (see the xref:vidocq::tck.adoc[runtime TCK page]).
+The assembled runtime passes **1868 official MicroProfile 7.1 TCK tests** across these eight specs (see the xref:vidocq::tck.adoc[runtime TCK page]).
 
 * xref:ravel::index.adoc[Ravel] — MicroProfile Config 3.1. TCK green (349 tests on the assembled runtime).
 * xref:knock::index.adoc[Knock] — MicroProfile Health 4.0. TCK green.
