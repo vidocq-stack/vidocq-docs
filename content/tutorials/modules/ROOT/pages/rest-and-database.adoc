@@ -307,7 +307,7 @@ ifeval::["{docs-line}" == "release"]
 ====
 endif::[]
 ifeval::["{docs-line}" == "dev"]
-NOTE: Named-datasource routing works end to end on the `{project-version}` line ([.tag-new]#NEW# since {release-version} — MANSART-005).
+NOTE: Named-datasource routing works end to end on the `{project-version}` line (since {release-version} — MANSART-005).
 endif::[]
 
 One database is rarely the whole story. Mansart routes repositories to *named* datasources: declare a second pool and point a repository at it.

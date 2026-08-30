@@ -21,49 +21,49 @@ antora:
 content:
   sources:
     - url: ../vidocq
-      branches: [main, docs/0.2.0]
+      branches: [main, docs/0.3.0, docs/0.2.0]
       start_paths: [docs/en]
     - url: ../vauban
-      branches: [main, docs/0.2.0]
+      branches: [main, docs/0.3.0, docs/0.2.0]
       start_paths: [docs/en]
     - url: ../ravel
-      branches: [main, docs/0.2.0]
+      branches: [main, docs/0.3.0, docs/0.2.0]
       start_paths: [docs/en]
     - url: ../cassini
-      branches: [main, docs/0.2.0]
+      branches: [main, docs/0.3.0, docs/0.2.0]
       start_paths: [docs/en]
     - url: ../champollion
-      branches: [main, docs/0.2.0]
+      branches: [main, docs/0.3.0, docs/0.2.0]
       start_paths: [docs/en]
     - url: ../chappe
-      branches: [main, docs/0.2.0]
+      branches: [main, docs/0.3.0, docs/0.2.0]
       start_paths: [docs/en]
     - url: ../foy
-      branches: [main, docs/0.2.0]
+      branches: [main, docs/0.3.0, docs/0.2.0]
       start_paths: [docs/en]
     - url: ../mansart
-      branches: [main, docs/0.2.0]
+      branches: [main, docs/0.3.0, docs/0.2.0]
       start_paths: [docs/en]
     - url: ../knock
-      branches: [main, docs/0.2.0]
+      branches: [main, docs/0.3.0, docs/0.2.0]
       start_paths: [docs/en]
     - url: ../humboldt
-      branches: [main, docs/0.2.0]
+      branches: [main, docs/0.3.0, docs/0.2.0]
       start_paths: [docs/en]
     - url: ../grimm
-      branches: [main, docs/0.2.0]
+      branches: [main, docs/0.3.0, docs/0.2.0]
       start_paths: [docs/en]
     - url: ../dirac
-      branches: [main, docs/0.2.0]
+      branches: [main, docs/0.3.0, docs/0.2.0]
       start_paths: [docs/en]
     - url: ../heisenberg
-      branches: [main, docs/0.2.0]
+      branches: [main, docs/0.3.0, docs/0.2.0]
       start_paths: [docs/en]
     - url: ../cervantes
-      branches: [main, docs/0.2.0]
+      branches: [main, docs/0.3.0, docs/0.2.0]
       start_paths: [docs/en]
     - url: ../cyrano
-      branches: [main, docs/0.2.0]
+      branches: [main, docs/0.3.0, docs/0.2.0]
       start_paths: [docs/en]
     # erasmus has never been released: dev docs only.
     - url: ../erasmus
@@ -75,7 +75,7 @@ content:
     # tutorials is versioned like the bricks: HEAD (dev) + the release branches
     # of THIS repo (content/tutorials only differs between them).
     - url: .
-      branches: [HEAD, docs/0.2.0]
+      branches: [HEAD, docs/0.3.0, docs/0.2.0]
       start_paths: [content/tutorials]
 
 ui:

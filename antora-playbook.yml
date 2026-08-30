@@ -31,49 +31,49 @@ antora:
 content:
   sources:
     - url: https://codefloe.com/Vidocq/vidocq.git
-      branches: [main, docs/0.2.0]
+      branches: [main, docs/0.3.0, docs/0.2.0]
       start_paths: [docs/en]
     - url: https://codefloe.com/Vidocq/vauban.git
-      branches: [main, docs/0.2.0]
+      branches: [main, docs/0.3.0, docs/0.2.0]
       start_paths: [docs/en]
     - url: https://codefloe.com/Vidocq/ravel.git
-      branches: [main, docs/0.2.0]
+      branches: [main, docs/0.3.0, docs/0.2.0]
       start_paths: [docs/en]
     - url: https://codefloe.com/Vidocq/cassini.git
-      branches: [main, docs/0.2.0]
+      branches: [main, docs/0.3.0, docs/0.2.0]
       start_paths: [docs/en]
     - url: https://codefloe.com/Vidocq/champollion.git
-      branches: [main, docs/0.2.0]
+      branches: [main, docs/0.3.0, docs/0.2.0]
       start_paths: [docs/en]
     - url: https://codefloe.com/Vidocq/chappe.git
-      branches: [main, docs/0.2.0]
+      branches: [main, docs/0.3.0, docs/0.2.0]
       start_paths: [docs/en]
     - url: https://codefloe.com/Vidocq/foy.git
-      branches: [main, docs/0.2.0]
+      branches: [main, docs/0.3.0, docs/0.2.0]
       start_paths: [docs/en]
     - url: https://codefloe.com/Vidocq/mansart.git
-      branches: [main, docs/0.2.0]
+      branches: [main, docs/0.3.0, docs/0.2.0]
       start_paths: [docs/en]
     - url: https://codefloe.com/Vidocq/knock.git
-      branches: [main, docs/0.2.0]
+      branches: [main, docs/0.3.0, docs/0.2.0]
       start_paths: [docs/en]
     - url: https://codefloe.com/Vidocq/humboldt.git
-      branches: [main, docs/0.2.0]
+      branches: [main, docs/0.3.0, docs/0.2.0]
       start_paths: [docs/en]
     - url: https://codefloe.com/Vidocq/grimm.git
-      branches: [main, docs/0.2.0]
+      branches: [main, docs/0.3.0, docs/0.2.0]
       start_paths: [docs/en]
     - url: https://codefloe.com/Vidocq/dirac.git
-      branches: [main, docs/0.2.0]
+      branches: [main, docs/0.3.0, docs/0.2.0]
       start_paths: [docs/en]
     - url: https://codefloe.com/Vidocq/heisenberg.git
-      branches: [main, docs/0.2.0]
+      branches: [main, docs/0.3.0, docs/0.2.0]
       start_paths: [docs/en]
     - url: https://codefloe.com/Vidocq/cervantes.git
-      branches: [main, docs/0.2.0]
+      branches: [main, docs/0.3.0, docs/0.2.0]
       start_paths: [docs/en]
     - url: https://codefloe.com/Vidocq/cyrano.git
-      branches: [main, docs/0.2.0]
+      branches: [main, docs/0.3.0, docs/0.2.0]
       start_paths: [docs/en]
     # erasmus has never been released: dev docs only.
     - url: https://codefloe.com/Vidocq/erasmus.git
@@ -85,7 +85,7 @@ content:
     # tutorials is versioned like the bricks: HEAD (dev) + the release branches
     # of THIS repo (content/tutorials only differs between them).
     - url: .
-      branches: [HEAD, docs/0.2.0]
+      branches: [HEAD, docs/0.3.0, docs/0.2.0]
       start_paths: [content/tutorials]
 
 ui:
