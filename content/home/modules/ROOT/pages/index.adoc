@@ -159,6 +159,7 @@ Three reasons:
 
 == Cross-cutting pages
 
+* xref:whats-new.adoc[What's new] — which components have something new on the development line, and where each one lists it.
 * xref:architecture.adoc[Overall architecture] — module boundaries, dependency matrix, cross-cutting choices (zero-dependency, Java Modules, codegen, virtual threads).
 * xref:compare.adoc[Comparison] — Vidocq Runtime against Quarkus, Helidon SE 4 and Spring Boot 4.
 * xref:roadmap.adoc[Consolidated roadmap] — module-by-module status and upcoming milestones.

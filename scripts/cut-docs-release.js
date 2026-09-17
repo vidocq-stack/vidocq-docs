@@ -141,11 +141,12 @@ for (const r of versioned) {
       if (fs.existsSync(pagesDir)) stripNew(pagesDir);
       const wn = path.join(wt2, 'docs/en/modules/ROOT/pages/whats-new.adoc');
       if (fs.existsSync(wn)) {
+        // Per component: each one owns its page, and home::whats-new.adoc indexes them.
         fs.writeFileSync(wn, `= What's new
-:description: Everything that changed across the Vidocq ecosystem since the {release-version} release.
+:description: Everything that changed in this component since the {release-version} release.
 
 [.lead]
-New in the \`{project-version}\` development line — everything listed here landed **after the {release-version} release** and is not part of it. Sections carrying the [.tag-new]#NEW# badge across the documentation point to these features. When the next release train ships, this page is frozen with it and restarts empty on the dev line.
+New in the \`{project-version}\` development line — everything listed here landed **after the {release-version} release** and is not part of it. Every entry links to the section that documents it, and those sections carry the [.tag-new]#NEW# badge. Each brick of the suite keeps its own page of this kind; xref:home::whats-new.adoc[the ecosystem index] gathers them. When the next release train ships, this page is frozen with it and restarts empty on the dev line.
 
 _Nothing documented yet for this cycle. Add entries here (and place [.tag-new]#NEW# badges on the relevant pages) as features land on main._
 `);

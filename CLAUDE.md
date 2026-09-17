@@ -87,9 +87,15 @@ Features added since the last release are flagged with the red badge
 `[.tag-new]#NEW#` written literally next to the section title or phrase
 (never via an attribute: inline roles are substituted before attributes, an
 attribute value would render as plain text; nav entries cannot carry it), and
-summarized in `vidocq`'s `whats-new.adoc` page with a link. Only on `main`: the release cut freezes them in `docs/<version>` and
-`cut-docs-release.js` strips the badges and resets the what's-new page on
-`main` for the next cycle.
+summarized with a link on the `whats-new.adoc` page of the component that
+carries the feature — each component owns its own, and
+`content/home/modules/ROOT/pages/whats-new.adoc` is the versionless index
+that names the components with something new and links to their pages
+(pin those cross-component links to `dev@`, since home is versionless and
+would otherwise resolve them against the latest released line). A component
+with nothing new has no such page. Only on `main`: the release cut freezes
+them in `docs/<version>` and `cut-docs-release.js` strips the badges and
+resets the what's-new page on `main` for the next cycle.
 
 ### Diagrams
 Mermaid via kroki (self-hosted, SVGs fetched at build time). Quote any edge
