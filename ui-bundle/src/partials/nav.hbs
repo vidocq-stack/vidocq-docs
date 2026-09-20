@@ -4,38 +4,5 @@
   <h3 class="component-nav-title">{{page.componentVersion.title}}</h3>
 {{/if}}
 {{#each page.navigation}}
-  <ul>
-    {{#each items}}
-      <li{{#if items}} class="nav-group"{{/if}}>
-        {{#if items}}
-          <details class="nav-group-details">
-            <summary class="nav-group-summary">
-              {{#if url}}
-                <a href="{{relativize url}}"{{#if (eq url ../../page.url)}} class="is-current-page"{{/if}}>{{{content}}}</a>
-              {{else}}
-                <span>{{{content}}}</span>
-              {{/if}}
-            </summary>
-            <ul>
-              {{#each items}}
-                <li>
-                  {{#if url}}
-                    <a href="{{relativize url}}"{{#if (eq url ../../../page.url)}} class="is-current-page"{{/if}}>{{{content}}}</a>
-                  {{else}}
-                    <span>{{{content}}}</span>
-                  {{/if}}
-                </li>
-              {{/each}}
-            </ul>
-          </details>
-        {{else}}
-          {{#if url}}
-            <a href="{{relativize url}}"{{#if (eq url ../../page.url)}} class="is-current-page"{{/if}}>{{{content}}}</a>
-          {{else}}
-            <span>{{{content}}}</span>
-          {{/if}}
-        {{/if}}
-      </li>
-    {{/each}}
-  </ul>
+  {{> nav-items items}}
 {{/each}}

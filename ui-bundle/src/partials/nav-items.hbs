@@ -1,0 +1,36 @@
+{{!
+  One level of the component navigation, and every level below it.
+
+  The partial calls itself for an entry that has children, so a nav.adoc is
+  rendered to whatever depth it declares. It used to stop after two, which
+  silently dropped every third-level entry: the dev console pages under Usage
+  and the whole "Reactor sub-modules" list were published, searchable and
+  reachable by link, but absent from the sidebar.
+
+  The current page is matched against @root.page.url rather than a relative
+  ../ path, whose depth changes with every level of recursion.
+}}
+<ul>
+  {{#each this}}
+    <li{{#if items}} class="nav-group"{{/if}}>
+      {{#if items}}
+        <details class="nav-group-details">
+          <summary class="nav-group-summary">
+            {{#if url}}
+              <a href="{{relativize url}}"{{#if (eq url @root.page.url)}} class="is-current-page"{{/if}}>{{{content}}}</a>
+            {{else}}
+              <span>{{{content}}}</span>
+            {{/if}}
+          </summary>
+          {{> nav-items items}}
+        </details>
+      {{else}}
+        {{#if url}}
+          <a href="{{relativize url}}"{{#if (eq url @root.page.url)}} class="is-current-page"{{/if}}>{{{content}}}</a>
+        {{else}}
+          <span>{{{content}}}</span>
+        {{/if}}
+      {{/if}}
+    </li>
+  {{/each}}
+</ul>
