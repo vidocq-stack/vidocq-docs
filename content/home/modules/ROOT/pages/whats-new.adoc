@@ -23,12 +23,19 @@ Full list: xref:dev@vidocq::whats-new.adoc[What's new in Vidocq Runtime].
 
 Full list: xref:dev@vauban::whats-new.adoc[What's new in Vauban].
 
+=== Cassini — unreadable request entities answer 400
+
+* **A client's malformed request entity is the client's fault.** Malformed JSON, an empty body or a value of the wrong type now answers `400 Bad Request` instead of `500`, after the application's own exception mappers, and no longer writes a stack trace at ERROR for every such request — one DEBUG line instead.
+* **`NoContentException` becomes a `BadRequestException`**, whatever reader throws it, as Jakarta REST §4.2.4 requires.
+
+Full list: xref:dev@cassini::whats-new.adoc[What's new in Cassini].
+
 == Components with nothing new
 
-xref:cassini::index.adoc[Cassini], xref:champollion::index.adoc[Champollion], xref:chappe::index.adoc[Chappe], xref:foy::index.adoc[Foy], xref:mansart::index.adoc[Mansart], xref:erasmus::index.adoc[Erasmus], xref:ravel::index.adoc[Ravel], xref:knock::index.adoc[Knock], xref:dirac::index.adoc[Dirac], xref:heisenberg::index.adoc[Heisenberg], xref:cervantes::index.adoc[Cervantes], xref:cyrano::index.adoc[Cyrano], xref:humboldt::index.adoc[Humboldt] and xref:grimm::index.adoc[Grimm] have nothing to announce on the current development line: they carry no [.tag-new]#NEW# badge and no What's new page. They are named here so that their absence from the list above reads as a fact rather than as a gap. Where each of them stands is on the xref:roadmap.adoc[Consolidated roadmap].
+xref:champollion::index.adoc[Champollion], xref:chappe::index.adoc[Chappe], xref:foy::index.adoc[Foy], xref:mansart::index.adoc[Mansart], xref:erasmus::index.adoc[Erasmus], xref:ravel::index.adoc[Ravel], xref:knock::index.adoc[Knock], xref:dirac::index.adoc[Dirac], xref:heisenberg::index.adoc[Heisenberg], xref:cervantes::index.adoc[Cervantes], xref:cyrano::index.adoc[Cyrano], xref:humboldt::index.adoc[Humboldt] and xref:grimm::index.adoc[Grimm] have nothing to announce on the current development line: they carry no [.tag-new]#NEW# badge and no What's new page. They are named here so that their absence from the list above reads as a fact rather than as a gap. Where each of them stands is on the xref:roadmap.adoc[Consolidated roadmap].
 
 == How these lists are maintained
 
-This page is versionless, so a link from here to a component resolves against that component's latest **released** documentation unless it says otherwise. The two links above are therefore pinned with `dev@`. Today that pin is what makes them resolve at all — no released line carries a What's new page, the practice being younger than the 0.3.0 cut. From the next release train on, each released line will carry the page frozen with it, and an unpinned link would quietly land on that frozen list instead of the one this index is about.
+This page is versionless, so a link from here to a component resolves against that component's latest **released** documentation unless it says otherwise. The links above are therefore pinned with `dev@`. Today that pin is what makes them resolve at all — no released line carries a What's new page, the practice being younger than the 0.3.0 cut. From the next release train on, each released line will carry the page frozen with it, and an unpinned link would quietly land on that frozen list instead of the one this index is about.
 
 When the next release train ships, each component's page is frozen with its released documentation and restarts empty on `dev`, and the [.tag-new]#NEW# badges are stripped from the pages they were flagging. The release cut does not touch this page: it has to be updated by hand when a component starts or stops having something to announce.
