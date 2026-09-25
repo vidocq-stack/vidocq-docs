@@ -35,11 +35,11 @@ services:
       REGISTRY_AUTH: htpasswd
       REGISTRY_AUTH_HTPASSWD_REALM: "registry.vidocq.dev"
       REGISTRY_AUTH_HTPASSWD_PATH: /auth/htpasswd
-      # SAME credentials the CI uses to `docker login` (Codeberg secrets
+      # SAME credentials the CI uses to `docker login` (Codefloe secrets
       # REGISTRY_USERNAME / REGISTRY_PASSWORD). Prefer an alphanumeric password
       # (no shell-special chars) to keep it interpolation-safe.
       REGISTRY_USERNAME: ${REGISTRY_USERNAME:?set the registry username, e.g. vidocq-ci}
-      REGISTRY_PASSWORD: ${REGISTRY_PASSWORD:?set the registry password (same value as the Codeberg secret)}
+      REGISTRY_PASSWORD: ${REGISTRY_PASSWORD:?set the registry password (same value as the Codefloe secret)}
     volumes:
       - registry-data:/var/lib/registry
     expose:

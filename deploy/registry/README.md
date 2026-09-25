@@ -31,7 +31,7 @@ No bcrypt to generate: the stack hashes the password in-container at startup. Ju
   `openssl rand -hex 24`;
 - an **HTTP secret** — any long random string, e.g. `openssl rand -hex 32`.
 
-Use the **same** username/password as the Codeberg CI secrets (`REGISTRY_USERNAME` /
+Use the **same** username/password as the Codefloe CI secrets (`REGISTRY_USERNAME` /
 `REGISTRY_PASSWORD`) — see step 6.
 
 ## 3. Deploy the stack in Portainer
@@ -83,7 +83,7 @@ Portainer → **Registries → Add registry → Custom registry**:
 
 The `vidocq-docs` stack then references images as `registry.vidocq.dev/vidocq-docs:...`.
 
-## 6. CI credentials (Codeberg org secrets)
+## 6. CI credentials (Codefloe org secrets)
 
 Add to the `Vidocq` org (or the `vidocq-docs` repo) secrets — convention: credentials go in
 `secrets.*`, never `vars.*`:

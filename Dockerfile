@@ -3,7 +3,7 @@
 # Vidocq documentation — image Docker.
 #
 # Le site Antora est buildé HORS Dockerfile (par le runner / build local) :
-# Antora clone les repos modules PUBLICS sur Codeberg en HTTPS anonyme.
+# Antora clone les repos modules PUBLICS sur Codefloe en HTTPS anonyme.
 # On garde la responsabilité du build Antora côté runner ; le `docker build`
 # se contente de COPY le résultat.
 #
@@ -110,7 +110,7 @@ exec java -jar /opt/vidocq-docs/chappe-cli.jar \${ARGS}
 EOF
 RUN chmod +x /opt/vidocq-docs/entrypoint.sh
 
-LABEL org.opencontainers.image.source="https://codeberg.org/Vidocq/vidocq-docs"
+LABEL org.opencontainers.image.source="https://codefloe.com/Vidocq/vidocq-docs"
 LABEL org.opencontainers.image.licenses="Apache-2.0"
 LABEL org.opencontainers.image.title="Vidocq Documentation"
 LABEL org.opencontainers.image.description="Documentation Antora de l'écosystème Vidocq, servie par chappe-cli."
