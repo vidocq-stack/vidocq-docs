@@ -54,10 +54,12 @@ jobs:
       - name: Fetch this repo's docs/* branches (versioned tutorials source)
         run: git fetch --no-tags origin '+refs/heads/docs/*:refs/heads/docs/*'
 
+      # A major version, not 'lts/*': the alias is resolved through GitHub's API, whose anonymous rate limit the
+      # shared runner's address exhausts, while a version falls back to nodejs.org when that lookup fails.
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 'lts/*'
+          node-version: '22'
 
       - name: Fetch Chappe version (for the UI bundle footer)
         run: node scripts/fetch-chappe-version.js
