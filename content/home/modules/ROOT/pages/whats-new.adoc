@@ -6,33 +6,80 @@ A component with something to announce keeps its own What's new page on its `dev
 
 == Components with something new
 
-=== Vidocq Runtime — startup identity, console logs, Maven goals
+=== Vidocq Runtime — MicroProfile 7.2 line, Rest Client, packaging, startup identity
 
-* **Booting says what it is.** Every start prints the exact Vidocq version, with the commit for a snapshot or a build from a modified tree, then the launch mode — `dev`, `test` or `prod` — together with the signal it was read from, and the address a debugger has to attach to when the JVM was started with a JDWP agent.
-* **Every jar carries its build identity** under `META-INF/vidocq/build-info/`, so two snapshots of the same version are told apart.
-* **Readable console logs by default.** An application that has not configured logging gets one aligned line per record on standard output, instead of the JDK's two-line records on standard error.
-* **Running from Maven.** `vidocq:run` compiles, indexes and runs the application in a forked JVM the way the production launcher does, and the experimental `vidocq:idea` goal writes the matching IntelliJ run configurations into `.run/`.
+* **The MicroProfile 7.2 specifications in the assembled runtime** — JWT Authentication 2.2, OpenAPI 4.2 and Telemetry 2.2 — with their TCKs green on the release candidates; the 7.2 finals are still under ballot, and the runtime is re-run against them once they are on Maven Central.
+* **`@Inject @RestClient` works**, through a new Rest Client codegen bundle that `checkpom` now requires, and a Rest Client application links with `jlink`; a new example shows it end to end.
+* **Packaging that says what is wrong** — `vidocq:docker` refuses to build a Linux image around a macOS or Windows `jlink` image, the legacy `package` layout launches through the main class's module, and an application left in the boot layer gets a message naming the `exports` to add.
+* **Booting says what it is** — version, commit, launch mode and debugger address — with readable console logs by default, and `vidocq:run` / `vidocq:idea` to run from Maven and IntelliJ.
 
 Full list: xref:dev@vidocq::whats-new.adoc[What's new in Vidocq Runtime].
 
-=== Vauban — client proxies without `opens`, Java SE launcher
+=== Vauban — client proxies without `opens`, interception that covers inherited methods
 
-* **A client proxy for a third-party produced type, without opening its package.** The Java SE launcher `io.vidocq.vauban.classloader.Launch` runs the application inside a Vauban layer, where the proxy is placed into the type's own package by the loader that owns it — no `opens`, no agent, no rewritten jar — and `Vidocq.run` re-layers with the same policy.
-* **Boot-time opening is opt-in**, `-Dvauban.opens.auto=true`, and off by default; left off, the container refuses and names every remedy.
-* **Two opt-in Maven goals.** `vauban:modularize` synthesizes a `module-info` for the non-modular dependency jars; `vauban:enhance-dependencies` is the last-resort copy of a dependency jar with the proxy co-located in it.
+* **A client proxy for a third-party produced type, without opening its package**, through the Java SE launcher and the Vauban layer; boot-time opening stays opt-in.
+* **Interception follows the specification more closely** — `@AroundInvoke` no longer runs around lifecycle callbacks, inherited and interface default methods are intercepted and forwarded, and members Java source cannot override are generated as bytecode.
+* **The build is reproducible and complete** — `vauban:generate` pre-generates every subclass the container would wrap, in a stable order.
+* **Module lookups for trusted extensions**, so an extension such as Heisenberg reaches a managed class's private members with no `opens`.
 
 Full list: xref:dev@vauban::whats-new.adoc[What's new in Vauban].
 
 === Cassini — unreadable request entities answer 400
 
-* **A client's malformed request entity is the client's fault.** Malformed JSON, an empty body or a value of the wrong type now answers `400 Bad Request` instead of `500`, after the application's own exception mappers, and no longer writes a stack trace at ERROR for every such request — one DEBUG line instead.
+* **A client's malformed request entity is the client's fault.** Malformed JSON, an empty body or a value of the wrong type now answers `400 Bad Request` instead of `500`, after the application's own exception mappers, and no longer writes a stack trace at ERROR for every such request.
 * **`NoContentException` becomes a `BadRequestException`**, whatever reader throws it, as Jakarta REST §4.2.4 requires.
 
 Full list: xref:dev@cassini::whats-new.adoc[What's new in Cassini].
 
+=== Cervantes — MicroProfile JWT Authentication 2.2
+
+* **RS256 and ES256 both accepted** when no algorithm is configured, PEM keys of either family, and a configured algorithm checked by family.
+* **A bad configuration fails the start** with a `DeploymentException` instead of failing every token at request time.
+
+Full list: xref:dev@cervantes::whats-new.adoc[What's new in Cervantes].
+
+=== Grimm — MicroProfile OpenAPI 4.2, a more faithful document
+
+* **OpenAPI 4.2 features** — unknown Schema properties as extensions, `@Header` examples, method-level `@ExternalDocumentation`, `@Digits` constraints.
+* **The model sources combine in the order the specification sets**, and every `@Schema` / `@SchemaProperty` attribute reaches the document; Grimm ships named Java modules.
+
+Full list: xref:dev@grimm::whats-new.adoc[What's new in Grimm].
+
+=== Humboldt — MicroProfile Telemetry 2.2, OpenTelemetry 1.66
+
+* **OpenTelemetry 1.66**, `code.function.name` on `@WithSpan` spans, and `@WithSpan(inheritContext = false)`.
+* **Nothing lost on export** — exceptions, event names, structured values and double metric points — and the OTLP exporters work on the module path.
+
+Full list: xref:dev@humboldt::whats-new.adoc[What's new in Humboldt].
+
+=== Cyrano — the Rest Client on the module path and in a jlink image
+
+* **`RestClientBuilder` works on the module path and in a jlink image**, listeners from other modules are found, and Reactive Streams is no longer forced on every client.
+* **`CompletionStage` responses never run on the caller's thread**, and builder listeners run once per builder.
+
+Full list: xref:dev@cyrano::whats-new.adoc[What's new in Cyrano].
+
+=== Heisenberg — fallback methods with no `opens`
+
+* **`@Fallback(fallbackMethod = ...)` works on a strict module path** with nothing opened, through Vauban's module lookup.
+
+Full list: xref:dev@heisenberg::whats-new.adoc[What's new in Heisenberg].
+
+=== Mansart — `@Enumerated` honoured
+
+* **`@Enumerated(ORDINAL)` stores the index, `STRING` the name**; an enum with no annotation keeps storing its name. The tooling API (`EntityModels.of`, `JdqlExecutor`) is public, and Mansart JPA has restarted.
+
+Full list: xref:dev@mansart::whats-new.adoc[What's new in Mansart].
+
+=== Ravel, Knock and Chappe
+
+* **Ravel** — `@Inject @ConfigProperty` works under the Vauban annotation processor. xref:dev@ravel::whats-new.adoc[What's new in Ravel].
+* **Knock** — the registry remembers the last result of each check, with a public `CheckResult`. xref:dev@knock::whats-new.adoc[What's new in Knock].
+* **Chappe** — `writeTimeout` is actually applied (a behaviour change: a client that stalls while reading is cut after 30 s by default), and connections close gracefully so the last response survives. xref:dev@chappe::whats-new.adoc[What's new in Chappe].
+
 == Components with nothing new
 
-xref:champollion::index.adoc[Champollion], xref:chappe::index.adoc[Chappe], xref:foy::index.adoc[Foy], xref:mansart::index.adoc[Mansart], xref:erasmus::index.adoc[Erasmus], xref:ravel::index.adoc[Ravel], xref:knock::index.adoc[Knock], xref:dirac::index.adoc[Dirac], xref:heisenberg::index.adoc[Heisenberg], xref:cervantes::index.adoc[Cervantes], xref:cyrano::index.adoc[Cyrano], xref:humboldt::index.adoc[Humboldt] and xref:grimm::index.adoc[Grimm] have nothing to announce on the current development line: they carry no [.tag-new]#NEW# badge and no What's new page. They are named here so that their absence from the list above reads as a fact rather than as a gap. Where each of them stands is on the xref:roadmap.adoc[Consolidated roadmap].
+xref:champollion::index.adoc[Champollion], xref:foy::index.adoc[Foy], xref:dirac::index.adoc[Dirac] and xref:erasmus::index.adoc[Erasmus] have nothing to announce on the current development line: they carry no [.tag-new]#NEW# badge and no What's new page. They are named here so that their absence from the list above reads as a fact rather than as a gap. Where each of them stands is on the xref:roadmap.adoc[Consolidated roadmap].
 
 == How these lists are maintained
 
