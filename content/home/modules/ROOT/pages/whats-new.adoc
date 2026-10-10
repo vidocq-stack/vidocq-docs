@@ -6,6 +6,16 @@ A component with something to announce keeps its own What's new page on its `dev
 
 == Components with something new
 
+=== Across the bricks — proven without Vauban, on Weld and Open Liberty
+
+Each brick below now has an `<brick>-it-other-containers` module that runs its jars, unchanged, under Weld SE on a plain class path and as a WAR on Open Liberty, with the server's own implementation of that specification turned off. The modules are part of every build and never published.
+
+* **What the tests found, and what is fixed** — normal-scoped beans could not load outside Vauban, because the build weaves a constructor taking a `vauban-api` type that was `provided` (Knock, Heisenberg, Cervantes, Humboldt); Heisenberg keyed metric names and configuration overrides by Weld's subclass; Humboldt's span finalizer turned every exception, a 404 included, into a 500 and failed outright on RESTEasy.
+* **A brick depends on APIs, its Vidocq extension picks the implementations** — Jakarta platform APIs are now `provided` in the bricks, and each Vidocq runtime extension brings what its brick leaves out: the Rest Client extension brings Champollion's JSON-B, so a Rest Client application without a REST server reads JSON again.
+* **Deploying on an application server** — each brick's page says which server features to keep off and to enable, in a `WARNING` block its Open Liberty module tests.
+
+Where to read it: xref:dev@knock::reference.adoc#other-containers[Knock], xref:dev@heisenberg::reference.adoc#other-containers[Heisenberg], xref:dev@cervantes::reference.adoc#other-containers[Cervantes], xref:dev@humboldt::reference.adoc#other-containers[Humboldt], xref:dev@cyrano::reference.adoc#other-containers[Cyrano], xref:dev@ravel::cdi-integration.adoc#other-containers[Ravel], xref:dev@champollion::reference.adoc#other-containers[Champollion].
+
 === Vidocq Runtime — MicroProfile 7.2 line, Rest Client, packaging, startup identity
 
 * **The MicroProfile 7.2 specifications in the assembled runtime** — JWT Authentication 2.2, OpenAPI 4.2 and Telemetry 2.2 — with their TCKs green on the release candidates; the 7.2 finals are still under ballot, and the runtime is re-run against them once they are on Maven Central.
@@ -71,15 +81,16 @@ Full list: xref:dev@heisenberg::whats-new.adoc[What's new in Heisenberg].
 
 Full list: xref:dev@mansart::whats-new.adoc[What's new in Mansart].
 
-=== Ravel, Knock and Chappe
+=== Ravel, Knock, Champollion and Chappe
 
 * **Ravel** — `@Inject @ConfigProperty` works under the Vauban annotation processor. xref:dev@ravel::whats-new.adoc[What's new in Ravel].
+* **Champollion** — proven on Weld and Open Liberty, where the server's JSON-B must stay off; the Annotation API is no longer shipped. xref:dev@champollion::whats-new.adoc[What's new in Champollion].
 * **Knock** — the registry remembers the last result of each check, with a public `CheckResult`. xref:dev@knock::whats-new.adoc[What's new in Knock].
 * **Chappe** — `writeTimeout` is actually applied (a behaviour change: a client that stalls while reading is cut after 30 s by default), and connections close gracefully so the last response survives. xref:dev@chappe::whats-new.adoc[What's new in Chappe].
 
 == Components with nothing new
 
-xref:champollion::index.adoc[Champollion], xref:foy::index.adoc[Foy], xref:dirac::index.adoc[Dirac] and xref:erasmus::index.adoc[Erasmus] have nothing to announce on the current development line: they carry no [.tag-new]#NEW# badge and no What's new page. They are named here so that their absence from the list above reads as a fact rather than as a gap. Where each of them stands is on the xref:roadmap.adoc[Consolidated roadmap].
+xref:foy::index.adoc[Foy], xref:dirac::index.adoc[Dirac] and xref:erasmus::index.adoc[Erasmus] have nothing to announce on the current development line: they carry no [.tag-new]#NEW# badge and no What's new page. They are named here so that their absence from the list above reads as a fact rather than as a gap. Where each of them stands is on the xref:roadmap.adoc[Consolidated roadmap].
 
 == How these lists are maintained
 
