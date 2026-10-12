@@ -184,6 +184,11 @@
   font-style: italic;
 }
 
+.components-quick-nav__spec {
+  font-size: 0.85em;
+  color: var(--c-text-soft);
+}
+
 .components-quick-nav__hint {
   font-size: 0.78rem;
   color: var(--c-text-soft);

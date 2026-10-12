@@ -24,9 +24,9 @@
                       {{#each items}}
                         <li class="components-quick-nav__item{{#if isCurrent}} is-current{{/if}}">
                           {{#if url}}
-                            <a href="{{relativize url}}">{{title}}</a>
+                            <a href="{{relativize url}}">{{title}}{{#if spec}} <span class="components-quick-nav__spec">({{spec}})</span>{{/if}}</a>
                           {{else}}
-                            <span>{{title}}</span>
+                            <span>{{title}}{{#if spec}} <span class="components-quick-nav__spec">({{spec}})</span>{{/if}}</span>
                           {{/if}}
                         </li>
                       {{/each}}
@@ -41,9 +41,9 @@
       {{#each extra}}
         <li class="components-quick-nav__item{{#if isCurrent}} is-current{{/if}}">
           {{#if url}}
-            <a href="{{relativize url}}">{{title}}</a>
+            <a href="{{relativize url}}">{{title}}{{#if spec}} <span class="components-quick-nav__spec">({{spec}})</span>{{/if}}</a>
           {{else}}
-            <span>{{title}}</span>
+            <span>{{title}}{{#if spec}} <span class="components-quick-nav__spec">({{spec}})</span>{{/if}}</span>
           {{/if}}
         </li>
       {{/each}}

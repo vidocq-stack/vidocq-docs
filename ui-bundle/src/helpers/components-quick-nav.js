@@ -24,6 +24,30 @@ const CATEGORIES = [
   { label: 'MicroProfile',    names: ['ravel', 'knock', 'dirac', 'heisenberg', 'humboldt', 'cervantes', 'cyrano', 'grimm'] },
 ];
 
+// Short name of the spec each component implements, shown after its name
+// ("Foy (Servlet)") so a reader finds a spec without knowing the code names.
+const SPECS = {
+  chappe: 'HTTP',
+  vauban: 'CDI',
+  champollion: 'JSON',
+  cassini: 'REST',
+  foy: 'Servlet',
+  peano: 'EL',
+  ibarra: 'JSP',
+  mansart: 'Data',
+  noether: 'JPA',
+  erasmus: 'Validation',
+  tassis: 'JMS',
+  ravel: 'Config',
+  knock: 'Health',
+  dirac: 'Metrics',
+  heisenberg: 'Fault Tolerance',
+  humboldt: 'Telemetry',
+  cervantes: 'JWT',
+  cyrano: 'Rest Client',
+  grimm: 'OpenAPI',
+};
+
 module.exports = function componentsQuickNav (options) {
   const ctx = (options && options.data && options.data.root) || {};
   const site = ctx.site;
@@ -49,6 +73,7 @@ module.exports = function componentsQuickNav (options) {
     return {
       name: c.name,
       title: c.title || c.name,
+      spec: SPECS[c.name] || null,
       url: v && v.url ? v.url : null,
       isHome: c.name === 'home',
       isCurrent: c.name === currentName,
