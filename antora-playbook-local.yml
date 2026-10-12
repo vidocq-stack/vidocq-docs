@@ -69,6 +69,19 @@ content:
     - url: ../erasmus
       branches: [main]
       start_paths: [docs/en]
+    # not released yet: dev docs only.
+    - url: ../ibarra
+      branches: [main]
+      start_paths: [docs/en]
+    - url: ../peano
+      branches: [main]
+      start_paths: [docs/en]
+    - url: ../noether
+      branches: [main]
+      start_paths: [docs/en]
+    - url: ../tassis
+      branches: [main]
+      start_paths: [docs/en]
     - url: .
       branches: HEAD
       start_paths: [content/home]
@@ -115,6 +128,10 @@ asciidoc:
     repo-dirac: 'https://codefloe.com/Vidocq/dirac'
     repo-heisenberg: 'https://codefloe.com/Vidocq/heisenberg'
     repo-erasmus: 'https://codefloe.com/Vidocq/erasmus'
+    repo-ibarra: 'https://codefloe.com/Vidocq/ibarra'
+    repo-peano: 'https://codefloe.com/Vidocq/peano'
+    repo-noether: 'https://codefloe.com/Vidocq/noether'
+    repo-tassis: 'https://codefloe.com/Vidocq/tassis'
 
     spec-rest-4: 'https://jakarta.ee/specifications/restful-ws/4.0/'
     spec-servlet-6-1: 'https://jakarta.ee/specifications/servlet/6.1/'

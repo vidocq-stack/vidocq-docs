@@ -79,6 +79,19 @@ content:
     - url: https://codefloe.com/Vidocq/erasmus.git
       branches: [main]
       start_paths: [docs/en]
+    # not released yet: dev docs only.
+    - url: https://codefloe.com/Vidocq/ibarra.git
+      branches: [main]
+      start_paths: [docs/en]
+    - url: https://codefloe.com/Vidocq/peano.git
+      branches: [main]
+      start_paths: [docs/en]
+    - url: https://codefloe.com/Vidocq/noether.git
+      branches: [main]
+      start_paths: [docs/en]
+    - url: https://codefloe.com/Vidocq/tassis.git
+      branches: [main]
+      start_paths: [docs/en]
     - url: .
       branches: HEAD
       start_paths: [content/home]
@@ -130,6 +143,10 @@ asciidoc:
     repo-dirac: 'https://codefloe.com/Vidocq/dirac'
     repo-heisenberg: 'https://codefloe.com/Vidocq/heisenberg'
     repo-erasmus: 'https://codefloe.com/Vidocq/erasmus'
+    repo-ibarra: 'https://codefloe.com/Vidocq/ibarra'
+    repo-peano: 'https://codefloe.com/Vidocq/peano'
+    repo-noether: 'https://codefloe.com/Vidocq/noether'
+    repo-tassis: 'https://codefloe.com/Vidocq/tassis'
 
     # --- Jakarta / MicroProfile spec URLs (canonical jakarta.ee) ---
     spec-rest-4: 'https://jakarta.ee/specifications/restful-ws/4.0/'

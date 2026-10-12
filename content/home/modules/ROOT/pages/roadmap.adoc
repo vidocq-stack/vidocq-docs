@@ -2,7 +2,7 @@
 :description: Per-module status and upcoming milestones.
 
 [.lead]
-This page aggregates the progress of all sixteen modules — eight Jakarta EE bricks (including the Vidocq Runtime orchestrator) plus eight MicroProfile implementations. Each section links to the module's documentation for details. The suite is released as `0.2.x` on Maven Central — an alpha, APIs may still change.
+This page aggregates the progress of all twenty modules — twelve Jakarta EE bricks (including the Vidocq Runtime orchestrator) plus eight MicroProfile implementations. Each section links to the module's documentation for details. The suite is released as `0.2.x` on Maven Central — an alpha, APIs may still change.
 
 == Upcoming milestones
 
@@ -30,10 +30,25 @@ This page aggregates the progress of all sixteen modules — eight Jakarta EE br
 | Jakarta Transactions 2.0 — full TCK suite
 | in progress
 
-| M7
-| xref:mansart::index.adoc[Mansart]
-| `mansart-persistence` — Jakarta Persistence 3.2 (classic JPA)
-| pending
+| —
+| xref:noether::index.adoc[Noether]
+| Jakarta Persistence 3.2 (classic JPA), extracted from Mansart
+| in progress
+
+| P6
+| xref:peano::index.adoc[Peano]
+| Jakarta Expression Language 6.0 — official TCK 361/361, first release
+| in progress
+
+| I3–I8
+| xref:ibarra::index.adoc[Ibarra]
+| Jakarta Pages 4.0 — build-time page generation, tag semantics, certification
+| in progress
+
+| —
+| xref:tassis::index.adoc[Tassis]
+| Jakarta Messaging 3.1 — in-VM broker, first release
+| in progress
 
 | M3–M8
 | xref:erasmus::index.adoc[Erasmus]
@@ -88,11 +103,11 @@ This page aggregates the progress of all sixteen modules — eight Jakarta EE br
 * **Coming up**: MicroProfile JWT `@RolesAllowed` integration on Cassini (via xref:cervantes::index.adoc[Cervantes]).
 * Details: xref:cassini::index.adoc[Cassini].
 
-=== Mansart — Jakarta Data + Transactions + JPA
+=== Mansart — Jakarta Data + Transactions
 
 * **Done**: Jakarta Data 1.0 — official TCK **74/74**, virtual-thread-native JDBC pool, named datasources (`dataStore` routing), Jakarta Transactions 2.0 transaction manager, `@Transactional` via Vauban.
 * **In progress (M6c)**: full Jakarta Transactions 2.0 TCK suite.
-* **Pending (M7)**: `mansart-persistence` — classic Jakarta Persistence 3.2 implementation. `mansart-jakarta-data` already covers everyday needs in Vidocq.
+* **Moved**: Jakarta Persistence 3.2 left Mansart for xref:noether::index.adoc[Noether] on 2026-10-11. `mansart-jakarta-data` already covers everyday needs in Vidocq.
 * Details: xref:mansart::index.adoc[Mansart].
 
 === Erasmus — Jakarta Validation 3.1
@@ -101,6 +116,30 @@ This page aggregates the progress of all sixteen modules — eight Jakarta EE br
 * **In progress**: cascaded validation and groups, `ValueExtractor` SPI, executable validation.
 * **Coming up**: APT static codegen, CDI (Vauban) and Jakarta REST (Cassini) integration, official TCK, first release.
 * Details: xref:erasmus::index.adoc[Erasmus].
+
+=== Noether — Jakarta Persistence 3.2
+
+* **In progress**: Jakarta Persistence 3.2 with generated entity access and virtual-thread JDBC execution, on Mansart's pool and transactions; Vidocq Runtime extension.
+* Details: xref:noether::index.adoc[Noether].
+
+=== Peano — Jakarta Expression Language 6.0
+
+* **Done**: grammar, operators, coercions, functions, method expressions, lambdas and collection operations, build-time accessors and compiled expressions; official EL 6.0.1 TCK **361/361**.
+* **Coming up**: first release.
+* Details: xref:peano::index.adoc[Peano].
+
+=== Ibarra — Jakarta Pages 4.0
+
+* **Done**: runtime and parser, Maven packaging (build-time precompilation), Foy HTTP binding, TLD listeners, compiled EL on Peano.
+* **In progress**: build-time page generation (I3–I6), full tag semantics.
+* **Coming up**: certification, Vidocq Runtime extension.
+* Details: xref:ibarra::index.adoc[Ibarra].
+
+=== Tassis — Jakarta Messaging 3.1
+
+* **Done**: classic, simplified and legacy domain-specific APIs on an in-VM broker, messages in memory.
+* **Coming up**: first release.
+* Details: xref:tassis::index.adoc[Tassis].
 
 === MicroProfile layer
 

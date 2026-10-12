@@ -23,6 +23,8 @@ flowchart TB
     subgraph REST["Jakarta REST / Servlet"]
         CASSINI[Cassini<br/>Jakarta REST 4.0]
         FOY[Foy<br/>Jakarta Servlet 6.1]
+        PEANO[Peano<br/>Jakarta EL 6.0 - in development]
+        IBARRA[Ibarra<br/>Jakarta Pages 4.0 - in development]
     end
     subgraph Serialization["Serialization"]
         CHAMPOLLION[Champollion<br/>JSON-P 2.1 + JSON-B 3.0]
@@ -31,8 +33,12 @@ flowchart TB
         VAUBAN[Vauban<br/>CDI 4.1 Lite build-time]
     end
     subgraph Persistence["Persistence &amp; validation"]
-        MANSART[Mansart<br/>Jakarta Data 1.0 + JPA 3.2]
+        MANSART[Mansart<br/>Jakarta Data 1.0 + Transactions]
+        NOETHER[Noether<br/>Jakarta Persistence 3.2 - in development]
         ERASMUS[Erasmus<br/>Jakarta Validation 3.1 - in development]
+    end
+    subgraph Messaging["Messaging"]
+        TASSIS[Tassis<br/>Jakarta Messaging 3.1 - in development]
     end
     subgraph MicroProfile["MicroProfile"]
         RAVEL[Ravel<br/>Config 3.1]
@@ -72,6 +78,10 @@ flowchart TB
     FOY --> VAUBAN
     MANSART --> VAUBAN
     ERASMUS -.-> VAUBAN
+    IBARRA -.-> FOY
+    IBARRA -.-> PEANO
+    NOETHER -.-> MANSART
+    NOETHER -.-> VAUBAN
 ....
 
 Each module is an independent project, released separately, with its own life-cycle. Vidocq Runtime assembles them through a Quarkus-inspired extension SPI.
@@ -116,13 +126,29 @@ Three reasons:
 | Jakarta Servlet 6.1 implementation
 | {repo-foy}
 
+| xref:peano::index.adoc[Peano]
+| Jakarta Expression Language 6.0 implementation *(in development, not released yet)*
+| {repo-peano}
+
+| xref:ibarra::index.adoc[Ibarra]
+| Jakarta Pages 4.0 (JSP) implementation, pages precompiled at build time *(in development, not released yet)*
+| {repo-ibarra}
+
 | xref:mansart::index.adoc[Mansart]
-| Jakarta Data 1.0 + Jakarta Persistence 3.2 *(JPA pending)*
+| Jakarta Data 1.0, Jakarta Transactions and the JDBC pool
 | {repo-mansart}
+
+| xref:noether::index.adoc[Noether]
+| Jakarta Persistence 3.2 implementation, extracted from Mansart *(in development, not released yet)*
+| {repo-noether}
 
 | xref:erasmus::index.adoc[Erasmus]
 | Jakarta Validation 3.1 implementation *(in development, not released yet)*
 | {repo-erasmus}
+
+| xref:tassis::index.adoc[Tassis]
+| Jakarta Messaging 3.1 provider with its own in-VM broker *(in development, not released yet)*
+| {repo-tassis}
 
 | xref:ravel::index.adoc[Ravel]
 | MicroProfile Config 3.1 implementation
@@ -187,7 +213,10 @@ What works today:
 
 Work in progress:
 
-* Mansart — Jakarta Persistence 3.2 (Jakarta Data 1.0 already ships).
+* Noether — Jakarta Persistence 3.2, extracted from Mansart (Mansart keeps Jakarta Data 1.0, which already ships).
+* Peano — Jakarta Expression Language 6.0 (official TCK 361/361, first release upcoming).
+* Ibarra — Jakarta Pages 4.0, pages precompiled at build time, on Foy and Peano.
+* Tassis — Jakarta Messaging 3.1 with an in-VM broker.
 * Erasmus — Jakarta Validation 3.1 (engine and built-in constraints working, first release upcoming).
 * WebSocket — Chappe + Foy.
 * HTTP/3 / QUIC — Chappe.

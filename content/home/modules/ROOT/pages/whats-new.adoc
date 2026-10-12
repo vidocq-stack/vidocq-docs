@@ -91,6 +91,15 @@ Full list: xref:dev@mansart::whats-new.adoc[What's new in Mansart].
 * **Dirac** — proven on Weld and Open Liberty; two containers in one JVM keep their metrics apart, and `vauban-api` is now a runtime dependency. xref:dev@dirac::whats-new.adoc[What's new in Dirac].
 * **Foy** — the CDI request context is active for each request, under any CDI 4 container, proven on Weld SE. xref:dev@foy::whats-new.adoc[What's new in Foy].
 
+=== Four new components — Peano, Ibarra, Noether and Tassis
+
+These components join the documentation on the development line. None of them is released yet.
+
+* xref:peano::index.adoc[Peano] — Jakarta Expression Language 6.0, official TCK 361/361.
+* xref:ibarra::index.adoc[Ibarra] — Jakarta Pages 4.0, pages precompiled at build time, on Foy and Peano.
+* xref:noether::index.adoc[Noether] — Jakarta Persistence 3.2, extracted from Mansart, which keeps Jakarta Data and Transactions.
+* xref:tassis::index.adoc[Tassis] — Jakarta Messaging 3.1 with an in-VM broker.
+
 == Components with nothing new
 
 xref:erasmus::index.adoc[Erasmus] has nothing to announce on the current development line: it carries no [.tag-new]#NEW# badge and no What's new page. It is named here so that its absence from the list above reads as a fact rather than as a gap. Where it stands is on the xref:roadmap.adoc[Consolidated roadmap].

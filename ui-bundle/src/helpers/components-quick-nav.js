@@ -19,7 +19,8 @@ const TOP = ['home', 'tutorials', 'vidocq'];
 const CATEGORIES = [
   { label: 'Transport',       names: ['chappe'] },
   { label: 'Jakarta EE Core', names: ['vauban', 'champollion', 'cassini'] },
-  { label: 'Jakarta EE Web',  names: ['foy', 'mansart', 'erasmus'] },
+  { label: 'Jakarta EE Web',  names: ['foy', 'peano', 'ibarra', 'mansart', 'noether', 'erasmus'] },
+  { label: 'Jakarta EE Platform', names: ['tassis'] },
   { label: 'MicroProfile',    names: ['ravel', 'knock', 'dirac', 'heisenberg', 'humboldt', 'cervantes', 'cyrano', 'grimm'] },
 ];
 
