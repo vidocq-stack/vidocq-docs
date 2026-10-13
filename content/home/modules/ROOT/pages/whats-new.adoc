@@ -98,7 +98,7 @@ These components join the documentation on the development line. None of them is
 * xref:peano::index.adoc[Peano] — Jakarta Expression Language 6.0, official TCK 361/361.
 * xref:ibarra::index.adoc[Ibarra] — Jakarta Pages 4.0, pages precompiled at build time, on Foy and Peano.
 * xref:noether::index.adoc[Noether] — Jakarta Persistence 3.2, extracted from Mansart, which keeps Jakarta Data and Transactions.
-* xref:tassis::index.adoc[Tassis] — Jakarta Messaging 3.1 with an in-VM broker.
+* xref:tassis::index.adoc[Tassis] — Jakarta Messaging 3.1 with an in-memory broker of its own, in the JVM or over AMQP 1.0.
 
 == Components with nothing new
 

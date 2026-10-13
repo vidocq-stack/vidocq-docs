@@ -147,7 +147,7 @@ Three reasons:
 | {repo-erasmus}
 
 | xref:tassis::index.adoc[Tassis]
-| Jakarta Messaging 3.1 provider with its own in-VM broker *(in development, not released yet)*
+| Jakarta Messaging 3.1 provider with its own in-memory broker, open to the network over AMQP 1.0 *(in development, not released yet)*
 | {repo-tassis}
 
 | xref:ravel::index.adoc[Ravel]
@@ -216,7 +216,7 @@ Work in progress:
 * Noether — Jakarta Persistence 3.2, extracted from Mansart (Mansart keeps Jakarta Data 1.0, which already ships).
 * Peano — Jakarta Expression Language 6.0 (official TCK 361/361, first release upcoming).
 * Ibarra — Jakarta Pages 4.0, pages precompiled at build time, on Foy and Peano.
-* Tassis — Jakarta Messaging 3.1 with an in-VM broker.
+* Tassis — Jakarta Messaging 3.1 with an in-memory broker, in the JVM or over AMQP 1.0 (official TCK 903/903 of the applicable tests, first release upcoming).
 * Erasmus — Jakarta Validation 3.1 (engine and built-in constraints working, first release upcoming).
 * WebSocket — Chappe + Foy.
 * HTTP/3 / QUIC — Chappe.

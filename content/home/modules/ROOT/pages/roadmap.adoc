@@ -47,7 +47,7 @@ This page aggregates the progress of all twenty modules — twelve Jakarta EE br
 
 | —
 | xref:tassis::index.adoc[Tassis]
-| Jakarta Messaging 3.1 — in-VM broker, first release
+| Jakarta Messaging 3.1 — XA and JTA, first release
 | in progress
 
 | M3–M8
@@ -137,8 +137,8 @@ This page aggregates the progress of all twenty modules — twelve Jakarta EE br
 
 === Tassis — Jakarta Messaging 3.1
 
-* **Done**: classic, simplified and legacy domain-specific APIs on an in-VM broker, messages in memory.
-* **Coming up**: first release.
+* **Done**: classic, simplified and legacy domain-specific APIs on an in-memory broker of its own; the broker opened to the network over AMQP 1.0, with TLS, for the Tassis client and for any other AMQP 1.0 client; connection pool; `JMSContext` injection on Vauban; official Messaging 3.1 TCK **903/903** of the tests that apply to a Java SE provider, in the JVM and through the network.
+* **Coming up**: XA and JTA, first release.
 * Details: xref:tassis::index.adoc[Tassis].
 
 === MicroProfile layer
