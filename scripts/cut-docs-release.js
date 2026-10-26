@@ -2,7 +2,15 @@
 // Cut the documentation for a release train.
 //
 //   node scripts/cut-docs-release.js --version 0.3.0 --next 0.4.0-SNAPSHOT \
-//        [--include erasmus] [--keep 3] [--dry-run]
+//        [--include erasmus] [--keep 3] [--bump-branch <name>] [--dry-run]
+//
+// A release candidate (--version 0.4.0-RC1) is cut the same way, but its docs line is marked
+// `prerelease: true`: it appears in the version dropdown without becoming the default one, and
+// the bare URLs keep pointing at the latest final release.
+//
+// --bump-branch <name>: push each repo's main bump (next SNAPSHOT, badges cleared, what's-new
+// reset) to the branch <name> instead of main, for repositories whose main only takes pull
+// requests; open the PRs yourself.
 //
 // "Freezing the dev docs" IS the branch cut: for every versioned component
 // this script branches docs/<version> from origin/main (the dev docs at this
@@ -39,15 +47,18 @@ const WORKSPACE = path.resolve(ROOT, opt('workspace', '..'));
 const INCLUDE = [];
 for (let i = 0; i < args.length; i++) if (args[i] === '--include') INCLUDE.push(args[i + 1]);
 const DRY = flag('dry-run');
+const BUMP_BRANCH = opt('bump-branch');
+const PRERELEASE = /-RC\d+$/.test(VERSION || '');
 
-if (!/^\d+\.\d+\.\d+$/.test(VERSION || '') || !/-SNAPSHOT$/.test(NEXT || '')) {
+if (!/^\d+\.\d+\.\d+(-RC\d+)?$/.test(VERSION || '') || !/-SNAPSHOT$/.test(NEXT || '')) {
   console.error('usage: cut-docs-release.js --version X.Y.Z --next A.B.C-SNAPSHOT [--include repo]... [--keep N] [--dry-run]');
   process.exit(2);
 }
 
+// x.y.z; a release candidate x.y.z-RCn ranks just below x.y.z; named versions (dev) are -1.
 const semverKey = (v) => {
-  const m = v.match(/^(\d+)\.(\d+)\.(\d+)$/);
-  return m ? (+m[1] * 1e6 + +m[2] * 1e3 + +m[3]) : -1;
+  const m = v.match(/^(\d+)\.(\d+)\.(\d+)(?:-RC(\d+))?$/);
+  return m ? (+m[1] * 1e6 + +m[2] * 1e3 + +m[3] - (m[4] ? 0.5 - +m[4] / 1000 : 0)) : -1;
 };
 
 const sh = (cmd, cwd) => execSync(cmd, { cwd, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] }).trim();
@@ -73,6 +84,7 @@ console.log(`Release ${VERSION} (next: ${NEXT}) — ${versioned.length} repos: $
 function pinRelease(y) {
   y = y.replace(/^version: (~|dev)$/m, `version: '${VERSION}'`);
   y = y.split('\n').filter((l) => !/^prerelease:/.test(l)).join('\n');
+  if (PRERELEASE) y = y.replace(/^(version: .*)$/m, '$1\nprerelease: true');
   y = /project-version:/.test(y)
     ? y.replace(/project-version: .*$/m, `project-version: ${VERSION}`)
     : y + `    project-version: ${VERSION}\n`;
@@ -155,7 +167,7 @@ _Nothing documented yet for this cycle. Add entries here (and place [.tag-new]#N
       if (dirty) {
         sh('git add docs/en', wt2);
         sh(`git commit -q -s -m "docs: dev line moves to ${NEXT} (last release: ${VERSION})"`, wt2);
-        sh('git push -q origin HEAD:main', wt2);
+        sh(`git push -q origin HEAD:${BUMP_BRANCH ? 'refs/heads/' + BUMP_BRANCH : 'main'}`, wt2);
       } else {
         console.log(`${r.name}: main docs already up to date`);
       }
