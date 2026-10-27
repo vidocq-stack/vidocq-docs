@@ -111,6 +111,7 @@ kroki *silently* skip the diagram). Conventions live in `CLAUDE.md` / `AGENTS.md
 * `docs/adr/0002-bilingual-fr-en.md` *(superseded by 0004)*
 * `docs/adr/0003-chappe-cli-from-repolite.md`
 * `docs/adr/0004-english-only-versioned-search.md`
+* `docs/adr/0005-shared-codegen-library-not-pursued.md` *(not pursued)*
 
 == License
 
