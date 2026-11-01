@@ -1,111 +1,61 @@
 = What's new across the Vidocq ecosystem
-:description: Which components have something new on the development line, and where each one lists it.
+:description: Which components have something new since the 0.4.0-RC1 release, and where each one lists it.
 
 [.lead]
-A component with something to announce keeps its own What's new page on its `dev` documentation line: it lists what landed after that component's last release, and each entry links to the section that documents it — the section carrying the [.tag-new]#NEW# badge. This page is the entry point to those lists. It names the components that have something today, and says what it is, so you can go straight to the one you work with.
+Each component keeps its own What's new page on its `dev` documentation line: it lists what landed after that component's last release (0.4.0-RC1, cut on 2026-10-26), and each entry links to the section that documents it — the section carrying the [.tag-new]#NEW# badge. This page is the entry point to those lists. It says what is new across the components, then where each one lists it.
 
-== Components with something new
+== The big changes since 0.4.0-RC1
 
-=== Across the bricks — proven without Vauban, on Weld and Open Liberty
+Most of the work since RC1 follows one rule: Vidocq generates at build time what other runtimes do by reflection at start-up, and *the CLI and the Maven plugin carry the build-time constraints, not you*. A tutorial written and replayed from `vidocq create` to a Docker image found every place where that was not yet true; the list below is what changed.
 
-Each brick below now has an `<brick>-it-other-containers` module that runs its jars, unchanged, under Weld SE on a plain class path and, for the MicroProfile bricks and Champollion, as a WAR on Open Liberty, with the server's own implementation of that specification turned off. Cassini and Foy, which an application server replaces with its own Jakarta REST and Servlet, are proven on Weld SE only. The modules are part of every build and never published.
+=== Java modules: the tooling writes the directives
 
-* **What the tests found, and what is fixed** — normal-scoped beans could not load outside Vauban, because the build weaves a constructor taking a `vauban-api` type that was `provided` (Knock, Heisenberg, Cervantes, Humboldt); Heisenberg keyed metric names and configuration overrides by Weld's subclass; Humboldt's span finalizer turned every exception, a 404 included, into a 500 and failed outright on RESTEasy; Dirac and Grimm kept what their extension discovered in `static` fields, so two containers in one JVM mixed their metrics or their OpenAPI documents, and Dirac failed a deployment on Open Liberty over server classes it could not load; Foy never activated the CDI request context, under any container.
-* **A brick depends on APIs, its Vidocq extension picks the implementations** — Jakarta platform APIs are now `provided` in the bricks, and each Vidocq runtime extension brings what its brick leaves out: the Rest Client extension brings Champollion's JSON-B, so a Rest Client application without a REST server reads JSON again, and the Telemetry, Rest Client and OpenAPI extensions bring the Jakarta REST API their bricks now leave to the runtime.
-* **Cassini and Foy on any CDI container** — `cassini-cdi`, a new container-neutral module, resolves resources and providers as beans of the running container and activates the request context around each request; Foy does the same for servlets, filters and listeners when given any container's `BeanManager`. The session scope stays Vauban-only in Foy for now.
-* **Deploying on an application server** — the page of each brick proven on Open Liberty says which server features to keep off and to enable, in a `WARNING` block its Open Liberty module tests.
+* **One check, written for you** — `vidocq doctor` and the build check the same module directives, the `opens` of the application's own packages included: the JPA entities, the types a REST resource takes or returns (through fields, getters, superclasses and implementations), the interceptors with a private method. `vidocq dev` writes a missing `opens` itself, `vidocq doctor --fix` and `vidocq:complete-module-info` write them on demand, and all of them keep one block marked `// vidocq:reflection`.
+* **A clear message at run time** — a package the runtime cannot reach, and the build could not see, fails with the package and the `opens` line to add; under `vidocq dev` the line is written and the application reloads.
+* **Or no directive at all** — `vidocq create --open-module` creates an `open module`.
 
-Where to read it: xref:dev@knock::reference.adoc#other-containers[Knock], xref:dev@heisenberg::reference.adoc#other-containers[Heisenberg], xref:dev@cervantes::reference.adoc#other-containers[Cervantes], xref:dev@humboldt::reference.adoc#other-containers[Humboldt], xref:dev@cyrano::reference.adoc#other-containers[Cyrano], xref:dev@ravel::cdi-integration.adoc#other-containers[Ravel], xref:dev@champollion::reference.adoc#other-containers[Champollion], xref:dev@dirac::reference.adoc#other-containers[Dirac], xref:dev@grimm::reference.adoc#other-containers[Grimm], xref:dev@cassini::reference.adoc#other-containers[Cassini], xref:dev@foy::reference.adoc#other-containers[Foy].
+Read: xref:dev@vidocq::java-modules.adoc[Java modules in a Vidocq application].
 
-=== Vidocq Runtime — MicroProfile 7.2 line, Rest Client, packaging, startup identity
+=== Less reflection in an application
 
-* **The MicroProfile 7.2 specifications in the assembled runtime** — JWT Authentication 2.2, OpenAPI 4.2 and Telemetry 2.2 — with their TCKs green on the release candidates; the 7.2 finals are still under ballot, and the runtime is re-run against them once they are on Maven Central.
-* **`@Inject @RestClient` works**, through a new Rest Client codegen bundle that `checkpom` now requires, and a Rest Client application links with `jlink`; a new example shows it end to end.
-* **Packaging that says what is wrong** — `vidocq:docker` refuses to build a Linux image around a macOS or Windows `jlink` image, the legacy `package` layout launches through the main class's module, and an application left in the boot layer gets a message naming the `exports` to add.
-* **Booting says what it is** — version, commit, launch mode and debugger address — with readable console logs by default, and `vidocq:run` / `vidocq:idea` to run from Maven and IntelliJ.
+* **JSON-B bindings generated at build time** — Champollion generates the binding of the records and final classes a REST resource exchanges, with no annotation, so JSON-B maps them without reflection. xref:dev@champollion::reference.adoc#rest-bindings[Champollion].
+* **Interceptor methods called by generated code** — Vauban calls `@AroundInvoke`, `@AroundConstruct` and lifecycle interceptor methods through the provider generated in their package: a package-private interceptor needs no `opens`. xref:dev@vauban::internals.adoc#components-provider[Vauban].
+* **Repositories from a dependency jar** — a library's `@Repository` interfaces are implemented at build time, like the application's, by `vidocq:generate`. xref:dev@mansart::usage.adoc#dependency-repositories[Mansart], xref:dev@vidocq::whats-new.adoc[Vidocq].
+* **Run-time generation is announced** — when Vauban, Cassini, Cyrano or Mansart must generate a class or serve a repository at run time instead of at build time, they say so in a framed warning at start-up.
+
+=== The CLI does the setup
+
+* **Dev services wired by `extension add`** — the dev-service provider, the JDBC driver and the test-scope pair are written into the `pom.xml`, the settings each extension needs into `vidocq.properties` (commented when only you can know the value), and `vidocq config set` uncomments a line in place. `vidocq doctor` and `vidocq:checkpom` warn about anything missing.
+* **Docker from macOS and Windows** — `vidocq build docker` links the runtime image inside a Linux JDK stage of the Dockerfile and builds the image when Docker answers.
+* **Quieter builds** — the "created in the last round" warnings are gone, Mansart's generated sources included.
 
 Full list: xref:dev@vidocq::whats-new.adoc[What's new in Vidocq Runtime].
 
-=== Vauban — client proxies without `opens`, interception that covers inherited methods
+=== SNAPSHOTs on our own repositories
 
-* **A client proxy for a third-party produced type, without opening its package**, through the Java SE launcher and the Vauban layer; boot-time opening stays opt-in.
-* **Interception follows the specification more closely** — `@AroundInvoke` no longer runs around lifecycle callbacks, inherited and interface default methods are intercepted and forwarded, and members Java source cannot override are generated as bytecode.
-* **The build is reproducible and complete** — `vauban:generate` pre-generates every subclass the container would wrap, in a stable order.
-* **Module lookups for trusted extensions**, so an extension such as Heisenberg reaches a managed class's private members with no `opens`.
+`main` of every component publishes its SNAPSHOTs to `https://maven.vidocq.dev/snapshots/`, copied every 10 minutes to `https://maven.bak.vidocq.dev/snapshots/`, then to Central's snapshot repository. `vidocq create` declares the first two. Releases stay on Maven Central.
 
-Full list: xref:dev@vauban::whats-new.adoc[What's new in Vauban].
+== Component by component
 
-=== Cassini — unreadable request entities answer 400
-
-* **A client's malformed request entity is the client's fault.** Malformed JSON, an empty body or a value of the wrong type now answers `400 Bad Request` instead of `500`, after the application's own exception mappers, and no longer writes a stack trace at ERROR for every such request.
-* **`NoContentException` becomes a `BadRequestException`**, whatever reader throws it, as Jakarta REST §4.2.4 requires.
-
-Full list: xref:dev@cassini::whats-new.adoc[What's new in Cassini].
-
-=== Cervantes — MicroProfile JWT Authentication 2.2
-
-* **RS256 and ES256 both accepted** when no algorithm is configured, PEM keys of either family, and a configured algorithm checked by family.
-* **A bad configuration fails the start** with a `DeploymentException` instead of failing every token at request time.
-
-Full list: xref:dev@cervantes::whats-new.adoc[What's new in Cervantes].
-
-=== Grimm — MicroProfile OpenAPI 4.2, a more faithful document
-
-* **OpenAPI 4.2 features** — unknown Schema properties as extensions, `@Header` examples, method-level `@ExternalDocumentation`, `@Digits` constraints.
-* **The model sources combine in the order the specification sets**, and every `@Schema` / `@SchemaProperty` attribute reaches the document; Grimm ships named Java modules.
-
-Full list: xref:dev@grimm::whats-new.adoc[What's new in Grimm].
-
-=== Humboldt — MicroProfile Telemetry 2.2, OpenTelemetry 1.66
-
-* **OpenTelemetry 1.66**, `code.function.name` on `@WithSpan` spans, and `@WithSpan(inheritContext = false)`.
-* **Nothing lost on export** — exceptions, event names, structured values and double metric points — and the OTLP exporters work on the module path.
-
-Full list: xref:dev@humboldt::whats-new.adoc[What's new in Humboldt].
-
-=== Cyrano — the Rest Client on the module path and in a jlink image
-
-* **`RestClientBuilder` works on the module path and in a jlink image**, listeners from other modules are found, and Reactive Streams is no longer forced on every client.
-* **`CompletionStage` responses never run on the caller's thread**, and builder listeners run once per builder.
-
-Full list: xref:dev@cyrano::whats-new.adoc[What's new in Cyrano].
-
-=== Heisenberg — fallback methods with no `opens`
-
-* **`@Fallback(fallbackMethod = ...)` works on a strict module path** with nothing opened, through Vauban's module lookup.
-
-Full list: xref:dev@heisenberg::whats-new.adoc[What's new in Heisenberg].
-
-=== Mansart — `@Enumerated` honoured
-
-* **`@Enumerated(ORDINAL)` stores the index, `STRING` the name**; an enum with no annotation keeps storing its name. The tooling API (`EntityModels.of`, `JdqlExecutor`) is public, and Mansart JPA has restarted.
-
-Full list: xref:dev@mansart::whats-new.adoc[What's new in Mansart].
-
-=== Ravel, Knock, Champollion, Chappe, Dirac and Foy
-
-* **Ravel** — `@Inject @ConfigProperty` works under the Vauban annotation processor. xref:dev@ravel::whats-new.adoc[What's new in Ravel].
-* **Champollion** — proven on Weld and Open Liberty, where the server's JSON-B must stay off; the Annotation API is no longer shipped. xref:dev@champollion::whats-new.adoc[What's new in Champollion].
-* **Knock** — the registry remembers the last result of each check, with a public `CheckResult`. xref:dev@knock::whats-new.adoc[What's new in Knock].
-* **Chappe** — `writeTimeout` is actually applied (a behaviour change: a client that stalls while reading is cut after 30 s by default), and connections close gracefully so the last response survives. xref:dev@chappe::whats-new.adoc[What's new in Chappe].
-* **Dirac** — proven on Weld and Open Liberty; two containers in one JVM keep their metrics apart, and `vauban-api` is now a runtime dependency. xref:dev@dirac::whats-new.adoc[What's new in Dirac].
-* **Foy** — the CDI request context is active for each request, under any CDI 4 container, proven on Weld SE. xref:dev@foy::whats-new.adoc[What's new in Foy].
-
-=== Four new components — Peano, Ibarra, Noether and Tassis
-
-These components join the documentation on the development line. None of them is released yet.
-
-* xref:peano::index.adoc[Peano] — Jakarta Expression Language 6.0, official TCK 361/361.
-* xref:ibarra::index.adoc[Ibarra] — Jakarta Pages 4.0, pages precompiled at build time, on Foy and Peano.
-* xref:noether::index.adoc[Noether] — Jakarta Persistence 3.2, extracted from Mansart, which keeps Jakarta Data and Transactions.
-* xref:tassis::index.adoc[Tassis] — Jakarta Messaging 3.1 with an in-memory broker of its own, in the JVM or over AMQP 1.0.
+* xref:dev@vidocq::whats-new.adoc[Vidocq Runtime] — the items above, plus JDBC spans with Telemetry, `--help` on every command, `vidocq test` reading the application's configuration, and the dev-service fixes.
+* xref:dev@vauban::whats-new.adoc[Vauban] — dependency beans validated at build time, generation before javac's last round, generated interceptor invokers, overloaded `@Inject` constructors, run-time generation announced, dependency classes read without being initialised.
+* xref:dev@champollion::whats-new.adoc[Champollion] — JSON-B bindings for REST types, an access error that names the `opens` to add, JSON-B and Protobuf conformance fixes, a cheaper JSON-P pipeline.
+* xref:dev@mansart::whats-new.adoc[Mansart] — repositories from a library, Weld and Open Liberty, Jakarta Data conformance fixes (MANSART-010 to -023), a build error for a method no query derives from.
+* xref:dev@cassini::whats-new.adoc[Cassini] — a lighter request path, `@PreMatching` filters run once, run-time adapters announced, Jakarta REST conformance and client fixes.
+* xref:dev@cyrano::whats-new.adoc[Cyrano] — run-time clients announced, more interfaces served at build time, exceptions unchanged through interceptors.
+* xref:dev@grimm::whats-new.adoc[Grimm] — the processor works under Maven, `@OpenAPIDefinition` read on Vidocq, the runtime's own endpoints left out, static-file fixes.
+* xref:dev@humboldt::whats-new.adoc[Humboldt] — OpenTelemetry 1.67.0 (GHSA-ccrj-gw8r-854m), exporters default to OTLP, `http.route` is the template, no SDK test library in an application.
+* xref:dev@heisenberg::whats-new.adoc[Heisenberg] — annotations read at compile time, `@Timeout` keeps the caller's context, policies resolved once.
+* xref:dev@cervantes::whats-new.adoc[Cervantes] — the token stays out of `toString`.
+* xref:dev@chappe::whats-new.adoc[Chappe] and xref:dev@dirac::whats-new.adoc[Dirac] — performance and build-time extension fixes.
+* xref:dev@peano::whats-new.adoc[Peano] and xref:dev@ibarra::whats-new.adoc[Ibarra] — released in 0.4.0-RC1; small fixes since.
 
 == Components with nothing new
 
-xref:erasmus::index.adoc[Erasmus] has nothing to announce on the current development line: it carries no [.tag-new]#NEW# badge and no What's new page. It is named here so that its absence from the list above reads as a fact rather than as a gap. Where it stands is on the xref:roadmap.adoc[Consolidated roadmap].
+xref:knock::index.adoc[Knock], xref:ravel::index.adoc[Ravel] and xref:foy::index.adoc[Foy] have nothing to announce since 0.4.0-RC1. xref:erasmus::index.adoc[Erasmus], xref:noether::index.adoc[Noether] and xref:tassis::index.adoc[Tassis] are not released yet: their documentation follows `main`. Where each stands is on the xref:roadmap.adoc[Consolidated roadmap].
 
 == How these lists are maintained
 
-This page is versionless, so a link from here to a component resolves against that component's latest **released** documentation unless it says otherwise. The links above are therefore pinned with `dev@`. Today that pin is what makes them resolve at all — no released line carries a What's new page, the practice being younger than the 0.3.0 cut. From the next release train on, each released line will carry the page frozen with it, and an unpinned link would quietly land on that frozen list instead of the one this index is about.
+This page is versionless, so a link from here to a component resolves against that component's latest **released** documentation unless it says otherwise. The links to What's new pages are therefore pinned with `dev@`: the 0.4.0-RC1 line carries the page frozen at the release, and an unpinned link would land on that frozen list instead of the one this index is about.
 
-When the next release train ships, each component's page is frozen with its released documentation and restarts empty on `dev`, and the [.tag-new]#NEW# badges are stripped from the pages they were flagging. The release cut does not touch this page: it has to be updated by hand when a component starts or stops having something to announce.
+When the next release train ships, each component's page is frozen with its released documentation and restarts empty on `dev`, and the [.tag-new]#NEW# badges are stripped from the pages they were flagging. The release cut does not touch this page: it is updated by hand when a component starts or stops having something to announce.

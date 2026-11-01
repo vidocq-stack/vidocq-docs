@@ -2,17 +2,17 @@
 :description: Step-by-step, end-to-end guides for building applications with the Vidocq runtime.
 
 [.lead]
-These tutorials walk you through building real applications with Vidocq, one step at a time. Each one is self-contained, starts from an empty directory (or from the previous tutorial), and every command has been run against the released artifacts.
+These tutorials walk you through building real applications with Vidocq, one step at a time. Each one is self-contained, starts from an empty directory (or from the previous tutorial), and follows the `{project-version}` development line: every command has been run with the CLI of that line, and the CLI writes the `pom.xml` and `module-info.java` changes each step needs.
 
 [cols="1,2",options="header"]
 |===
 | Tutorial | You will build
 
 | xref:your-first-app.adoc[Your first Vidocq application]
-| A REST service scaffolded with the CLI: install, create, write a resource, run it, use dev mode, and package it for production. *Start here.*
+| A REST service scaffolded with the CLI: install, create, serve JSON, dev mode, tests, a health check, and a Docker image. *Start here.*
 
 | xref:rest-and-database.adoc[REST + database]
-| The same application extended with persistence: a Jakarta Data repository (Mansart) over a pooled datasource, transactions included — and a look at named datasources and PostgreSQL Dev Services.
+| The same application extended with persistence: a Jakarta Data repository (Mansart) over a pooled datasource, transactions and a Flyway migration, with PostgreSQL started for you in dev mode and in tests.
 |===
 
 [NOTE]

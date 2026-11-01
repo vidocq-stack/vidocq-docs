@@ -1,48 +1,53 @@
 = Your first Vidocq application
-:description: From nothing to a running REST service — install the CLI, scaffold a project, write a resource, run it in dev mode and package it for production.
+:description: From nothing to a running REST service — install the CLI, scaffold a project, serve JSON, work in dev mode, test, and package it as a Docker image.
 
 [.lead]
-In this tutorial you install the Vidocq CLI, scaffold a REST application called `todo`, serve JSON from it, watch it reload in dev mode, and package it as a production distribution. Around twenty minutes, no prior Vidocq knowledge assumed. Every command targets the released *{release-version}* artifacts on Maven Central.
+In this tutorial you install the Vidocq CLI, scaffold a REST application called `todo`, serve JSON from it, watch it reload in dev mode, run its tests, and package it as a Docker image. Around twenty minutes, no prior Vidocq knowledge assumed. It follows the `{project-version}` development line: the CLI and the artifacts come from `https://maven.vidocq.dev/snapshots/`, where every build of `main` is published.
 
 == What you will build
 
 A small `todo` HTTP API:
 
 * `GET /hello` — a plain-text sanity check;
-* `GET /todos` and `POST /todos` — a JSON list, serialized automatically.
+* `GET /todos` and `POST /todos` — a JSON list, serialized automatically;
+* `GET /health` — a health check, added as an extension.
 
-Under the hood you will be running the real thing: the Chappe HTTP server on virtual threads, Cassini (Jakarta REST 4.0), Vauban (CDI 4.1 Lite) and Champollion (JSON-B) — all wired at *compile time*. No runtime reflection, no classpath scanning at boot: that is why the application starts in well under a second.
+Under the hood you will be running the real thing: the Chappe HTTP server on virtual threads, Cassini (Jakarta REST 4.0), Vauban (CDI 4.1 Lite) and Champollion (JSON-B), all wired at *compile time*. No classpath scanning and no proxies at boot: that is why the application starts in well under a second.
+
+You never edit the `pom.xml` or `module-info.java` by hand in this tutorial: the CLI writes what each step needs.
 
 == Prerequisites
 
 * **Java 25** (Temurin recommended) — check with `java -version`
-* **Maven 3.9+** — check with `mvn -version`
+* **Docker** (Docker Desktop, OrbStack, Podman…) for the last step only
 
-TIP: With https://sdkman.io[SDKMAN!]: `sdk install java 25-tem && sdk install maven`.
+You do not need Maven installed: every project comes with the Maven wrapper (`./mvnw`).
+
+TIP: With https://sdkman.io[SDKMAN!]: `sdk install java 25-tem`.
 
 == Step 1 — Install the CLI
 
 [source,bash]
 ----
-curl -fsSL https://vidocq.dev/install.sh | sh
+curl -fsSL https://vidocq.dev/install.sh | VIDOCQ_VERSION=snapshot sh
 ----
 
 On Windows (PowerShell):
 
 [source,powershell]
 ----
-irm https://vidocq.dev/install.ps1 | iex
+$env:VIDOCQ_VERSION = "snapshot"; irm https://vidocq.dev/install.ps1 | iex
 ----
 
-The script downloads the latest released CLI from Maven Central into `~/.vidocq/cli` and puts a `vidocq` launcher on your `PATH`. Verify:
+The script downloads the latest CLI of the development line into `~/.vidocq/cli` and puts a `vidocq` launcher in `~/.local/bin`. Verify:
 
 [source,bash,subs=attributes+]
 ----
 $ vidocq version
-Vidocq CLI {cli-version}
+Vidocq CLI {project-version} (built …)
 ----
 
-NOTE: No installer needed? Download `vidocq-runtime-cli-<version>-cli.zip` from https://repo1.maven.org/maven2/io/vidocq/runtime/vidocq-runtime-cli/[Maven Central], unzip it anywhere, and add its `bin/` directory to your `PATH`.
+NOTE: Without `VIDOCQ_VERSION=snapshot`, the script installs the latest release from Maven Central; this tutorial then needs the {release-version} version of these pages.
 
 == Step 2 — Scaffold the project
 
@@ -52,64 +57,39 @@ vidocq create --name todo --group-id com.acme --extension cassini-rest
 cd todo
 ----
 
-`--extension cassini-rest` (short: `-x`) enables Jakarta REST — it transitively brings the Chappe HTTP server, CDI (Vauban) and JSON-B (Champollion). What you get is a completely standard Maven project with Java Modules:
+`--extension cassini-rest` (short: `-x`) enables Jakarta REST — it brings the Chappe HTTP server, CDI (Vauban) and JSON-B (Champollion). What you get is a standard Maven project with Java modules:
 
 [source]
 ----
 todo/
-  pom.xml                      <1>
+  pom.xml                                     <1>
+  mvnw, mvnw.cmd                              <2>
   src/main/java/
-    module-info.java           <2>
-    com/acme/todo/TodoApp.java <3>
+    module-info.java                          <3>
+    com/acme/todo/HelloResource.java          <4>
   src/main/resources/
-    vidocq.properties          <4>
+    vidocq.properties                         <5>
+  src/test/java/com/acme/todo/
+    HelloResourceTest.java                    <6>
 ----
-<1> Inherits `io.vidocq.runtime:vidocq-runtime-parent:{release-version}` and wires the `vidocq-runtime-maven-plugin`, so a plain `mvn package` produces a runnable distribution.
-<2> Module descriptor, pre-filled with the `requires`/`opens` a REST application needs.
-<3> The entry point — boots the runtime with `VidocqBootstrap`.
-<4> MicroProfile-style configuration (`vidocq.http.port=8080`, …).
+<1> Inherits `io.vidocq.runtime:vidocq-runtime-parent:{project-version}`, which binds the `vidocq-runtime-maven-plugin` goals: a plain `./mvnw package` produces a runnable distribution. It also declares `maven.vidocq.dev` (and its mirror `maven.bak.vidocq.dev`) for the SNAPSHOTs.
+<2> The Maven wrapper: no local Maven needed.
+<3> The module descriptor, with the `requires` and `opens` the REST extension needs, each marked `// vidocq:cassini-rest`.
+<4> A first resource, `GET /hello`.
+<5> Configuration (`vidocq.http.port=8080`, …).
+<6> A test that starts the application and calls `/hello`.
 
-There is no Vidocq-specific build tool and no hidden magic in the project: everything the runtime needs is declared in this `pom.xml`, and you could have written it by hand (the xref:vidocq::getting-started.adoc[runtime getting-started guide] shows the full manual equivalent).
+There is no main class: the runtime boots the application (`vidocq create --main` adds one, for an IDE Run configuration). Run `vidocq extension list --available` to see every extension, and `vidocq create --help` for the options (`--package`, `--open-module`, …).
 
-TIP: Run `vidocq extension list --available` to see all first-party extensions, and `vidocq help create` for the options (`--package`, `--parent-version`, …).
+== Step 3 — Build and run
 
-== Step 3 — A first resource
-
-Create `src/main/java/com/acme/todo/HelloResource.java`:
-
-[source,java]
+[source,bash]
 ----
-package com.acme.todo;
-
-import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.ws.rs.GET;
-import jakarta.ws.rs.Path;
-import jakarta.ws.rs.Produces;
-import jakarta.ws.rs.core.MediaType;
-
-@Path("/hello")
-@ApplicationScoped
-public class HelloResource {
-
-    @GET
-    @Produces(MediaType.TEXT_PLAIN)
-    public String hello() {
-        return "Hello from Vidocq!";
-    }
-}
+vidocq build
+sh target/todo-1.0.0-SNAPSHOT/bin/todo.sh
 ----
 
-That is standard Jakarta REST — nothing Vidocq-specific. No further wiring is needed: the Cassini annotation processor generates the dispatch adapter *at compile time*.
-
-== Step 4 — Build and run
-
-[source,bash,subs=attributes+]
-----
-mvn package
-sh target/todo-{release-version}/bin/todo.sh
-----
-
-`mvn package` compiles, runs the code generators, and assembles a standalone distribution under `target/todo-{release-version}/` (launchers in `bin/`, module path in `lib/`). In another terminal:
+`vidocq build` runs `./mvnw package`: it compiles, runs the code generators, and assembles a distribution under `target/todo-1.0.0-SNAPSHOT/` (launchers in `bin/`, module path in `lib/`, also zipped as `target/todo-1.0.0-SNAPSHOT-dist.zip`). In another terminal:
 
 [source,bash]
 ----
@@ -121,47 +101,45 @@ The log line to look for:
 
 [source]
 ----
-INFOS: Vidocq - Started in 90.940 ms (process running for 135 ms)
+[INFO ][…][main][i.v.r.c.VidocqBootstrap#start] : Vidocq - Started in 118.963 ms (process running for 209 ms)
 ----
 
 .What just happened?
 [NOTE]
 ====
-During `mvn package`, three code generators ran: the Cassini processor turned `@Path`/`@GET` into a static dispatch adapter, the Vauban indexer resolved the CDI graph, and the Vidocq plugin assembled a module-path distribution. At boot the runtime *instantiates* what was computed at build time — it does not scan, proxy or reflect. That is the whole Vidocq philosophy in one build.
+During the build, code generators ran: the Cassini processor turned `@Path` and `@GET` into a static dispatch adapter, the Vauban processor resolved the CDI graph and generated the beans' factories, and the Vidocq plugin checked the module directives and assembled a module-path distribution. At boot the runtime *instantiates* what was computed at build time. That is the whole Vidocq philosophy in one build.
 ====
+
+Stop the application (Ctrl+C) before the next step.
+
+== Step 4 — Dev mode
+
+Rebuilding after each change gets old quickly. Dev mode runs the application and rebuilds it on each change:
+
+[source,bash]
+----
+vidocq dev
+----
+
+Leave it running. Edit the text in `HelloResource`, save, and `curl` again: the new text is served a few seconds later, without a restart of the JVM. Dev mode also starts the xref:dev@vidocq::dev-services.adoc[dev services] your extensions need (none yet) and serves the dev console.
 
 == Step 5 — Serve JSON
 
-Add a `Todo` payload class and a resource that keeps an in-memory list. Create `src/main/java/com/acme/todo/Todo.java`:
+Still in dev mode, add a `todos` package. Create `src/main/java/com/acme/todo/todos/Todo.java`:
 
 [source,java]
 ----
-package com.acme.todo;
+package com.acme.todo.todos;
 
-public class Todo {
-
-    private String title;
-    private boolean done;
-
-    public Todo() {}
-
-    public Todo(String title, boolean done) {
-        this.title = title;
-        this.done  = done;
-    }
-
-    public String  getTitle()             { return title;    }
-    public void    setTitle(String t)     { this.title = t;  }
-    public boolean isDone()               { return done;     }
-    public void    setDone(boolean d)     { this.done = d;   }
+public record Todo(String title, boolean done) {
 }
 ----
 
-And `src/main/java/com/acme/todo/TodoResource.java`:
+And `src/main/java/com/acme/todo/todos/TodoResource.java`:
 
 [source,java]
 ----
-package com.acme.todo;
+package com.acme.todo.todos;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.ws.rs.Consumes;
@@ -195,13 +173,10 @@ public class TodoResource {
 }
 ----
 
-JSON serialization is handled by Champollion (JSON-B 3.0) — no annotation, no configuration. Rebuild and try it:
+Save, and try it:
 
-[source,bash,subs=attributes+]
+[source,bash]
 ----
-mvn package
-sh target/todo-{release-version}/bin/todo.sh &
-
 curl -X POST http://localhost:8080/todos \
      -H 'Content-Type: application/json' \
      -d '{"title":"write my first Vidocq app","done":true}'
@@ -211,23 +186,35 @@ curl http://localhost:8080/todos
 
 [source,json]
 ----
-[{"done":true,"title":"write my first Vidocq app"}]
+[{"title":"write my first Vidocq app","done":true}]
 ----
 
-NOTE: The `opens com.acme.todo;` line the scaffold put in `module-info.java` is what lets JSON-B and Jakarta REST access your payload and resource classes — Java Modules encapsulate everything else.
+JSON serialization is handled by Champollion (JSON-B 3.0): no annotation, no configuration.
 
-== Step 6 — Dev mode
+.The `opens` line you did not write
+[NOTE]
+====
+Look at the dev-mode console when you saved the new package:
 
-Rebuilding after each change gets old quickly. Dev mode watches your sources:
+----
+[INFO] ✔ module-info.java: opens com.acme.todo.todos;   (com.acme.todo.todos.Todo, reached through com.acme.todo.todos.TodoResource)
+----
+
+An application is a Java module, and a package the runtime reaches by reflection must be opened to it. The build checks it, and in dev mode it writes the missing line into `module-info.java` itself, in a block marked `// vidocq:reflection`. Outside dev mode, `./mvnw package` stops with that line, and `vidocq doctor --fix` writes it. xref:dev@vidocq::java-modules.adoc[Java modules in a Vidocq application] explains what is checked, and how to opt out with an `open module`.
+====
+
+== Step 6 — Test
+
+The scaffolded `HelloResourceTest` starts the application and calls it. Run the tests continuously while you work:
 
 [source,bash]
 ----
-mvn vidocq:dev
+vidocq test
 ----
 
-It launches the application on its module path and rebuilds on change — edit `HelloResource`, save, and curl again. It reads the `vidocq.mainModule` / `vidocq.mainClass` properties already set in the generated pom.
+It runs every test, then again on each change of the main or test sources; `r` runs every test, `f` the failed ones, `q` quits. In a CI, run them once with `./mvnw test`.
 
-NOTE: `vidocq dev` and `vidocq start` (the CLI commands, as opposed to the Maven goal) boot the runtime from the CLI's own module path and therefore do not see the extensions declared in your pom. Prefer `mvn vidocq:dev` and the packaged launcher for extension-based apps.
+TIP: If you changed the text of `HelloResource` in Step 4, the test now fails: it expects `Hello from Vidocq!`. Put the text back, or update the test.
 
 == Step 7 — Add extensions as you grow
 
@@ -237,10 +224,17 @@ Every capability is an extension — health checks, metrics, persistence, JWT se
 ----
 vidocq extension list --available
 vidocq extension add knock-health
-mvn package
 ----
 
-`extension add` edits your `pom.xml` with the correct coordinates. See xref:vidocq::usage.adoc[the runtime usage page] for per-extension configuration keys.
+`extension add` writes the dependency into `pom.xml` and the `requires` into `module-info.java`; for extensions with a dev service or settings, it also writes those (xref:rest-and-database.adoc[the next tutorial] shows it). Restart `vidocq dev`, then:
+
+[source,bash]
+----
+$ curl http://localhost:8080/health
+{"status":"UP","checks":[]}
+----
+
+`vidocq doctor` checks the whole project (extensions, module directives, dev services) and `vidocq doctor --fix` repairs what it can.
 
 == Step 8 — Package for production
 
@@ -250,11 +244,29 @@ vidocq build jlink    # self-contained runtime image (no local java needed)
 vidocq build docker   # container image
 ----
 
-Both wrap the Vidocq Maven plugin (`vidocq build` with no type is the plain `mvn package` distribution). See xref:vidocq::usage.adoc[Usage] for jlink/jpackage/Docker options and AOT notes.
+`vidocq build docker` links a minimal runtime image and wraps it in a distroless image. On macOS and Windows, where the local `jlink` produces a macOS or Windows image, the generated Dockerfile links it again inside a Linux JDK stage; when Docker answers, the CLI builds the image:
+
+[source]
+----
+[INFO] The runtime image was linked for macOS (Mach-O executable): the Dockerfile links it again inside eclipse-temurin:25-jdk (Linux).
+[INFO] Docker image built: todo:1.0.0-SNAPSHOT
+✔ Docker image built.
+----
+
+Run it:
+
+[source,bash]
+----
+docker run --rm -p 8080:8080 todo:1.0.0-SNAPSHOT
+curl http://localhost:8080/hello
+----
+
+Without Docker, the CLI says so and prints the `docker build` command to run later. See xref:dev@vidocq::usage.adoc[Usage] for jlink, jpackage and Docker options.
 
 == Where to next
 
-* xref:rest-and-database.adoc[Tutorial — REST + database]: give the `todo` app a real database with Mansart (Jakarta Data), pooling and transactions.
-* xref:vidocq::getting-started.adoc[Runtime getting-started]: the condensed version of this journey, plus the full no-CLI annex.
-* xref:vidocq::concepts.adoc[Runtime concepts]: extensions, build steps, recorders — how the machinery works.
+* xref:rest-and-database.adoc[Tutorial — REST + database]: give the `todo` app a real database with Mansart (Jakarta Data), PostgreSQL in dev mode and Flyway migrations.
+* xref:dev@vidocq::getting-started.adoc[Runtime getting-started]: the condensed version of this journey.
+* xref:dev@vidocq::java-modules.adoc[Java modules in a Vidocq application]: what the tooling checks and writes for you.
+* xref:dev@vidocq::concepts.adoc[Runtime concepts]: extensions, build steps, recorders — how the machinery works.
 * https://vidocq.dev/blog[The Vidocq blog] — walkthroughs and release notes.
