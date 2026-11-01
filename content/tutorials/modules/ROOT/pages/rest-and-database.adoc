@@ -183,7 +183,7 @@ public class ProductResource {
 vidocq dev
 ----
 
-The first start pulls the PostgreSQL image; the dev service then starts a container, hands its URL and credentials to the pool, and Flyway creates the table. As in the first tutorial, the build opens the new package for you:
+The first start pulls the PostgreSQL image; the dev service then starts a container, hands its URL and credentials to the pool, and Flyway creates the table. `Product` is a JPA entity, which Jakarta Persistence reaches by reflection, so its package must be opened: `vidocq dev` writes the line into `module-info.java` for you (a plain `./mvnw package` stops and gives you the line, which `vidocq doctor --fix` writes):
 
 [source]
 ----

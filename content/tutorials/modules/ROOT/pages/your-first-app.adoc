@@ -191,16 +191,12 @@ curl http://localhost:8080/todos
 
 JSON serialization is handled by Champollion (JSON-B 3.0): no annotation, no configuration.
 
-.The `opens` line you did not write
+.No reflection, no `opens`
 [NOTE]
 ====
-Look at the dev-mode console when you saved the new package:
+An application is a Java module, and JSON-B would normally read `Todo` by reflection, which needs its package opened. Here it does not: `Todo` is a record a resource returns, so the build generates its JSON-B binding — plain code that reads and writes it, without reflection — and there is nothing to open.
 
-----
-[INFO] ✔ module-info.java: opens com.acme.todo.todos;   (com.acme.todo.todos.Todo, reached through com.acme.todo.todos.TodoResource)
-----
-
-An application is a Java module, and a package the runtime reaches by reflection must be opened to it. The build checks it, and in dev mode it writes the missing line into `module-info.java` itself, in a block marked `// vidocq:reflection`. Outside dev mode, `./mvnw package` stops with that line, and `vidocq doctor --fix` writes it. xref:dev@vidocq::java-modules.adoc[Java modules in a Vidocq application] explains what is checked, and how to opt out with an `open module`.
+When a type does keep the reflective mapping (a JPA entity, as in the next tutorial, or a type the generated code cannot map, named in the build output), its package must be opened: `vidocq dev` writes the line into `module-info.java` itself, in a block marked `// vidocq:reflection`; outside dev mode, `./mvnw package` stops with that line, and `vidocq doctor --fix` writes it. xref:dev@vidocq::java-modules.adoc[Java modules in a Vidocq application] explains what is generated, what is checked, and how to opt out with an `open module`.
 ====
 
 == Step 6 — Test
