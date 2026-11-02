@@ -22,6 +22,7 @@ Read: xref:dev@vidocq::java-modules.adoc[Java modules in a Vidocq application].
 * **Interceptor methods called by generated code** — Vauban calls `@AroundInvoke`, `@AroundConstruct` and lifecycle interceptor methods through the provider generated in their package: a package-private interceptor needs no `opens`. xref:dev@vauban::internals.adoc#components-provider[Vauban].
 * **Repositories from a dependency jar** — a library's `@Repository` interfaces are implemented at build time, like the application's, by `vidocq:generate`. xref:dev@mansart::usage.adoc#dependency-repositories[Mansart], xref:dev@vidocq::whats-new.adoc[Vidocq].
 * **Run-time generation is announced** — when Vauban, Cassini, Cyrano or Mansart must generate a class or serve a repository at run time instead of at build time, they say so in a framed warning at start-up.
+* **What is generated, brick by brick** — each component's _Internals_ page now has a section, _Generated code and reflective fallback_, with the same table everywhere: what is generated, by which tool and when, what uses it at run time, what runs when it is missing, and how to tell which path ran. Start from xref:dev@vidocq::internals.adoc#generated-code[Vidocq's], which lists every codegen bundle and links to each brick's.
 
 === The CLI does the setup
 
@@ -49,10 +50,11 @@ Full list: xref:dev@vidocq::whats-new.adoc[What's new in Vidocq Runtime].
 * xref:dev@cervantes::whats-new.adoc[Cervantes] — the token stays out of `toString`.
 * xref:dev@chappe::whats-new.adoc[Chappe] and xref:dev@dirac::whats-new.adoc[Dirac] — performance and build-time extension fixes.
 * xref:dev@peano::whats-new.adoc[Peano] and xref:dev@ibarra::whats-new.adoc[Ibarra] — released in 0.4.0-RC1; small fixes since.
+* xref:dev@knock::whats-new.adoc[Knock], xref:dev@ravel::whats-new.adoc[Ravel] and xref:dev@foy::whats-new.adoc[Foy] — the _Generated code and reflective fallback_ section of their _Internals_ page.
 
-== Components with nothing new
+== Components not released yet
 
-xref:knock::index.adoc[Knock], xref:ravel::index.adoc[Ravel] and xref:foy::index.adoc[Foy] have nothing to announce since 0.4.0-RC1. xref:erasmus::index.adoc[Erasmus], xref:noether::index.adoc[Noether] and xref:tassis::index.adoc[Tassis] are not released yet: their documentation follows `main`. Where each stands is on the xref:roadmap.adoc[Consolidated roadmap].
+xref:erasmus::index.adoc[Erasmus], xref:noether::index.adoc[Noether] and xref:tassis::index.adoc[Tassis] are not released yet: their documentation follows `main`. Where each stands is on the xref:roadmap.adoc[Consolidated roadmap].
 
 == How these lists are maintained
 
