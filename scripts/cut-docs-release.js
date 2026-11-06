@@ -258,6 +258,21 @@ for (const file of ['antora-playbook.yml', 'antora-playbook-local.yml']) {
   });
 }
 
+// ---- redirects: the retired lines point to the line that replaced them ---------------------
+{
+  const known = [...new Set(repos.flatMap((r) => r.branches).filter((b) => b.startsWith('docs/')).map((b) => b.slice(5)))];
+  const file = path.join(ROOT, 'scripts/retired-lines.json');
+  const map = JSON.parse(fs.readFileSync(file, 'utf8'));
+  const gone = known.filter(retired);
+  if (gone.length) {
+    act(`redirects: ${gone.join(', ')} -> ${VERSION} (scripts/retired-lines.json)`, () => {
+      gone.forEach((v) => { map[v] = VERSION; });
+      Object.keys(map).forEach((k) => { if (retired(k)) map[k] = VERSION; });
+      fs.writeFileSync(file, JSON.stringify(map, null, 2) + '\n');
+    });
+  }
+}
+
 // ---- What's new: keep the entries of the retired release candidate -------------------------
 {
   const known = [...new Set(repos.flatMap((r) => r.branches).filter((b) => b.startsWith('docs/')).map((b) => b.slice(5)))];
@@ -273,7 +288,7 @@ for (const file of ['antora-playbook.yml', 'antora-playbook-local.yml']) {
 }
 
 act('vidocq-docs: commit playbooks + tutorials bump (push it yourself to trigger the deploy)', () => {
-  sh('git add antora-playbook.yml antora-playbook-local.yml content/tutorials', ROOT);
+  sh('git add antora-playbook.yml antora-playbook-local.yml content/tutorials scripts/retired-lines.json', ROOT);
   sh(`git commit -q -s -m "docs-site: publish the ${VERSION} release line (retention: last ${KEEP} + dev)"`, ROOT);
 });
 

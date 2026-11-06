@@ -53,5 +53,19 @@ for (const comp of fs.readdirSync(SITE, { withFileTypes: true })) {
   }
 }
 
+// Retired lines (a release candidate replaced by the next one of its train, see retired-lines.json):
+// their pages are gone from the site, but the links shared while they were current still circulate.
+// The subtree holds no asset any more, so one splat rule per component cannot shadow anything.
+const retired = JSON.parse(fs.readFileSync(path.join(__dirname, 'retired-lines.json'), 'utf8'));
+for (const comp of fs.readdirSync(SITE, { withFileTypes: true })) {
+  if (!comp.isDirectory() || comp.name.startsWith('_')) continue;
+  for (const [old, successor] of Object.entries(retired)) {
+    const oldDir = path.join(SITE, comp.name, old);
+    if (fs.existsSync(oldDir) || !fs.existsSync(path.join(SITE, comp.name, successor))) continue;
+    rules.push(`/${comp.name}/${old} /${comp.name}/${successor}/ 301`);
+    rules.push(`/${comp.name}/${old}/* /${comp.name}/${successor}/:splat 301`);
+  }
+}
+
 fs.writeFileSync(path.join(SITE, '_redirects'), rules.join('\n') + '\n');
 console.log(`[gen-redirects] ${rules.length} rules written to build/site/_redirects`);
