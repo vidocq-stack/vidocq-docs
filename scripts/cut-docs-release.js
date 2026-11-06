@@ -24,6 +24,9 @@
 // Branches dropped from the playbook are NOT deleted — re-add them to publish
 // an old version again.
 //
+// A release candidate replaces the earlier ones of its train: their docs line leaves the playbooks and
+// their What's new entries are kept in the cumulative pages (scripts/cumulate-whats-new.js).
+//
 // Manual follow-ups it will remind you about: cli-version (vidocq only, when
 // the CLI ships a new release) and checking the deploy run.
 'use strict';
@@ -220,9 +223,13 @@ try {
 }
 
 // ---- playbooks: retention window -------------------------------------------
+// A line replaces the earlier release candidates of its own train (RC1 once RC2 is out, every RC once
+// the final is out): their entries live on in the cumulative What's new pages (cumulate-whats-new.js).
+const trainOf = (v) => v.replace(/-RC\d+$/, '');
+const retired = (v) => v !== VERSION && /-RC\d+$/.test(v) && trainOf(v) === trainOf(VERSION);
 const kept = (branches) => {
   const releases = [...new Set(branches.filter((b) => b.startsWith('docs/')).map((b) => b.slice(5)).concat(VERSION))]
-    .filter((v) => semverKey(v) >= 0)
+    .filter((v) => semverKey(v) >= 0 && !retired(v))
     .sort((a, b) => semverKey(b) - semverKey(a))
     .slice(0, KEEP);
   return ['main', ...releases.map((v) => 'docs/' + v)];
@@ -249,6 +256,20 @@ for (const file of ['antora-playbook.yml', 'antora-playbook-local.yml']) {
   act(`${file}: retention window applied to ${touched} sources -> [${(sample || kept([])).join(', ')}]`, () => {
     fs.writeFileSync(p, lines.join('\n'));
   });
+}
+
+// ---- What's new: keep the entries of the retired release candidate -------------------------
+{
+  const known = [...new Set(repos.flatMap((r) => r.branches).filter((b) => b.startsWith('docs/')).map((b) => b.slice(5)))];
+  const previous = known.filter(retired).sort((a, b) => semverKey(b) - semverKey(a))[0];
+  const base = known.filter((v) => !/-RC\d+$/.test(v) && semverKey(v) >= 0 && semverKey(v) < semverKey(VERSION))
+    .sort((a, b) => semverKey(b) - semverKey(a))[0];
+  if (previous && base) {
+    act(`What's new: ${VERSION} keeps the entries of ${previous} (base ${base})`, () => {
+      console.log(sh(`node scripts/cumulate-whats-new.js --from ${previous} --to ${VERSION} --base ${base} --workspace ${WORKSPACE}`, ROOT));
+    });
+    console.log(`Remember: the ecosystem What's new (content/home) is edited by hand for the ${VERSION} line.`);
+  }
 }
 
 act('vidocq-docs: commit playbooks + tutorials bump (push it yourself to trigger the deploy)', () => {

@@ -36,7 +36,11 @@ next SNAPSHOT, and applies the retention window (**last 3 releases + dev**)
 to both playbooks — the version dropdown follows the playbook automatically.
 `--include <repo>` for a brick's first release, `--dry-run` to preview.
 Dropped versions keep their `docs/*` branch (re-add to the playbook to
-republish). Cut the docs at the same commit as the release itself: main's
+republish). A release candidate replaces the earlier ones of its train
+(RC1 leaves once RC2 ships, every RC once the final ships): the cut calls
+`scripts/cumulate-whats-new.js`, which makes each component's What's new
+page on the new line cumulative (one anchored section per line, newest
+first) so no entry is lost; edit `content/home`'s ecosystem page by hand. Cut the docs at the same commit as the release itself: main's
 docs then describe exactly the released code — never write docs on `main`
 for unmerged features.
 
