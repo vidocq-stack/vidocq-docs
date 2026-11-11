@@ -138,7 +138,7 @@ todo/
             <dependency>
                 <groupId>io.vidocq.runtime</groupId>
                 <artifactId>vidocq-runtime-bom</artifactId>
-                <version>$\{vidocq.version}</version>
+                <version>${vidocq.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -178,7 +178,7 @@ todo/
             <plugin>
                 <groupId>io.vidocq.runtime</groupId>
                 <artifactId>vidocq-runtime-maven-plugin</artifactId>
-                <version>$\{vidocq.version}</version>
+                <version>${vidocq.version}</version>
                 <extensions>true</extensions>
             </plugin>
         </plugins>
