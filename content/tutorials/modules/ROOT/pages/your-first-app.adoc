@@ -211,7 +211,7 @@ vidocq build
 sh target/todo-1.0.0-SNAPSHOT/bin/todo.sh
 ----
 
-`vidocq build` runs `./mvnw package`: it compiles, runs the code generators, and assembles a distribution under `target/todo-1.0.0-SNAPSHOT/` (launchers in `bin/`, module path in `lib/`, also zipped as `target/todo-1.0.0-SNAPSHOT-dist.zip`). In another terminal:
+`vidocq build` runs `./mvnw package`: it compiles, runs the code generators, and assembles a distribution under `target/todo-1.0.0-SNAPSHOT/` (launchers in `bin/`, the application and its own libraries in `app/`, the runtime and its bricks in `lib/`, also zipped as `target/todo-1.0.0-SNAPSHOT-dist.zip`). In another terminal:
 
 [source,bash]
 ----
