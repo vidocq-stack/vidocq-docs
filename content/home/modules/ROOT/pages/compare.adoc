@@ -77,7 +77,7 @@ This page compares Vidocq Runtime to the contemporary Java runtimes closest in i
 | Tomcat / Jetty / Netty, Hibernate, Jackson
 
 | MicroProfile spec
-| The MicroProfile 7.1 set: Config, Health, Metrics, Fault Tolerance, JWT, REST Client, Telemetry, OpenAPI
+| MicroProfile 7.2 ready: Config, Health, Metrics, Fault Tolerance, JWT, REST Client, Telemetry, OpenAPI
 | Full implementation
 | Full MP implementation
 | No MicroProfile (Spring Actuator instead)
@@ -127,7 +127,7 @@ GlassFish, WildFly and Open Liberty are full Jakarta EE application servers: an 
 | Classpath for the application
 
 | MicroProfile spec
-| The MicroProfile 7.1 set, as extensions
+| MicroProfile 7.2 ready, as extensions
 | Config, JWT, Health and REST Client; see the GlassFish documentation for the versions
 | MicroProfile Platform 7.1
 | MicroProfile 7.0 and 7.1
