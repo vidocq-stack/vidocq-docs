@@ -63,7 +63,7 @@ cd todo
 ----
 todo/
   pom.xml                                     <1>
-  mvnw, mvnw.cmd                              <2>
+  mvnw, mvnw.cmd, .mvn/wrapper/               <2>
   src/main/java/
     module-info.java                          <3>
     com/acme/todo/HelloResource.java          <4>
@@ -100,8 +100,10 @@ todo/
     <properties>
         <vidocq.version>{project-version}</vidocq.version>
         <maven.compiler.release>25</maven.compiler.release>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <vidocq.mainModule>com.acme.todo</vidocq.mainModule>
     </properties>
+ifeval::["{docs-line}" == "dev"]
 
     <repositories>
         <repository>
@@ -132,6 +134,7 @@ todo/
             <snapshots><enabled>true</enabled></snapshots>
         </pluginRepository>
     </pluginRepositories>
+endif::[]
 
     <dependencyManagement>
         <dependencies>
@@ -187,11 +190,13 @@ todo/
 ----
 ====
 
-Four things in it are worth knowing:
+Worth knowing in it:
 
-* *No parent.* The pom imports `vidocq-runtime-bom` (the versions of every Vidocq artifact) and declares `vidocq-runtime-maven-plugin` with `<extensions>true</extensions>`. As a build extension, the plugin completes the build before any goal runs: it binds its goals (`generate`, `check-module-info`, `package`, …), sets `maven.compiler.release=25` and the UTF-8 source encoding, and pins the versions of the lifecycle plugins. That is what `vidocq-runtime-parent` used to carry, so a plain `./mvnw package` still produces a runnable distribution. The first line of the build log names what the plugin added.
-* *One version.* `vidocq.version` drives both the BOM and the plugin; change it in one place to move to another Vidocq version.
+* *No parent.* The pom imports `vidocq-runtime-bom` (the versions of every Vidocq artifact) and declares `vidocq-runtime-maven-plugin` with `<extensions>true</extensions>`. As a build extension, the plugin completes the build before any goal runs: it binds its goals (`generate`, `check-module-info`, `package`, …), pins the versions of the lifecycle plugins, and supplies the compiler release and the source encoding where a pom does not name them. That is what `vidocq-runtime-parent` used to carry, so a plain `./mvnw package` still produces a runnable distribution. An `[INFO] [vidocq] todo: no Vidocq parent in the pom, the plugin adds …` line at the top of the build log names what it added.
+* *One version.* `vidocq.version` drives both the BOM and the plugin; change it in one place to move to another Vidocq version. The pom also names `maven.compiler.release` and `project.build.sourceEncoding` itself, so an IDE that reads the pom without running the plugin sees them.
+ifeval::["{docs-line}" == "dev"]
 * *Snapshot repositories.* This tutorial follows the development line, so the pom declares `maven.vidocq.dev` (and its mirror `maven.bak.vidocq.dev`) as repository and plugin repository for the SNAPSHOTs. A project created from a release does not write them: Maven Central is enough.
+endif::[]
 * *Dependencies.* `vidocq-runtime-core` and the extension you chose (`vidocq-runtime-cassini-rest-extension`), plus the test dependencies. There is no version on them: the BOM manages it.
 
 NOTE: `vidocq create --with-parent` writes the previous style, a pom that inherits `io.vidocq.runtime:vidocq-runtime-parent`. `vidocq pom convert --to parentless` (or `--to parent`) moves an existing pom from one style to the other. Both builds give the same result; see xref:dev@vidocq::modules/vidocq-runtime-maven-plugin.adoc#parentless[An application without the parent].
@@ -313,7 +318,7 @@ JSON serialization is handled by Champollion (JSON-B 3.0): no annotation, no con
 ====
 An application is a Java module, and JSON-B would normally read `Todo` by reflection, which needs its package opened. Here it does not: `Todo` is a record a resource returns, so the build generates its JSON-B binding — plain code that reads and writes it, without reflection — and there is nothing to open.
 
-When a type does keep the reflective mapping (a JPA entity, as in the next tutorial, or a type the generated code cannot map, named in the build output), its package must be opened: `vidocq dev` writes the line into `module-info.java` itself, in a block marked `// vidocq:reflection`; outside dev mode, `./mvnw package` stops with that line, and `vidocq doctor --fix` writes it. xref:dev@vidocq::java-modules.adoc[Java modules in a Vidocq application] explains what is generated, what is checked, and how to opt out with an `open module`.
+When a type does keep the reflective mapping (one the generated code cannot map — an abstract class or an interface as a property type, a getter overridden in a subclass, … — named in the build output), its package must be opened: `vidocq dev` writes the line into `module-info.java` itself, in a block marked `// vidocq:reflection`; outside dev mode, `./mvnw package` stops with that line, and `vidocq doctor --fix` writes it. xref:dev@vidocq::java-modules.adoc[Java modules in a Vidocq application] explains what is generated, what is checked, and how to opt out with an `open module`.
 ====
 
 == Step 6 — Test
@@ -325,7 +330,7 @@ The scaffolded `HelloResourceTest` starts the application and calls it. Run the 
 vidocq test
 ----
 
-It runs every test, then again on each change of the main or test sources; `r` runs every test, `f` the failed ones, `q` quits. In a CI, run them once with `./mvnw test`.
+It runs every test, then again on each change of the main or test sources. The summary line ends with the keys: type `r` and Enter to run every test again, `f` for the failed ones, `q` to quit. In a CI, run them once with `./mvnw test`.
 
 TIP: If you changed the text of `HelloResource` in Step 4, the test now fails: it expects `Hello from Vidocq!`. Put the text back, or update the test.
 

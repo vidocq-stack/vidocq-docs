@@ -183,11 +183,20 @@ public class ProductResource {
 vidocq dev
 ----
 
-The first start pulls the PostgreSQL image; the dev service then starts a container, hands its URL and credentials to the pool, and Flyway creates the table. `Product` is a JPA entity, which Jakarta Persistence reaches by reflection, so its package must be opened: `vidocq dev` writes the line into `module-info.java` for you (a plain `./mvnw package` stops and gives you the line, which `vidocq doctor --fix` writes):
+The first start pulls the PostgreSQL image; the dev service then starts a container, hands its URL and credentials to the pool, and Flyway creates the table:
 
 [source]
 ----
-[INFO] ✔ module-info.java: opens com.acme.todo.products;   (com.acme.todo.products.Product, …)
+[INFO ][…][main][i.v.r.e.e.m.MigrationExtension#configure] : Migration configured: engine=flyway datasources=[default]
+[INFO ][…][main][o.f.c.FlywayExecutor#init] : Database: jdbc:postgresql:******** (PostgreSQL 16.11)
+[INFO ][…][main][i.v.r.c.VidocqBootstrap#start] : Vidocq - Started in 394.872 ms (process running for 519 ms)
+----
+
+Nothing to open in `module-info.java`: `Product` is an entity, but Mansart reaches it through the code its processor generated at compile time (the entity model and `ProductRepositoryImpl`), and the REST extension generated its JSON-B binding, as it did for `Todo`. The build check says so, in dev mode as in a plain `./mvnw package`:
+
+[source]
+----
+[INFO] Vidocq check-module-info: module-info of 'com.acme.todo' satisfies all 4 extension requirement(s) and opens the 0 package(s) the runtime reaches by reflection.
 ----
 
 Try it:
