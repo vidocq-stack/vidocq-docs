@@ -71,13 +71,130 @@ todo/
     vidocq.properties                         <5>
   src/test/java/com/acme/todo/
     HelloResourceTest.java                    <6>
+  README.md, .gitignore
 ----
-<1> Inherits `io.vidocq.runtime:vidocq-runtime-parent:{project-version}`, which binds the `vidocq-runtime-maven-plugin` goals: a plain `./mvnw package` produces a runnable distribution. It also declares `maven.vidocq.dev` (and its mirror `maven.bak.vidocq.dev`) for the SNAPSHOTs.
+<1> The build descriptor, without a parent: it imports the Vidocq BOM, declares `vidocq-runtime-maven-plugin` as a build extension, and lists the dependencies. See <<the-pom,the pom below>>.
 <2> The Maven wrapper: no local Maven needed.
 <3> The module descriptor, with the `requires` and `opens` the REST extension needs, each marked `// vidocq:cassini-rest`.
 <4> A first resource, `GET /hello`.
 <5> Configuration (`vidocq.http.port=8080`, …).
 <6> A test that starts the application and calls `/hello`.
+
+[[the-pom]]
+.The `pom.xml` that `vidocq create` writes
+[%collapsible]
+====
+[source,xml,subs=attributes+]
+----
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.acme</groupId>
+    <artifactId>todo</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
+    <name>todo</name>
+
+    <properties>
+        <vidocq.version>{project-version}</vidocq.version>
+        <maven.compiler.release>25</maven.compiler.release>
+        <vidocq.mainModule>com.acme.todo</vidocq.mainModule>
+    </properties>
+
+    <repositories>
+        <repository>
+            <id>vidocq-snapshots</id>
+            <url>https://maven.vidocq.dev/snapshots/</url>
+            <releases><enabled>false</enabled></releases>
+            <snapshots><enabled>true</enabled></snapshots>
+        </repository>
+        <repository>
+            <id>vidocq-snapshots-bak</id>
+            <url>https://maven.bak.vidocq.dev/snapshots/</url>
+            <releases><enabled>false</enabled></releases>
+            <snapshots><enabled>true</enabled></snapshots>
+        </repository>
+    </repositories>
+
+    <pluginRepositories>
+        <pluginRepository>
+            <id>vidocq-snapshots</id>
+            <url>https://maven.vidocq.dev/snapshots/</url>
+            <releases><enabled>false</enabled></releases>
+            <snapshots><enabled>true</enabled></snapshots>
+        </pluginRepository>
+        <pluginRepository>
+            <id>vidocq-snapshots-bak</id>
+            <url>https://maven.bak.vidocq.dev/snapshots/</url>
+            <releases><enabled>false</enabled></releases>
+            <snapshots><enabled>true</enabled></snapshots>
+        </pluginRepository>
+    </pluginRepositories>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>io.vidocq.runtime</groupId>
+                <artifactId>vidocq-runtime-bom</artifactId>
+                <version>$\{vidocq.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.junit</groupId>
+                <artifactId>junit-bom</artifactId>
+                <version>6.0.3</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <dependencies>
+        <dependency>
+            <groupId>io.vidocq.runtime</groupId>
+            <artifactId>vidocq-runtime-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.vidocq.runtime.extensions.jakartaee.core</groupId>
+            <artifactId>vidocq-runtime-cassini-rest-extension</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.vidocq.runtime</groupId>
+            <artifactId>vidocq-runtime-junit</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>io.vidocq.runtime</groupId>
+                <artifactId>vidocq-runtime-maven-plugin</artifactId>
+                <version>$\{vidocq.version}</version>
+                <extensions>true</extensions>
+            </plugin>
+        </plugins>
+    </build>
+</project>
+----
+====
+
+Four things in it are worth knowing:
+
+* *No parent.* The pom imports `vidocq-runtime-bom` (the versions of every Vidocq artifact) and declares `vidocq-runtime-maven-plugin` with `<extensions>true</extensions>`. As a build extension, the plugin completes the build before any goal runs: it binds its goals (`generate`, `check-module-info`, `package`, …), sets `maven.compiler.release=25` and the UTF-8 source encoding, and pins the versions of the lifecycle plugins. That is what `vidocq-runtime-parent` used to carry, so a plain `./mvnw package` still produces a runnable distribution. The first line of the build log names what the plugin added.
+* *One version.* `vidocq.version` drives both the BOM and the plugin; change it in one place to move to another Vidocq version.
+* *Snapshot repositories.* This tutorial follows the development line, so the pom declares `maven.vidocq.dev` (and its mirror `maven.bak.vidocq.dev`) as repository and plugin repository for the SNAPSHOTs. A project created from a release does not write them: Maven Central is enough.
+* *Dependencies.* `vidocq-runtime-core` and the extension you chose (`vidocq-runtime-cassini-rest-extension`), plus the test dependencies. There is no version on them: the BOM manages it.
+
+NOTE: `vidocq create --with-parent` writes the previous style, a pom that inherits `io.vidocq.runtime:vidocq-runtime-parent`. `vidocq pom convert --to parentless` (or `--to parent`) moves an existing pom from one style to the other. Both builds give the same result; see xref:dev@vidocq::modules/vidocq-runtime-maven-plugin.adoc#parentless[An application without the parent].
 
 There is no main class: the runtime boots the application (`vidocq create --main` adds one, for an IDE Run configuration). Run `vidocq extension list --available` to see every extension, and `vidocq create --help` for the options (`--package`, `--open-module`, …).
 
