@@ -153,7 +153,7 @@ Anything that would otherwise be done by reflection or dynamic proxy is **genera
 * **Class-File API** (JEP 484) — Vauban (interceptors), Mansart (`Connection` proxy).
 * No ASM, no Byte Buddy, no JDK dynamic proxy.
 
-Direct payoff: compatible with **GraalVM `native-image`** and **Project Leyden CDS** without reflection configuration.
+Direct payoff: the JDK's **AOT cache** (Project Leyden) works on a packaged application, with no reflection configuration. It is also the groundwork for a **GraalVM `native-image`**, which is not available yet.
 
 === 4. Virtual threads everywhere for I/O
 

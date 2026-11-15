@@ -35,13 +35,13 @@ This page compares Vidocq Runtime to the contemporary Java runtimes closest in i
 | Classpath
 
 | AOT (GraalVM `native-image`)
-| Compatible by construction (zero reflection)
+| Not available yet (groundwork: zero reflection)
 | First-class (Quarkus native)
 | Supported
 | Supported (Spring AOT)
 
-| Project Leyden CDS
-| Compatible (no dynamic proxy)
+| Project Leyden (the JDK's AOT cache)
+| Works, recorded by hand (no goal yet)
 | Compatible
 | Compatible
 | Compatible (Spring 6.1+)

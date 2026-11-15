@@ -92,7 +92,7 @@ Three reasons:
 
 . **Technical sovereignty.** The Jakarta world rests largely on a handful of historical foundations (Tomcat, Jetty, Netty, Hibernate, Yasson, ArC, RESTEasy). Remarkable work, but accumulated dependencies. Vidocq bets on rebuilding everything on pure Java 25, leaning on what the JDK now offers: virtual threads, scoped values, Class-File API, strict Java Modules.
 
-. **Compile-time generation.** No runtime reflection, no dynamic proxies, no ASM, no Byte Buddy. Anything computable at `compile-time` is computed at `compile-time`. At startup, we instantiate. AOT-compatible (GraalVM `native-image`, Project Leyden CDS).
+. **Compile-time generation.** No runtime reflection, no dynamic proxies, no ASM, no Byte Buddy. Anything computable at `compile-time` is computed at `compile-time`. At startup, we instantiate. The JDK's AOT cache (Project Leyden) works on a packaged application; a GraalVM `native-image` is not available yet.
 
 . **Sober historical inspiration.** Each component honours a French figure from the late 18th / early 19th century whose method captures the spirit of the module. An aesthetic stance, not a pastiche.
 

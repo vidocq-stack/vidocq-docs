@@ -160,7 +160,7 @@ The assembled runtime passes **1868 official MicroProfile 7.1 TCK tests** across
 
 * **Done**: bootstrap, lifecycle, BuildStep / BuildItem / Recorder SPI, Mansart H2 + transactions extensions, MicroProfile extension wiring (Config, Health, Metrics, Fault Tolerance, JWT, Rest Client, Telemetry, OpenAPI), Maven plugin (jlink / jpackage / Docker).
 * **In progress**: cross-cutting MicroProfile integration hardening, packaging.
-* **Coming up**: GraalVM `native-image` and Project Leyden CDS proof-of-concept.
+* **Coming up**: a GraalVM `native-image`, and a goal that records the JDK's AOT cache (Project Leyden), which works by hand today.
 * Details: xref:vidocq::index.adoc[Vidocq Runtime].
 
 == Track progress
