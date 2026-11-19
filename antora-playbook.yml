@@ -33,63 +33,26 @@ content:
     - url: https://codefloe.com/Vidocq/vidocq.git
       branches: [docs/0.4.0-RC2, docs/0.3.0]
       start_paths: [docs/en]
-    - url: https://codefloe.com/Vidocq/vauban.git
-      branches: [docs/0.4.0-RC2, docs/0.3.0]
-      start_paths: [docs/en]
-    - url: https://codefloe.com/Vidocq/ravel.git
-      branches: [docs/0.4.0-RC2, docs/0.3.0]
-      start_paths: [docs/en]
-    - url: https://codefloe.com/Vidocq/cassini.git
-      branches: [docs/0.4.0-RC2, docs/0.3.0]
-      start_paths: [docs/en]
-    - url: https://codefloe.com/Vidocq/champollion.git
-      branches: [docs/0.4.0-RC2, docs/0.3.0]
-      start_paths: [docs/en]
-    - url: https://codefloe.com/Vidocq/chappe.git
-      branches: [docs/0.4.0-RC2, docs/0.3.0]
-      start_paths: [docs/en]
-    - url: https://codefloe.com/Vidocq/foy.git
-      branches: [docs/0.4.0-RC2, docs/0.3.0]
-      start_paths: [docs/en]
-    - url: https://codefloe.com/Vidocq/mansart.git
-      branches: [docs/0.4.0-RC2, docs/0.3.0]
-      start_paths: [docs/en]
-    - url: https://codefloe.com/Vidocq/knock.git
-      branches: [docs/0.4.0-RC2, docs/0.3.0]
-      start_paths: [docs/en]
-    - url: https://codefloe.com/Vidocq/humboldt.git
-      branches: [docs/0.4.0-RC2, docs/0.3.0]
-      start_paths: [docs/en]
-    - url: https://codefloe.com/Vidocq/grimm.git
-      branches: [docs/0.4.0-RC2, docs/0.3.0]
-      start_paths: [docs/en]
-    - url: https://codefloe.com/Vidocq/dirac.git
-      branches: [docs/0.4.0-RC2, docs/0.3.0]
-      start_paths: [docs/en]
-    - url: https://codefloe.com/Vidocq/heisenberg.git
-      branches: [docs/0.4.0-RC2, docs/0.3.0]
-      start_paths: [docs/en]
-    - url: https://codefloe.com/Vidocq/cervantes.git
-      branches: [docs/0.4.0-RC2, docs/0.3.0]
-      start_paths: [docs/en]
-    - url: https://codefloe.com/Vidocq/cyrano.git
-      branches: [docs/0.4.0-RC2, docs/0.3.0]
-      start_paths: [docs/en]
+    # The released docs of the bricks: their former repositories were deleted after the move into the monorepo,
+    # and each docs-archive/<version> branch of Vidocq/vidocq holds <brick>/docs/en of every brick's docs/<version>.
+    - url: https://codefloe.com/Vidocq/vidocq.git
+      branches: [docs-archive/0.4.0-RC2, docs-archive/0.3.0]
+      start_paths: [vauban/docs/en, ravel/docs/en, cassini/docs/en, champollion/docs/en, chappe/docs/en, foy/docs/en,
+                    mansart/docs/en, knock/docs/en, humboldt/docs/en, grimm/docs/en, dirac/docs/en, heisenberg/docs/en,
+                    cervantes/docs/en, cyrano/docs/en]
+    # ibarra and peano were first released with 0.4.0-RC1.
+    - url: https://codefloe.com/Vidocq/vidocq.git
+      branches: [docs-archive/0.4.0-RC2]
+      start_paths: [ibarra/docs/en, peano/docs/en]
     # erasmus has never been released: dev docs only.
     - url: https://codefloe.com/Vidocq/erasmus.git
       branches: [main]
-      start_paths: [docs/en]
-    - url: https://codefloe.com/Vidocq/ibarra.git
-      branches: [docs/0.4.0-RC2]
-      start_paths: [docs/en]
-    - url: https://codefloe.com/Vidocq/peano.git
-      branches: [docs/0.4.0-RC2]
       start_paths: [docs/en]
     - url: https://codefloe.com/Vidocq/tassis.git
       branches: [main]
       start_paths: [docs/en]
     # Every component but erasmus and tassis lives in the monorepo since 2026-11-19: its dev docs (main) come from
-    # its folder there; the release branches above stay in its archived repository.
+    # its folder there; its released docs come from the docs-archive branches above.
     - url: https://codefloe.com/Vidocq/vidocq.git
       branches: [main]
       start_paths:

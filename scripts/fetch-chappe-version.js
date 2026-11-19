@@ -2,9 +2,10 @@
 /* eslint-env node */
 /**
  * Reads the current Chappe version from:
- *   - ../../chappe/main/pom.xml for a local build. Under the mani layout every
- *     repo is cloned as <repo>/main, so chappe sits next to this repo's parent.
- *   - https://codefloe.com/.../pom.xml in CI (when the local clone is absent)
+ *   - Chappe's pom.xml in the local monorepo clone for a local build. Under the
+ *     mani layout every repo is cloned as <repo>/main, so the monorepo (vidocq)
+ *     sits next to this repo's parent.
+ *   - the same file of Vidocq/vidocq on Codefloe in CI (when the local clone is absent)
  *
  * Writes ui-bundle/src/data/versions.json:
  *   { "chappe": "0.1.0-SNAPSHOT", "isSnapshot": true, "buildDate": "..." }
@@ -18,8 +19,9 @@ const https = require('https');
 const http = require('http');
 
 const REPO_ROOT = path.resolve(__dirname, '..');
-const LOCAL_POM = path.resolve(REPO_ROOT, '..', '..', 'chappe', 'main', 'pom.xml');
-const REMOTE_URL = 'https://codefloe.com/Vidocq/chappe/raw/branch/main/pom.xml';
+const CHAPPE_POM = 'vidocq-components/vidocq-components-transport/chappe/pom.xml';
+const LOCAL_POM = path.resolve(REPO_ROOT, '..', '..', 'vidocq', 'main', CHAPPE_POM);
+const REMOTE_URL = `https://codefloe.com/Vidocq/vidocq/raw/branch/main/${CHAPPE_POM}`;
 const OUT_FILE = path.resolve(REPO_ROOT, 'ui-bundle', 'src', 'data', 'versions.json');
 
 function extractRootVersion(pomXml) {

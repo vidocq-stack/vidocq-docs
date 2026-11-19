@@ -23,63 +23,26 @@ content:
     - url: ../vidocq
       branches: [docs/0.4.0-RC2, docs/0.3.0]
       start_paths: [docs/en]
-    - url: ../vauban
-      branches: [docs/0.4.0-RC2, docs/0.3.0]
-      start_paths: [docs/en]
-    - url: ../ravel
-      branches: [docs/0.4.0-RC2, docs/0.3.0]
-      start_paths: [docs/en]
-    - url: ../cassini
-      branches: [docs/0.4.0-RC2, docs/0.3.0]
-      start_paths: [docs/en]
-    - url: ../champollion
-      branches: [docs/0.4.0-RC2, docs/0.3.0]
-      start_paths: [docs/en]
-    - url: ../chappe
-      branches: [docs/0.4.0-RC2, docs/0.3.0]
-      start_paths: [docs/en]
-    - url: ../foy
-      branches: [docs/0.4.0-RC2, docs/0.3.0]
-      start_paths: [docs/en]
-    - url: ../mansart
-      branches: [docs/0.4.0-RC2, docs/0.3.0]
-      start_paths: [docs/en]
-    - url: ../knock
-      branches: [docs/0.4.0-RC2, docs/0.3.0]
-      start_paths: [docs/en]
-    - url: ../humboldt
-      branches: [docs/0.4.0-RC2, docs/0.3.0]
-      start_paths: [docs/en]
-    - url: ../grimm
-      branches: [docs/0.4.0-RC2, docs/0.3.0]
-      start_paths: [docs/en]
-    - url: ../dirac
-      branches: [docs/0.4.0-RC2, docs/0.3.0]
-      start_paths: [docs/en]
-    - url: ../heisenberg
-      branches: [docs/0.4.0-RC2, docs/0.3.0]
-      start_paths: [docs/en]
-    - url: ../cervantes
-      branches: [docs/0.4.0-RC2, docs/0.3.0]
-      start_paths: [docs/en]
-    - url: ../cyrano
-      branches: [docs/0.4.0-RC2, docs/0.3.0]
-      start_paths: [docs/en]
+    # The released docs of the bricks: each docs-archive/<version> branch of the monorepo holds <brick>/docs/en of
+    # every brick's docs/<version> (their former repositories were deleted). Fetch them into the local clone first.
+    - url: ../vidocq
+      branches: [docs-archive/0.4.0-RC2, docs-archive/0.3.0]
+      start_paths: [vauban/docs/en, ravel/docs/en, cassini/docs/en, champollion/docs/en, chappe/docs/en, foy/docs/en,
+                    mansart/docs/en, knock/docs/en, humboldt/docs/en, grimm/docs/en, dirac/docs/en, heisenberg/docs/en,
+                    cervantes/docs/en, cyrano/docs/en]
+    # ibarra and peano were first released with 0.4.0-RC1.
+    - url: ../vidocq
+      branches: [docs-archive/0.4.0-RC2]
+      start_paths: [ibarra/docs/en, peano/docs/en]
     # erasmus has never been released: dev docs only.
     - url: ../erasmus
       branches: [main]
-      start_paths: [docs/en]
-    - url: ../ibarra
-      branches: [docs/0.4.0-RC2]
-      start_paths: [docs/en]
-    - url: ../peano
-      branches: [docs/0.4.0-RC2]
       start_paths: [docs/en]
     - url: ../tassis
       branches: [main]
       start_paths: [docs/en]
     # Every component but erasmus and tassis lives in the monorepo since 2026-11-19: its dev docs (main) come from
-    # its folder there; the release branches above stay in its archived repository.
+    # its folder there; its released docs come from the docs-archive branches above.
     - url: ../vidocq
       branches: [main]
       start_paths:
