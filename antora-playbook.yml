@@ -31,71 +31,87 @@ antora:
 content:
   sources:
     - url: https://codefloe.com/Vidocq/vidocq.git
-      branches: [main, docs/0.4.0-RC2, docs/0.3.0]
+      branches: [docs/0.4.0-RC2, docs/0.3.0]
       start_paths: [docs/en]
     - url: https://codefloe.com/Vidocq/vauban.git
-      branches: [main, docs/0.4.0-RC2, docs/0.3.0]
+      branches: [docs/0.4.0-RC2, docs/0.3.0]
       start_paths: [docs/en]
     - url: https://codefloe.com/Vidocq/ravel.git
-      branches: [main, docs/0.4.0-RC2, docs/0.3.0]
+      branches: [docs/0.4.0-RC2, docs/0.3.0]
       start_paths: [docs/en]
     - url: https://codefloe.com/Vidocq/cassini.git
-      branches: [main, docs/0.4.0-RC2, docs/0.3.0]
+      branches: [docs/0.4.0-RC2, docs/0.3.0]
       start_paths: [docs/en]
     - url: https://codefloe.com/Vidocq/champollion.git
-      branches: [main, docs/0.4.0-RC2, docs/0.3.0]
+      branches: [docs/0.4.0-RC2, docs/0.3.0]
       start_paths: [docs/en]
     - url: https://codefloe.com/Vidocq/chappe.git
-      branches: [main, docs/0.4.0-RC2, docs/0.3.0]
+      branches: [docs/0.4.0-RC2, docs/0.3.0]
       start_paths: [docs/en]
     - url: https://codefloe.com/Vidocq/foy.git
-      branches: [main, docs/0.4.0-RC2, docs/0.3.0]
+      branches: [docs/0.4.0-RC2, docs/0.3.0]
       start_paths: [docs/en]
     - url: https://codefloe.com/Vidocq/mansart.git
-      branches: [main, docs/0.4.0-RC2, docs/0.3.0]
+      branches: [docs/0.4.0-RC2, docs/0.3.0]
       start_paths: [docs/en]
     - url: https://codefloe.com/Vidocq/knock.git
-      branches: [main, docs/0.4.0-RC2, docs/0.3.0]
+      branches: [docs/0.4.0-RC2, docs/0.3.0]
       start_paths: [docs/en]
     - url: https://codefloe.com/Vidocq/humboldt.git
-      branches: [main, docs/0.4.0-RC2, docs/0.3.0]
+      branches: [docs/0.4.0-RC2, docs/0.3.0]
       start_paths: [docs/en]
     - url: https://codefloe.com/Vidocq/grimm.git
-      branches: [main, docs/0.4.0-RC2, docs/0.3.0]
+      branches: [docs/0.4.0-RC2, docs/0.3.0]
       start_paths: [docs/en]
     - url: https://codefloe.com/Vidocq/dirac.git
-      branches: [main, docs/0.4.0-RC2, docs/0.3.0]
+      branches: [docs/0.4.0-RC2, docs/0.3.0]
       start_paths: [docs/en]
     - url: https://codefloe.com/Vidocq/heisenberg.git
-      branches: [main, docs/0.4.0-RC2, docs/0.3.0]
+      branches: [docs/0.4.0-RC2, docs/0.3.0]
       start_paths: [docs/en]
     - url: https://codefloe.com/Vidocq/cervantes.git
-      branches: [main, docs/0.4.0-RC2, docs/0.3.0]
+      branches: [docs/0.4.0-RC2, docs/0.3.0]
       start_paths: [docs/en]
     - url: https://codefloe.com/Vidocq/cyrano.git
-      branches: [main, docs/0.4.0-RC2, docs/0.3.0]
+      branches: [docs/0.4.0-RC2, docs/0.3.0]
       start_paths: [docs/en]
     # erasmus has never been released: dev docs only.
     - url: https://codefloe.com/Vidocq/erasmus.git
       branches: [main]
       start_paths: [docs/en]
-    # not released yet: dev docs only.
     - url: https://codefloe.com/Vidocq/ibarra.git
-      branches: [main, docs/0.4.0-RC2]
+      branches: [docs/0.4.0-RC2]
       start_paths: [docs/en]
     - url: https://codefloe.com/Vidocq/peano.git
-      branches: [main, docs/0.4.0-RC2]
-      start_paths: [docs/en]
-    - url: https://codefloe.com/Vidocq/noether.git
-      branches: [main]
+      branches: [docs/0.4.0-RC2]
       start_paths: [docs/en]
     - url: https://codefloe.com/Vidocq/tassis.git
       branches: [main]
       start_paths: [docs/en]
-    # not released yet: dev docs only.
-    - url: https://codefloe.com/Vidocq/kerckhoffs.git
+    # Every component but erasmus and tassis lives in the monorepo since 2026-11-19: its dev docs (main) come from
+    # its folder there; the release branches above stay in its archived repository.
+    - url: https://codefloe.com/Vidocq/vidocq.git
       branches: [main]
-      start_paths: [docs/en]
+      start_paths:
+        - vidocq-runtime/docs/en
+        - vidocq-components/vidocq-components-transport/chappe/docs/en
+        - vidocq-components/vidocq-components-jakartaee/vidocq-components-jakartaee-core/vauban/docs/en
+        - vidocq-components/vidocq-components-jakartaee/vidocq-components-jakartaee-core/champollion/docs/en
+        - vidocq-components/vidocq-components-jakartaee/vidocq-components-jakartaee-core/cassini/docs/en
+        - vidocq-components/vidocq-components-jakartaee/vidocq-components-jakartaee-webprofile/foy/docs/en
+        - vidocq-components/vidocq-components-jakartaee/vidocq-components-jakartaee-webprofile/peano/docs/en
+        - vidocq-components/vidocq-components-jakartaee/vidocq-components-jakartaee-webprofile/ibarra/docs/en
+        - vidocq-components/vidocq-components-jakartaee/vidocq-components-jakartaee-webprofile/mansart/docs/en
+        - vidocq-components/vidocq-components-microprofile/ravel/docs/en
+        - vidocq-components/vidocq-components-microprofile/knock/docs/en
+        - vidocq-components/vidocq-components-microprofile/dirac/docs/en
+        - vidocq-components/vidocq-components-microprofile/heisenberg/docs/en
+        - vidocq-components/vidocq-components-microprofile/cervantes/docs/en
+        - vidocq-components/vidocq-components-microprofile/cyrano/docs/en
+        - vidocq-components/vidocq-components-microprofile/humboldt/docs/en
+        - vidocq-components/vidocq-components-microprofile/grimm/docs/en
+        - preview/vidocq-components-jakartaee/vidocq-components-jakartaee-webprofile/noether/docs/en
+        - preview/vidocq-components-jakartaee/vidocq-components-jakartaee-webprofile/kerckhoffs/docs/en
     - url: .
       branches: HEAD
       start_paths: [content/home]

@@ -21,70 +21,87 @@ antora:
 content:
   sources:
     - url: ../vidocq
-      branches: [main, docs/0.4.0-RC2, docs/0.3.0]
+      branches: [docs/0.4.0-RC2, docs/0.3.0]
       start_paths: [docs/en]
     - url: ../vauban
-      branches: [main, docs/0.4.0-RC2, docs/0.3.0]
+      branches: [docs/0.4.0-RC2, docs/0.3.0]
       start_paths: [docs/en]
     - url: ../ravel
-      branches: [main, docs/0.4.0-RC2, docs/0.3.0]
+      branches: [docs/0.4.0-RC2, docs/0.3.0]
       start_paths: [docs/en]
     - url: ../cassini
-      branches: [main, docs/0.4.0-RC2, docs/0.3.0]
+      branches: [docs/0.4.0-RC2, docs/0.3.0]
       start_paths: [docs/en]
     - url: ../champollion
-      branches: [main, docs/0.4.0-RC2, docs/0.3.0]
+      branches: [docs/0.4.0-RC2, docs/0.3.0]
       start_paths: [docs/en]
     - url: ../chappe
-      branches: [main, docs/0.4.0-RC2, docs/0.3.0]
+      branches: [docs/0.4.0-RC2, docs/0.3.0]
       start_paths: [docs/en]
     - url: ../foy
-      branches: [main, docs/0.4.0-RC2, docs/0.3.0]
+      branches: [docs/0.4.0-RC2, docs/0.3.0]
       start_paths: [docs/en]
     - url: ../mansart
-      branches: [main, docs/0.4.0-RC2, docs/0.3.0]
+      branches: [docs/0.4.0-RC2, docs/0.3.0]
       start_paths: [docs/en]
     - url: ../knock
-      branches: [main, docs/0.4.0-RC2, docs/0.3.0]
+      branches: [docs/0.4.0-RC2, docs/0.3.0]
       start_paths: [docs/en]
     - url: ../humboldt
-      branches: [main, docs/0.4.0-RC2, docs/0.3.0]
+      branches: [docs/0.4.0-RC2, docs/0.3.0]
       start_paths: [docs/en]
     - url: ../grimm
-      branches: [main, docs/0.4.0-RC2, docs/0.3.0]
+      branches: [docs/0.4.0-RC2, docs/0.3.0]
       start_paths: [docs/en]
     - url: ../dirac
-      branches: [main, docs/0.4.0-RC2, docs/0.3.0]
+      branches: [docs/0.4.0-RC2, docs/0.3.0]
       start_paths: [docs/en]
     - url: ../heisenberg
-      branches: [main, docs/0.4.0-RC2, docs/0.3.0]
+      branches: [docs/0.4.0-RC2, docs/0.3.0]
       start_paths: [docs/en]
     - url: ../cervantes
-      branches: [main, docs/0.4.0-RC2, docs/0.3.0]
+      branches: [docs/0.4.0-RC2, docs/0.3.0]
       start_paths: [docs/en]
     - url: ../cyrano
-      branches: [main, docs/0.4.0-RC2, docs/0.3.0]
+      branches: [docs/0.4.0-RC2, docs/0.3.0]
       start_paths: [docs/en]
     # erasmus has never been released: dev docs only.
     - url: ../erasmus
       branches: [main]
       start_paths: [docs/en]
-    # not released yet: dev docs only.
     - url: ../ibarra
-      branches: [main, docs/0.4.0-RC2]
+      branches: [docs/0.4.0-RC2]
       start_paths: [docs/en]
     - url: ../peano
-      branches: [main, docs/0.4.0-RC2]
-      start_paths: [docs/en]
-    - url: ../noether
-      branches: [main]
+      branches: [docs/0.4.0-RC2]
       start_paths: [docs/en]
     - url: ../tassis
       branches: [main]
       start_paths: [docs/en]
-    - url: ../kerckhoffs
+    # Every component but erasmus and tassis lives in the monorepo since 2026-11-19: its dev docs (main) come from
+    # its folder there; the release branches above stay in its archived repository.
+    - url: ../vidocq
       branches: [main]
-      start_paths: [docs/en]
+      start_paths:
+        - vidocq-runtime/docs/en
+        - vidocq-components/vidocq-components-transport/chappe/docs/en
+        - vidocq-components/vidocq-components-jakartaee/vidocq-components-jakartaee-core/vauban/docs/en
+        - vidocq-components/vidocq-components-jakartaee/vidocq-components-jakartaee-core/champollion/docs/en
+        - vidocq-components/vidocq-components-jakartaee/vidocq-components-jakartaee-core/cassini/docs/en
+        - vidocq-components/vidocq-components-jakartaee/vidocq-components-jakartaee-webprofile/foy/docs/en
+        - vidocq-components/vidocq-components-jakartaee/vidocq-components-jakartaee-webprofile/peano/docs/en
+        - vidocq-components/vidocq-components-jakartaee/vidocq-components-jakartaee-webprofile/ibarra/docs/en
+        - vidocq-components/vidocq-components-jakartaee/vidocq-components-jakartaee-webprofile/mansart/docs/en
+        - vidocq-components/vidocq-components-microprofile/ravel/docs/en
+        - vidocq-components/vidocq-components-microprofile/knock/docs/en
+        - vidocq-components/vidocq-components-microprofile/dirac/docs/en
+        - vidocq-components/vidocq-components-microprofile/heisenberg/docs/en
+        - vidocq-components/vidocq-components-microprofile/cervantes/docs/en
+        - vidocq-components/vidocq-components-microprofile/cyrano/docs/en
+        - vidocq-components/vidocq-components-microprofile/humboldt/docs/en
+        - vidocq-components/vidocq-components-microprofile/grimm/docs/en
+        - preview/vidocq-components-jakartaee/vidocq-components-jakartaee-webprofile/noether/docs/en
+        - preview/vidocq-components-jakartaee/vidocq-components-jakartaee-webprofile/kerckhoffs/docs/en
     - url: .
       branches: HEAD
       start_paths: [content/home]
