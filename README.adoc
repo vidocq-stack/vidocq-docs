@@ -25,18 +25,28 @@ The site is **English-only** and **versioned** — see
 # 1. build the UI bundle (once, or after any ui-bundle/src change)
 cd ui-bundle && npm ci && npx gulp bundle && cd ..
 
-# 2. build the site from the local sibling clones
+# 2. build the site from the clones of the workspace
 npm ci
-npx antora antora-playbook-local.yml       # reads ../<repo> refs main + docs/0.2.0
+npx antora antora-playbook-local.yml
 
 # 3. serve it
 npx http-server build/site -p 8080
 ----
 
-The local playbook reads each sibling repo's `main` and `docs/0.2.0` refs
-directly from `.git`; a repo whose working tree has `main` checked out is read
-from the working tree (uncommitted docs edits show up — handy for preview).
-Always `rm -rf build/site` before rebuilding if components were removed.
+`bash scripts/build-local.sh --serve` does the three steps.
+
+The local playbook expects the layout of the Vidocq workspace (mani): this
+repository in `vidocq-docs/main`, the monorepo in `vidocq/main`, and
+`erasmus/main`, `tassis/main` beside them. It reads their branches straight
+from `.git`, remote-tracking ones included: run `git fetch` in `vidocq/main`
+first, so the `docs/<version>` and `docs-archive/<version>` branches are there.
+A clone whose working tree has `main` checked out is read from the working tree
+(uncommitted docs edits show up — handy for preview).
+
+Build from `vidocq-docs/main`, not from a worktree: Antora reads the `.` sources
+of this repository only from a clone with a `.git` directory ("Local content
+source must be a git repository"). Always `rm -rf build/site` before rebuilding
+if components were removed.
 
 The prod playbook (`antora-playbook.yml`) is the same site built from
 `https://codefloe.com/Vidocq/*` over anonymous HTTPS.

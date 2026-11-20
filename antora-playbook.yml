@@ -64,6 +64,7 @@ content:
         - vidocq-components/vidocq-components-jakartaee/vidocq-components-jakartaee-webprofile/foy/docs/en
         - vidocq-components/vidocq-components-jakartaee/vidocq-components-jakartaee-webprofile/peano/docs/en
         - vidocq-components/vidocq-components-jakartaee/vidocq-components-jakartaee-webprofile/ibarra/docs/en
+        - vidocq-components/vidocq-components-jakartaee/vidocq-components-jakartaee-webprofile/bodoni/docs/en
         - vidocq-components/vidocq-components-jakartaee/vidocq-components-jakartaee-webprofile/mansart/docs/en
         - vidocq-components/vidocq-components-microprofile/ravel/docs/en
         - vidocq-components/vidocq-components-microprofile/knock/docs/en
