@@ -74,8 +74,8 @@ content:
         - vidocq-components/vidocq-components-microprofile/cyrano/docs/en
         - vidocq-components/vidocq-components-microprofile/humboldt/docs/en
         - vidocq-components/vidocq-components-microprofile/grimm/docs/en
-        - preview/vidocq-components-jakartaee/vidocq-components-jakartaee-webprofile/noether/docs/en
-        - preview/vidocq-components-jakartaee/vidocq-components-jakartaee-webprofile/kerckhoffs/docs/en
+        - vidocq-preview/vidocq-components-jakartaee/vidocq-components-jakartaee-webprofile/noether/docs/en
+        - vidocq-preview/vidocq-components-jakartaee/vidocq-components-jakartaee-webprofile/kerckhoffs/docs/en
     - url: .
       branches: HEAD
       start_paths: [content/home]
