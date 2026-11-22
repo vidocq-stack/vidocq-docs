@@ -35,6 +35,11 @@ vidocq-docs, then push. It cuts `docs/X` from every versioned repo's `main`
 next SNAPSHOT, and applies the retention window (**last 3 releases + dev**)
 to both playbooks — the version dropdown follows the playbook automatically.
 `--include <repo>` for a brick's first release, `--dry-run` to preview.
+The monorepo is cut once: `docs/X` pins every `antora.yml` under the start
+paths of the playbook source that reads its `main`, only that source gets
+`docs/X`, and the old-layout and `docs-archive/*` sources only leave the
+window. Its `main` takes pull requests only: add `--bump-branch <name>` and
+open the pull request of the bump.
 Dropped versions keep their `docs/*` branch (re-add to the playbook to
 republish). A release candidate replaces the earlier ones of its train
 (RC1 leaves once RC2 ships, every RC once the final ships): the cut calls

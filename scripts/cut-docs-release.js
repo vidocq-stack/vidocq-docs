@@ -19,10 +19,18 @@
 // releases (default 3) plus main (dev) — the version dropdown follows the
 // playbook automatically, nothing else to touch.
 //
-// Repos are the sibling clones (../<repo>); every git write goes through an
-// ephemeral detached worktree, never through the clone's working tree.
-// Branches dropped from the playbook are NOT deleted — re-add them to publish
-// an old version again.
+// A repository with several components (the monorepo) is cut once: docs/<version>
+// branches from its main, and every antora.yml under the start paths of the
+// playbook sources that read its main is pinned on it, then bumped on main. Only
+// those sources get the new line; the others (the old runtime layout of
+// docs/<version>, the docs-archive/<version> branches of the bricks) only leave
+// the retention window, and a source left without a line leaves the playbook.
+// The monorepo's main takes pull requests only: pass --bump-branch.
+//
+// Repos are the clones of the mani workspace (<workspace>/<repo>/main) or
+// sibling clones (../<repo>); every git write goes through an ephemeral detached
+// worktree, never through the clone's working tree. Branches dropped from the
+// playbook are NOT deleted — re-add them to publish an old version again.
 //
 // A release candidate replaces the earlier ones of its train: their docs line leaves the playbooks and
 // their What's new entries are kept in the cumulative pages (scripts/cumulate-whats-new.js).
@@ -34,6 +42,10 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 const { execSync } = require('child_process');
+const {
+  parseSources, applyRetention, versionedRepos, devStartPaths, versionOf, semverKey, retired: retiredBy, repoDir,
+  defaultWorkspace,
+} = require('./playbook-sources');
 
 const ROOT = path.resolve(__dirname, '..');
 const args = process.argv.slice(2);
@@ -46,7 +58,7 @@ const flag = (name) => args.includes('--' + name);
 const VERSION = opt('version');
 const NEXT = opt('next');
 const KEEP = parseInt(opt('keep', '3'), 10);
-const WORKSPACE = path.resolve(ROOT, opt('workspace', '..'));
+const WORKSPACE = path.resolve(ROOT, opt('workspace', defaultWorkspace(ROOT)));
 const INCLUDE = [];
 for (let i = 0; i < args.length; i++) if (args[i] === '--include') INCLUDE.push(args[i + 1]);
 const DRY = flag('dry-run');
@@ -58,30 +70,14 @@ if (!/^\d+\.\d+\.\d+(-RC\d+)?$/.test(VERSION || '') || !/-SNAPSHOT$/.test(NEXT |
   process.exit(2);
 }
 
-// x.y.z; a release candidate x.y.z-RCn ranks just below x.y.z; named versions (dev) are -1.
-const semverKey = (v) => {
-  const m = v.match(/^(\d+)\.(\d+)\.(\d+)(?:-RC(\d+))?$/);
-  return m ? (+m[1] * 1e6 + +m[2] * 1e3 + +m[3] - (m[4] ? 0.5 - +m[4] / 1000 : 0)) : -1;
-};
-
 const sh = (cmd, cwd) => execSync(cmd, { cwd, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] }).trim();
 const act = (desc, fn) => { console.log((DRY ? '[dry-run] ' : '') + desc); if (!DRY) return fn(); };
 
 // ---- discover versioned repos from the prod playbook -----------------------
-const playbook = fs.readFileSync(path.join(ROOT, 'antora-playbook.yml'), 'utf8');
-const repos = []; // {name, branches[]}
-{
-  const lines = playbook.split('\n');
-  for (let i = 0; i < lines.length; i++) {
-    const m = lines[i].match(/-\s*url:\s*https:\/\/codefloe\.com\/Vidocq\/([\w-]+)\.git/);
-    if (!m) continue;
-    const bm = (lines[i + 1] || '').match(/branches:\s*\[([^\]]*)\]/);
-    const branches = bm ? bm[1].split(',').map((s) => s.trim()) : [];
-    repos.push({ name: m[1], branches });
-  }
-}
-const versioned = repos.filter((r) => r.branches.some((b) => b.startsWith('docs/')) || INCLUDE.includes(r.name));
-console.log(`Release ${VERSION} (next: ${NEXT}) — ${versioned.length} repos: ${versioned.map((r) => r.name).join(', ')}\n`);
+const sources = parseSources(fs.readFileSync(path.join(ROOT, 'antora-playbook.yml'), 'utf8'));
+const versionedNames = versionedRepos(sources, INCLUDE); // '.' is this repository (tutorials)
+const versioned = versionedNames.filter((n) => n !== '.').map((name) => ({ name, docRoots: devStartPaths(sources, name) }));
+console.log(`Release ${VERSION} (next: ${NEXT}) — ${versioned.length} repos: ${versioned.map((r) => `${r.name} (${r.docRoots.length} components)`).join(', ')}\n`);
 
 // ---- antora.yml transformations --------------------------------------------
 function pinRelease(y) {
@@ -112,52 +108,85 @@ function bumpMain(y) {
 // ---- per-repo: cut docs/<version>, bump main -------------------------------
 const failures = [];
 for (const r of versioned) {
-  const repoDir = path.join(WORKSPACE, r.name);
-  if (!fs.existsSync(path.join(repoDir, '.git'))) { failures.push(`${r.name}: clone not found at ${repoDir}`); continue; }
+  const dir = repoDir(WORKSPACE, r.name);
+  if (!dir) { failures.push(`${r.name}: clone not found under ${WORKSPACE}`); continue; }
+  if (!r.docRoots.length) { failures.push(`${r.name}: no playbook source reads its main`); continue; }
   try {
-    sh('git fetch -q origin main', repoDir);
-    const already = sh(`git ls-remote --heads origin docs/${VERSION}`, repoDir) !== '';
-    const wt = fs.mkdtempSync(path.join(os.tmpdir(), `cutdocs-${r.name}-`));
+    sh('git fetch -q origin main', dir);
+    // Every root must hold an antora.yml on main: a source of the playbook that names a folder main no longer has
+    // would cut a line without that component.
+    const missing = r.docRoots.filter((root) => {
+      try { sh(`git cat-file -e origin/main:${root}/antora.yml`, dir); return false; } catch { return true; }
+    });
+    if (missing.length) { failures.push(`${r.name}: no antora.yml on main under ${missing.join(', ')}`); continue; }
+    const already = sh(`git ls-remote --heads origin docs/${VERSION}`, dir) !== '';
     if (already) {
       console.log(`${r.name}: docs/${VERSION} already exists on origin — skipping the cut, bumping main only`);
     } else {
-      act(`${r.name}: branch docs/${VERSION} from origin/main, pin antora.yml, push`, () => {
-        sh(`git worktree add -q ${wt} origin/main`, repoDir);
-        const yml = path.join(wt, 'docs/en/antora.yml');
-        fs.writeFileSync(yml, pinRelease(fs.readFileSync(yml, 'utf8')));
-        sh('git add docs/en/antora.yml', wt);
-        sh(`git commit -q -s -m "docs: pin the ${VERSION} release documentation line"`, wt);
+      if (DRY) {
+        // What the cut would write, read from origin/main without a worktree.
+        const pinned = r.docRoots.filter((root) =>
+          new RegExp(`^version: '${VERSION.replace(/\./g, '\\.')}'$`, 'm').test(pinRelease(sh(`git show origin/main:${root}/antora.yml`, dir))));
+        console.log(`[dry-run] ${r.name}: ${pinned.length}/${r.docRoots.length} antora.yml would read version '${VERSION}'`);
+      }
+      act(`${r.name}: branch docs/${VERSION} from origin/main, pin ${r.docRoots.length} antora.yml, push`, () => {
+        const wt = fs.mkdtempSync(path.join(os.tmpdir(), `cutdocs-${r.name}-`));
+        sh(`git worktree add -q ${wt} origin/main`, dir);
+        for (const root of r.docRoots) {
+          const yml = path.join(wt, root, 'antora.yml');
+          fs.writeFileSync(yml, pinRelease(fs.readFileSync(yml, 'utf8')));
+          sh(`git add ${root}/antora.yml`, wt);
+        }
+        sh(`git commit -q -S -s -m "docs: pin the ${VERSION} release documentation line"`, wt);
         sh(`git push -q origin HEAD:refs/heads/docs/${VERSION}`, wt);
-        sh(`git worktree remove --force ${wt}`, repoDir);
+        sh(`git worktree remove --force ${wt}`, dir);
       });
     }
-    act(`${r.name}: bump main to ${NEXT}, clear {tag-new} badges, reset whats-new, push`, () => {
+    act(`${r.name}: bump main to ${NEXT}, clear {tag-new} badges, reset whats-new, push${BUMP_BRANCH ? ' to ' + BUMP_BRANCH : ''}`, () => {
       const wt2 = fs.mkdtempSync(path.join(os.tmpdir(), `cutmain-${r.name}-`));
-      sh(`git worktree add -q ${wt2} origin/main`, repoDir);
-      const yml = path.join(wt2, 'docs/en/antora.yml');
-      const before = fs.readFileSync(yml, 'utf8');
-      const after = bumpMain(before);
-      let dirty = after !== before;
-      if (dirty) fs.writeFileSync(yml, after);
-      // New cycle: the frozen docs/<VERSION> keeps its NEW badges; main drops
-      // them and restarts the what's-new page empty.
-      const stripNew = (dir) => {
-        for (const e of fs.readdirSync(dir, { withFileTypes: true })) {
-          const p = path.join(dir, e.name);
-          if (e.isDirectory()) stripNew(p);
-          else if (e.name.endsWith('.adoc')) {
-            const t = fs.readFileSync(p, 'utf8');
-            const t2 = t.replace(/ ?\[\.tag-new\]#NEW# ?/g, '');
-            if (t2 !== t) { fs.writeFileSync(p, t2); dirty = true; }
-          }
-        }
-      };
-      const pagesDir = path.join(wt2, 'docs/en/modules');
-      if (fs.existsSync(pagesDir)) stripNew(pagesDir);
-      const wn = path.join(wt2, 'docs/en/modules/ROOT/pages/whats-new.adoc');
-      if (fs.existsSync(wn)) {
-        // Per component: each one owns its page, and home::whats-new.adoc indexes them.
-        fs.writeFileSync(wn, `= What's new
+      sh(`git worktree add -q ${wt2} origin/main`, dir);
+      let dirty = false;
+      for (const root of r.docRoots) if (bumpRoot(path.join(wt2, root))) dirty = true;
+      if (dirty) {
+        sh(`git add ${r.docRoots.join(' ')}`, wt2);
+        sh(`git commit -q -S -s -m "docs: dev line moves to ${NEXT} (last release: ${VERSION})"`, wt2);
+        sh(`git push -q origin HEAD:${BUMP_BRANCH ? 'refs/heads/' + BUMP_BRANCH : 'main'}`, wt2);
+      } else {
+        console.log(`${r.name}: main docs already up to date`);
+      }
+      sh(`git worktree remove --force ${wt2}`, dir);
+    });
+  } catch (e) {
+    failures.push(`${r.name}: ${e.message.split('\n')[0]}`);
+  }
+}
+
+// One component on main: next SNAPSHOT, NEW badges dropped, What's new restarted empty. True when a file changed.
+function bumpRoot(docRoot) {
+  const yml = path.join(docRoot, 'antora.yml');
+  const before = fs.readFileSync(yml, 'utf8');
+  const after = bumpMain(before);
+  let dirty = after !== before;
+  if (dirty) fs.writeFileSync(yml, after);
+  // New cycle: the frozen docs/<VERSION> keeps its NEW badges; main drops
+  // them and restarts the what's-new page empty.
+  const stripNew = (d) => {
+    for (const e of fs.readdirSync(d, { withFileTypes: true })) {
+      const p = path.join(d, e.name);
+      if (e.isDirectory()) stripNew(p);
+      else if (e.name.endsWith('.adoc')) {
+        const t = fs.readFileSync(p, 'utf8');
+        const t2 = t.replace(/ ?\[\.tag-new\]#NEW# ?/g, '');
+        if (t2 !== t) { fs.writeFileSync(p, t2); dirty = true; }
+      }
+    }
+  };
+  const pagesDir = path.join(docRoot, 'modules');
+  if (fs.existsSync(pagesDir)) stripNew(pagesDir);
+  const wn = path.join(docRoot, 'modules/ROOT/pages/whats-new.adoc');
+  if (fs.existsSync(wn)) {
+    // Per component: each one owns its page, and home::whats-new.adoc indexes them.
+    fs.writeFileSync(wn, `= What's new
 :description: Everything that changed in this component since the {release-version} release.
 
 [.lead]
@@ -165,20 +194,9 @@ New in the \`{project-version}\` development line — everything listed here lan
 
 _Nothing documented yet for this cycle. Add entries here (and place [.tag-new]#NEW# badges on the relevant pages) as features land on main._
 `);
-        dirty = true;
-      }
-      if (dirty) {
-        sh('git add docs/en', wt2);
-        sh(`git commit -q -s -m "docs: dev line moves to ${NEXT} (last release: ${VERSION})"`, wt2);
-        sh(`git push -q origin HEAD:${BUMP_BRANCH ? 'refs/heads/' + BUMP_BRANCH : 'main'}`, wt2);
-      } else {
-        console.log(`${r.name}: main docs already up to date`);
-      }
-      sh(`git worktree remove --force ${wt2}`, repoDir);
-    });
-  } catch (e) {
-    failures.push(`${r.name}: ${e.message.split('\n')[0]}`);
+    dirty = true;
   }
+  return dirty;
 }
 
 // ---- this repo: the versioned tutorials component --------------------------
@@ -197,7 +215,7 @@ try {
       y = y.replace(/docs-line: dev/, 'docs-line: release');
       fs.writeFileSync(yml, y);
       sh('git add content/tutorials/antora.yml', wt);
-      sh(`git commit -q -s -m "docs: pin the ${VERSION} tutorials line"`, wt);
+      sh(`git commit -q -S -s -m "docs: pin the ${VERSION} tutorials line"`, wt);
       sh(`git push -q origin HEAD:refs/heads/docs/${VERSION}`, wt);
       sh(`git worktree remove --force ${wt}`, ROOT);
     });
@@ -222,45 +240,40 @@ try {
   failures.push('vidocq-docs (tutorials): ' + e.message.split('\n')[0]);
 }
 
-// ---- playbooks: retention window -------------------------------------------
 // A line replaces the earlier release candidates of its own train (RC1 once RC2 is out, every RC once
 // the final is out): their entries live on in the cumulative What's new pages (cumulate-whats-new.js).
-const trainOf = (v) => v.replace(/-RC\d+$/, '');
-const retired = (v) => v !== VERSION && /-RC\d+$/.test(v) && trainOf(v) === trainOf(VERSION);
-const kept = (branches) => {
-  const releases = [...new Set(branches.filter((b) => b.startsWith('docs/')).map((b) => b.slice(5)).concat(VERSION))]
-    .filter((v) => semverKey(v) >= 0 && !retired(v))
-    .sort((a, b) => semverKey(b) - semverKey(a))
-    .slice(0, KEEP);
-  return ['main', ...releases.map((v) => 'docs/' + v)];
-};
+const retired = (v) => retiredBy(v, VERSION);
+const known = [...new Set(sources.flatMap((s) => s.branches || []).map(versionOf).filter(Boolean))];
 
+// ---- What's new: keep the entries of the retired release candidate -------------------------
+// Before the retention window: cumulate-whats-new.js finds the pages of the retired line through the playbook.
+{
+  const previous = known.filter(retired).sort((a, b) => semverKey(b) - semverKey(a))[0];
+  const base = known.filter((v) => !/-RC\d+$/.test(v) && semverKey(v) >= 0 && semverKey(v) < semverKey(VERSION))
+    .sort((a, b) => semverKey(b) - semverKey(a))[0];
+  if (previous && base) {
+    const cmd = `node scripts/cumulate-whats-new.js --from ${previous} --to ${VERSION} --base ${base} --workspace ${WORKSPACE}`;
+    act(`What's new: ${VERSION} keeps the entries of ${previous} (base ${base}): ${cmd}`, () => {
+      console.log(sh(cmd, ROOT));
+    });
+    console.log(`Remember: the ecosystem What's new (content/home) is edited by hand for the ${VERSION} line.`);
+  }
+}
+
+// ---- playbooks: retention window -------------------------------------------
 for (const file of ['antora-playbook.yml', 'antora-playbook-local.yml']) {
   const p = path.join(ROOT, file);
-  const lines = fs.readFileSync(p, 'utf8').split('\n');
-  let touched = 0;
-  let sample = null;
-  for (let i = 0; i < lines.length; i++) {
-    const m = lines[i].match(/-\s*url:\s*(?:https:\/\/codefloe\.com\/Vidocq\/([\w-]+)\.git|\.\.\/([\w-]+))\s*$/);
-    const self = /-\s*url:\s*\.\s*$/.test(lines[i]) && /content\/tutorials/.test(lines[i + 2] || '');
-    const name = m && (m[1] || m[2]);
-    if (!self && (!name || !versioned.some((r) => r.name === name))) continue;
-    const bm = (lines[i + 1] || '').match(/^(\s*)branches:\s*\[([^\]]*)\]/);
-    if (!bm) continue;
-    const newList = kept(bm[2].split(',').map((s) => s.trim()));
-    if (self) newList[0] = 'HEAD';
-    if (!sample) sample = newList;
-    lines[i + 1] = `${bm[1]}branches: [${newList.join(', ')}]`;
-    touched++;
-  }
-  act(`${file}: retention window applied to ${touched} sources -> [${(sample || kept([])).join(', ')}]`, () => {
-    fs.writeFileSync(p, lines.join('\n'));
+  const { text, changes } = applyRetention(fs.readFileSync(p, 'utf8'), { version: VERSION, keep: KEEP, versioned: versionedNames });
+  act(`${file}: retention window (last ${KEEP} + dev) changes ${changes.length} sources`, () => {
+    fs.writeFileSync(p, text);
   });
+  for (const c of changes) {
+    console.log(`  ${c.repo === '.' ? 'vidocq-docs' : c.repo}: [${c.from.join(', ')}] -> ${c.to.length ? '[' + c.to.join(', ') + ']' : 'source removed'}`);
+  }
 }
 
 // ---- redirects: the retired lines point to the line that replaced them ---------------------
 {
-  const known = [...new Set(repos.flatMap((r) => r.branches).filter((b) => b.startsWith('docs/')).map((b) => b.slice(5)))];
   const file = path.join(ROOT, 'scripts/retired-lines.json');
   const map = JSON.parse(fs.readFileSync(file, 'utf8'));
   const gone = known.filter(retired);
@@ -273,29 +286,16 @@ for (const file of ['antora-playbook.yml', 'antora-playbook-local.yml']) {
   }
 }
 
-// ---- What's new: keep the entries of the retired release candidate -------------------------
-{
-  const known = [...new Set(repos.flatMap((r) => r.branches).filter((b) => b.startsWith('docs/')).map((b) => b.slice(5)))];
-  const previous = known.filter(retired).sort((a, b) => semverKey(b) - semverKey(a))[0];
-  const base = known.filter((v) => !/-RC\d+$/.test(v) && semverKey(v) >= 0 && semverKey(v) < semverKey(VERSION))
-    .sort((a, b) => semverKey(b) - semverKey(a))[0];
-  if (previous && base) {
-    act(`What's new: ${VERSION} keeps the entries of ${previous} (base ${base})`, () => {
-      console.log(sh(`node scripts/cumulate-whats-new.js --from ${previous} --to ${VERSION} --base ${base} --workspace ${WORKSPACE}`, ROOT));
-    });
-    console.log(`Remember: the ecosystem What's new (content/home) is edited by hand for the ${VERSION} line.`);
-  }
-}
-
 act('vidocq-docs: commit playbooks + tutorials bump (push it yourself to trigger the deploy)', () => {
   sh('git add antora-playbook.yml antora-playbook-local.yml content/tutorials scripts/retired-lines.json', ROOT);
-  sh(`git commit -q -s -m "docs-site: publish the ${VERSION} release line (retention: last ${KEEP} + dev)"`, ROOT);
+  sh(`git commit -q -S -s -m "docs-site: publish the ${VERSION} release line (retention: last ${KEEP} + dev)"`, ROOT);
 });
 
 console.log('\n---');
 if (failures.length) { console.log('FAILURES:'); failures.forEach((f) => console.log('  ' + f)); }
 console.log(`Done${DRY ? ' (dry-run, nothing written)' : ''}. Reminders:
-  - git push (vidocq-docs) to trigger the site deploy, then check the run.
-  - vidocq only: bump cli-version in docs/en/antora.yml (main + docs/${VERSION}) if the CLI shipped a new version.
+  - git push (vidocq-docs) to trigger the site deploy, then check the run.${BUMP_BRANCH ? `
+  - open the pull request of ${BUMP_BRANCH} in each repository whose main takes pull requests only (the monorepo).` : ''}
+  - vidocq only: bump cli-version in vidocq-runtime/docs/en/antora.yml (main + docs/${VERSION}) if the CLI shipped a new version.
   - releases older than the ${KEEP}-version window left the playbook but their docs/* branches remain — re-add one to republish it.`);
 process.exit(failures.length ? 1 : 0);

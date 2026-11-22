@@ -2,6 +2,7 @@
 // Make the What's new pages of a release line cumulative.
 //
 //   node scripts/cumulate-whats-new.js --from 0.4.0-RC1 --to 0.4.0-RC2 --base 0.3.0 [--dry-run]
+//        [--workspace <dir>] [--playbook <file>] [--print <component>]
 //
 // When a documentation line is retired because a newer one of the same train replaces it (RC1 dropped
 // once RC2 is out, the RCs dropped once the final is out), the entries of the retired page must not
@@ -22,6 +23,7 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 const { execSync } = require('child_process');
+const { parseSources, versionedRepos, devStartPaths, versionOf, repoDir, defaultWorkspace } = require('./playbook-sources');
 
 const ROOT = path.resolve(__dirname, '..');
 const args = process.argv.slice(2);
@@ -31,8 +33,8 @@ const TO = opt('to');
 const BASE = opt('base');
 const DRY = args.includes('--dry-run');
 const PRINT = opt('print');
-const WORKSPACE = path.resolve(ROOT, opt('workspace', '..'));
-const PAGE = 'docs/en/modules/ROOT/pages/whats-new.adoc';
+const WORKSPACE = path.resolve(ROOT, opt('workspace', defaultWorkspace(ROOT)));
+const PAGE = 'modules/ROOT/pages/whats-new.adoc'; // under the folder of the component's antora.yml
 
 if (!FROM || !TO || !BASE) {
   console.error('usage: cumulate-whats-new.js --from <version> --to <version> --base <version> [--dry-run]');
@@ -106,38 +108,63 @@ ${[newest, ...older].map((s) => s.text).join('\n\n')}
 `;
 }
 
-// ---- discover versioned repos from the prod playbook --------------------------------------
-const playbook = fs.readFileSync(path.join(ROOT, 'antora-playbook.yml'), 'utf8');
-const repos = [];
-{
-  const lines = playbook.split('\n');
-  for (let i = 0; i < lines.length; i++) {
-    const m = lines[i].match(/-\s*url:\s*https:\/\/codefloe\.com\/Vidocq\/([\w-]+)\.git/);
-    if (m && /docs\//.test(lines[i + 1] || '')) repos.push(m[1]);
+// ---- discover the pages from the prod playbook ---------------------------------------------
+// A component is matched by its Antora name across lines, since its folder may differ between them: in the
+// monorepo, 0.4.0-RC2's runtime is at docs/en of docs/0.4.0-RC2 and its bricks at <brick>/docs/en of
+// docs-archive/0.4.0-RC2, while docs/0.4.0 has each under its folder of main. The <from> pages are found through the
+// sources that list a <from> branch, the <to> pages under the start paths of the sources that read main (docs/<to>
+// is cut from main), so run this before the retention window drops <from> from the playbook, as
+// cut-docs-release.js does; --playbook <file> reads another copy.
+const sources = parseSources(fs.readFileSync(path.resolve(ROOT, opt('playbook', 'antora-playbook.yml')), 'utf8'));
+const repos = versionedRepos(sources, []).filter((n) => n !== '.');
+
+// {component name -> {branch, page}} of one line of a repository.
+function pagesOf(dir, roots) {
+  const out = new Map();
+  for (const { branch, root } of roots) {
+    let yml;
+    try { yml = sh(`git show origin/${branch}:${root}/antora.yml`, dir); } catch { continue; }
+    const name = (/^name:\s*(\S+)/m.exec(yml) || [])[1];
+    if (name && !out.has(name)) out.set(name, { branch, page: `${root}/${PAGE}` });
   }
+  return out;
 }
 
 const failures = [];
 for (const name of repos) {
-  const dir = path.join(WORKSPACE, name);
+  const dir = repoDir(WORKSPACE, name);
+  if (!dir) { failures.push(`${name}: clone not found under ${WORKSPACE}`); continue; }
   try {
     sh('git fetch -q origin', dir);
-    const show = (b) => { try { return sh(`git show origin/docs/${b}:${PAGE}`, dir); } catch { return null; } };
-    const fromText = show(FROM);
-    const toText = show(TO);
-    if (!toText) { console.log(`${name}: no What's new page on docs/${TO} — skipped`); continue; }
-    if (!fromText) { console.log(`${name}: no What's new page on docs/${FROM} — skipped (nothing to keep)`); continue; }
-    const merged = cumulate(fromText, toText);
-    if (merged === null) { console.log(`${name}: docs/${TO} is already cumulative`); continue; }
-    const count = (t) => (t.match(/^\* /gm) || []).length;
-    console.log(`${name}: ${count(toText)} entries of ${TO} + ${count(fromText)} of ${FROM} -> ${count(merged)}${DRY ? ' (dry-run)' : ''}`);
-    if (PRINT === name) console.log(merged);
-    if (DRY) continue;
+    const fromRoots = sources.filter((s) => s.repo === name && (s.branches || []).some((b) => versionOf(b) === FROM))
+      .flatMap((s) => s.startPaths.map((root) => ({ branch: s.branches.find((b) => versionOf(b) === FROM), root })));
+    const toRoots = devStartPaths(sources, name).map((root) => ({ branch: `docs/${TO}`, root }));
+    const from = pagesOf(dir, fromRoots);
+    const to = pagesOf(dir, toRoots);
+    if (!to.size) { console.log(`${name}: no component on docs/${TO} — skipped`); continue; }
+    const writes = [];
+    for (const [component, t] of to) {
+      const label = name === component ? name : `${name}/${component}`;
+      const show = (loc) => { try { return sh(`git show origin/${loc.branch}:${loc.page}`, dir); } catch { return null; } };
+      const toText = show(t);
+      const fromText = from.has(component) ? show(from.get(component)) : null;
+      if (!toText) { console.log(`${label}: no What's new page on docs/${TO} — skipped`); continue; }
+      if (!fromText) { console.log(`${label}: no What's new page on the ${FROM} line — skipped (nothing to keep)`); continue; }
+      const merged = cumulate(fromText, toText);
+      if (merged === null) { console.log(`${label}: docs/${TO} is already cumulative`); continue; }
+      const count = (x) => (x.match(/^\* /gm) || []).length;
+      console.log(`${label}: ${count(toText)} entries of ${TO} + ${count(fromText)} of ${FROM} -> ${count(merged)}${DRY ? ' (dry-run)' : ''}`);
+      if (PRINT === component) console.log(merged);
+      writes.push({ page: t.page, merged });
+    }
+    if (DRY || !writes.length) continue;
     const wt = fs.mkdtempSync(path.join(os.tmpdir(), `cumul-${name}-`));
     sh(`git worktree add -q ${wt} origin/docs/${TO}`, dir);
-    fs.writeFileSync(path.join(wt, PAGE), merged);
-    sh(`git add ${PAGE}`, wt);
-    sh(`git commit -q -S -s -m "docs(whats-new): keep the ${FROM} entries in the ${TO} page"`, wt);
+    for (const w of writes) {
+      fs.writeFileSync(path.join(wt, w.page), w.merged);
+      sh(`git add ${w.page}`, wt);
+    }
+    sh(`git commit -q -S -s -m "docs(whats-new): keep the ${FROM} entries in the ${TO} pages"`, wt);
     sh(`git push -q origin HEAD:refs/heads/docs/${TO}`, wt);
     sh(`git worktree remove --force ${wt}`, dir);
   } catch (e) {

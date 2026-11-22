@@ -81,9 +81,21 @@ to both playbooks):
 
 [source,bash]
 ----
-node scripts/cut-docs-release.js --version 0.3.0 --next 0.4.0-SNAPSHOT
+node scripts/cut-docs-release.js --version 0.4.0 --next 0.5.0-SNAPSHOT \
+    --bump-branch chore/docs-dev-line-0.5.0
 git push        # triggers the deploy
 ----
+
+The monorepo (`Vidocq/vidocq`) is cut once for all its components: `docs/X`
+branches from its `main`, and every `antora.yml` under the start paths of the
+playbook source that reads `main` is pinned there. That source alone gets
+`docs/X`: the other sources of the monorepo (the old runtime layout of
+`docs/0.3.0`, the `docs-archive/*` branches of the bricks) only leave the
+retention window, and one left without a line leaves the playbook. Its `main`
+takes pull requests only, hence `--bump-branch`: open the pull request of that
+branch afterwards. The script finds the clones in the mani workspace
+(`<repo>/main`) or next to vidocq-docs; `--workspace <dir>` overrides.
+`node --test scripts/` runs the tests of the playbook rewriting.
 
 Add `--dry-run` to preview, `--include <repo>` the first time a new brick
 (e.g. erasmus) joins the train, `--keep N` to change the retention window.
