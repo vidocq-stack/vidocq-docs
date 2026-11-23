@@ -102,8 +102,9 @@ Add `--dry-run` to preview, `--include <repo>` the first time a new brick
 Branches dropped from the window are kept in git — re-add one to the
 `branches:` lists to republish that version.
 
-Two caveats the script reminds you about: `cli-version` (vidocq) is bumped by
-hand when the CLI ships, and a docs fix that must also appear in a released
+Two caveats the script reminds you about: the ecosystem What's new page of
+`content/home` is written by hand (add the section of the release and repin
+its links), and a docs fix that must also appear in a released
 line is cherry-picked onto its `docs/<version>` branch (`notify-docs`
 rebuilds on `docs/*` pushes too).
 

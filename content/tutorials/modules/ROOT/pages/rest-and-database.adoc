@@ -2,7 +2,7 @@
 :description: Add persistence to a Vidocq application — a Jakarta Data repository (Mansart) over a pooled datasource, transactions, Flyway migrations, and PostgreSQL started for you in dev mode and tests.
 
 [.lead]
-This tutorial continues from xref:your-first-app.adoc[Your first Vidocq application] and gives the app a real database: a `Product` entity, a Jakarta Data repository generated at compile time by Mansart, a virtual-thread-native connection pool, `@Transactional` methods and a Flyway migration. In dev mode and in tests, a PostgreSQL container is started for you. Like the first tutorial, it follows the `{project-version}` development line.
+This tutorial continues from xref:your-first-app.adoc[Your first Vidocq application] and gives the app a real database: a `Product` entity, a Jakarta Data repository generated at compile time by Mansart, a virtual-thread-native connection pool, `@Transactional` methods and a Flyway migration. In dev mode and in tests, a PostgreSQL container is started for you. Like the first tutorial, it is written for Vidocq `{project-version}`.
 
 == What you will build
 
@@ -252,9 +252,9 @@ vidocq config set vidocq.pool.username todo
 
 == Going further
 
-* **Named datasources** — declare a second pool with `vidocq.pool.<name>.*` keys and route a repository to it with `@Repository(dataStore = "<name>")`; `@Inject @Named("<name>") DataSource` injects it anywhere. See xref:dev@vidocq::modules/vidocq-runtime-extensions.adoc[the runtime extensions page] for the setup.
-* **Repositories shipped in a library** — `@Repository` interfaces of a dependency jar are implemented at build time like yours. See xref:dev@mansart::usage.adoc#dependency-repositories[Mansart usage].
-* xref:dev@mansart::usage.adoc[Mansart usage] — derived queries, JDQL, pagination, pool sizing.
-* xref:dev@mansart::concepts.adoc[Mansart concepts] — how the repository implementations are generated.
-* xref:dev@vidocq::dev-services.adoc[Dev services] — the PostgreSQL, Keycloak and OpenTelemetry dev services, their settings and how to turn them off.
+* **Named datasources** — declare a second pool with `vidocq.pool.<name>.*` keys and route a repository to it with `@Repository(dataStore = "<name>")`; `@Inject @Named("<name>") DataSource` injects it anywhere. See xref:{page-component-version}@vidocq::modules/vidocq-runtime-extensions.adoc[the runtime extensions page] for the setup.
+* **Repositories shipped in a library** — `@Repository` interfaces of a dependency jar are implemented at build time like yours. See xref:{page-component-version}@mansart::usage.adoc#dependency-repositories[Mansart usage].
+* xref:{page-component-version}@mansart::usage.adoc[Mansart usage] — derived queries, JDQL, pagination, pool sizing.
+* xref:{page-component-version}@mansart::concepts.adoc[Mansart concepts] — how the repository implementations are generated.
+* xref:{page-component-version}@vidocq::dev-services.adoc[Dev services] — the PostgreSQL, Keycloak and OpenTelemetry dev services, their settings and how to turn them off.
 * The complete runnable example: `vidocq-runtime-examples/vidocq-runtime-mansart-h2-example` in {repo-vidocq}[Vidocq/vidocq] — H2, XA transactions, OpenAPI and a small UI on top of what you just built.

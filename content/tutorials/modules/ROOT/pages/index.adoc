@@ -2,7 +2,7 @@
 :description: Step-by-step, end-to-end guides for building applications with the Vidocq runtime.
 
 [.lead]
-These tutorials walk you through building real applications with Vidocq, one step at a time. Each one is self-contained, starts from an empty directory (or from the previous tutorial), and follows the `{project-version}` development line: every command has been run with the CLI of that line, and the CLI writes the `pom.xml` and `module-info.java` changes each step needs.
+These tutorials walk you through building real applications with Vidocq, one step at a time. Each one is self-contained, starts from an empty directory (or from the previous tutorial), and is written for Vidocq `{project-version}`: every command has been run with the CLI of that version, and the CLI writes the `pom.xml` and `module-info.java` changes each step needs.
 
 [cols="1,2",options="header"]
 |===
@@ -19,5 +19,5 @@ These tutorials walk you through building real applications with Vidocq, one ste
 ====
 Tutorials are *learning-oriented*: they take you somewhere, in order. If you are
 looking for the reference material instead, each component of the sidebar has its
-own documentation — start with the xref:vidocq::index.adoc[Vidocq Runtime] pages.
+own documentation — start with the xref:{page-component-version}@vidocq::index.adoc[Vidocq Runtime] pages.
 ====

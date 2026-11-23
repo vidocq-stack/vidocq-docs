@@ -27,6 +27,7 @@ TIP: With https://sdkman.io[SDKMAN!]: `sdk install java 25-tem`.
 
 == Step 1 — Install the CLI
 
+ifeval::["{docs-line}" == "dev"]
 [source,bash]
 ----
 curl -fsSL https://vidocq.dev/install.sh | VIDOCQ_VERSION=snapshot sh
@@ -40,6 +41,22 @@ $env:VIDOCQ_VERSION = "snapshot"; irm https://vidocq.dev/install.ps1 | iex
 ----
 
 The script downloads the latest CLI of the development line into `~/.vidocq/cli` and puts a `vidocq` launcher in `~/.local/bin`. Verify:
+endif::[]
+ifeval::["{docs-line}" != "dev"]
+[source,bash,subs=attributes+]
+----
+curl -fsSL https://vidocq.dev/install.sh | VIDOCQ_VERSION={project-version} sh
+----
+
+On Windows (PowerShell):
+
+[source,powershell,subs=attributes+]
+----
+$env:VIDOCQ_VERSION = "{project-version}"; irm https://vidocq.dev/install.ps1 | iex
+----
+
+The script downloads the {project-version} CLI from Maven Central into `~/.vidocq/cli` and puts a `vidocq` launcher in `~/.local/bin`. Verify:
+endif::[]
 
 [source,bash,subs=attributes+]
 ----
@@ -47,7 +64,12 @@ $ vidocq version
 Vidocq CLI {project-version} (built …)
 ----
 
+ifeval::["{docs-line}" == "dev"]
 NOTE: Without `VIDOCQ_VERSION=snapshot`, the script installs the latest release from Maven Central; this tutorial then needs the {release-version} version of these pages.
+endif::[]
+ifeval::["{docs-line}" != "dev"]
+NOTE: Without `VIDOCQ_VERSION`, the script installs the latest release, which may be newer than these pages: pick its version in the version selector. `VIDOCQ_VERSION=snapshot` installs the latest build of `main`, which the `dev` version of these pages follows.
+endif::[]
 
 == Step 2 — Scaffold the project
 
@@ -199,7 +221,7 @@ ifeval::["{docs-line}" == "dev"]
 endif::[]
 * *Dependencies.* `vidocq-runtime-core` and the extension you chose (`vidocq-runtime-cassini-rest-extension`), plus the test dependencies. There is no version on them: the BOM manages it.
 
-NOTE: `vidocq create --with-parent` writes the previous style, a pom that inherits `io.vidocq.runtime:vidocq-runtime-parent`. `vidocq pom convert --to parentless` (or `--to parent`) moves an existing pom from one style to the other. Both builds give the same result; see xref:dev@vidocq::modules/vidocq-runtime-maven-plugin.adoc#parentless[An application without the parent].
+NOTE: `vidocq create --with-parent` writes the previous style, a pom that inherits `io.vidocq.runtime:vidocq-runtime-parent`. `vidocq pom convert --to parentless` (or `--to parent`) moves an existing pom from one style to the other. Both builds give the same result; see xref:{page-component-version}@vidocq::modules/vidocq-runtime-maven-plugin.adoc#parentless[An application without the parent].
 
 There is no main class: the runtime boots the application (`vidocq create --main` adds one, for an IDE Run configuration). Run `vidocq extension list --available` to see every extension, and `vidocq create --help` for the options (`--package`, `--open-module`, …).
 
@@ -243,7 +265,7 @@ Rebuilding after each change gets old quickly. Dev mode runs the application and
 vidocq dev
 ----
 
-Leave it running. Edit the text in `HelloResource`, save, and `curl` again: the new text is served a few seconds later, without a restart of the JVM. Dev mode also starts the xref:dev@vidocq::dev-services.adoc[dev services] your extensions need (none yet) and serves the dev console.
+Leave it running. Edit the text in `HelloResource`, save, and `curl` again: the new text is served a few seconds later, without a restart of the JVM. Dev mode also starts the xref:{page-component-version}@vidocq::dev-services.adoc[dev services] your extensions need (none yet) and serves the dev console.
 
 == Step 5 — Serve JSON
 
@@ -318,7 +340,7 @@ JSON serialization is handled by Champollion (JSON-B 3.0): no annotation, no con
 ====
 An application is a Java module, and JSON-B would normally read `Todo` by reflection, which needs its package opened. Here it does not: `Todo` is a record a resource returns, so the build generates its JSON-B binding — plain code that reads and writes it, without reflection — and there is nothing to open.
 
-When a type does keep the reflective mapping (one the generated code cannot map — an abstract class or an interface as a property type, a getter overridden in a subclass, … — named in the build output), its package must be opened: `vidocq dev` writes the line into `module-info.java` itself, in a block marked `// vidocq:reflection`; outside dev mode, `./mvnw package` stops with that line, and `vidocq doctor --fix` writes it. xref:dev@vidocq::java-modules.adoc[Java modules in a Vidocq application] explains what is generated, what is checked, and how to opt out with an `open module`.
+When a type does keep the reflective mapping (one the generated code cannot map — an abstract class or an interface as a property type, a getter overridden in a subclass, … — named in the build output), its package must be opened: `vidocq dev` writes the line into `module-info.java` itself, in a block marked `// vidocq:reflection`; outside dev mode, `./mvnw package` stops with that line, and `vidocq doctor --fix` writes it. xref:{page-component-version}@vidocq::java-modules.adoc[Java modules in a Vidocq application] explains what is generated, what is checked, and how to opt out with an `open module`.
 ====
 
 == Step 6 — Test
@@ -379,12 +401,12 @@ docker run --rm -p 8080:8080 todo:1.0.0-SNAPSHOT
 curl http://localhost:8080/hello
 ----
 
-Without Docker, the CLI says so and prints the `docker build` command to run later. See xref:dev@vidocq::usage.adoc[Usage] for jlink, jpackage and Docker options.
+Without Docker, the CLI says so and prints the `docker build` command to run later. See xref:{page-component-version}@vidocq::usage.adoc[Usage] for jlink, jpackage and Docker options.
 
 == Where to next
 
 * xref:rest-and-database.adoc[Tutorial — REST + database]: give the `todo` app a real database with Mansart (Jakarta Data), PostgreSQL in dev mode and Flyway migrations.
-* xref:dev@vidocq::getting-started.adoc[Runtime getting-started]: the condensed version of this journey.
-* xref:dev@vidocq::java-modules.adoc[Java modules in a Vidocq application]: what the tooling checks and writes for you.
-* xref:dev@vidocq::concepts.adoc[Runtime concepts]: extensions, build steps, recorders — how the machinery works.
+* xref:{page-component-version}@vidocq::getting-started.adoc[Runtime getting-started]: the condensed version of this journey.
+* xref:{page-component-version}@vidocq::java-modules.adoc[Java modules in a Vidocq application]: what the tooling checks and writes for you.
+* xref:{page-component-version}@vidocq::concepts.adoc[Runtime concepts]: extensions, build steps, recorders — how the machinery works.
 * https://vidocq.dev/blog[The Vidocq blog] — walkthroughs and release notes.

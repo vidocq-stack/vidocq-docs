@@ -85,7 +85,7 @@ This page compares Vidocq Runtime to the contemporary Java runtimes closest in i
 
 [NOTE]
 ====
-Cold start, resident memory and image size depend heavily on application size and on the AOT/JIT choice. Those numbers are recorded per module in the respective `BENCH.md` files (lien:{repo-chappe}/src/branch/main/BENCH.md[Chappe], lien:{repo-cassini}/src/branch/main/BENCH.md[Cassini], lien:{repo-champollion}/src/branch/main/BENCH.md[Champollion]) and cross-checked against the examples in the `compare-to/` directory.
+Cold start, resident memory and image size depend heavily on application size and on the AOT/JIT choice. Those numbers are recorded per module in the respective `BENCH.md` files (link:{repo-chappe}/BENCH.md[Chappe], link:{repo-cassini}/BENCH.md[Cassini], link:{repo-champollion}/BENCH.md[Champollion]). The same service written for Vidocq, Quarkus, Helidon MP, Spring Boot and Open Liberty, with the load scripts and the reports, is in the link:{repo-benchmarks}[vidocq-benchmarks] repository (`bench-http-cdi-rest/apps/`).
 ====
 
 == Compared with Jakarta EE application servers
@@ -144,15 +144,15 @@ The programming model is the same one: Jakarta CDI, REST and Data annotations, M
 
 == Coming from Quarkus
 
-Vidocq Runtime shares Quarkus's build-time philosophy: **BuildStep**, **BuildItem**, **Recorder**, extension SPI. The main difference is the execution model: Vidocq uses virtual threads by default, where Quarkus stays mostly reactive (Mutiny). No cosmetic migration is required on the Jakarta REST 4.0 side — resource code stays the same. Reference example: `compare-to/quarkus-rest-example/`.
+Vidocq Runtime shares Quarkus's build-time philosophy: **BuildStep**, **BuildItem**, **Recorder**, extension SPI. The main difference is the execution model: Vidocq uses virtual threads by default, where Quarkus stays mostly reactive (Mutiny). No cosmetic migration is required on the Jakarta REST 4.0 side — resource code stays the same. Reference example: `bench-http-cdi-rest/apps/quarkus-classic/` in link:{repo-benchmarks}[vidocq-benchmarks].
 
 == Coming from Helidon SE 4
 
-Helidon SE and Vidocq share the **virtual threads** bet as the default model and the simplicity of a clean HTTP server. The central difference: Helidon SE has no CDI container and no build-time codegen — every endpoint is registered programmatically, and reflection remains in the JSON path (Yasson). Vidocq Runtime removes reflection from the chain. Reference example: `compare-to/helidon4-rest-example/`.
+Helidon SE and Vidocq share the **virtual threads** bet as the default model and the simplicity of a clean HTTP server. The central difference: Helidon SE has no CDI container and no build-time codegen — every endpoint is registered programmatically, and reflection remains in the JSON path (Yasson). Vidocq Runtime removes reflection from the chain.
 
 == Coming from Spring Boot 4
 
-Spring's model relies on auto-configuration and bootstrap reflection. Vidocq Runtime replaces it with an explicit extension SPI and compile-time code generation. API mapping: `@RestController` becomes `@Path`, `@Autowired` becomes `@Inject` (CDI 4.1 Lite), Spring Data JPA becomes Jakarta Data 1.0 (Mansart). No direct equivalent to `@SpringBootApplication` — Vidocq Runtime bootstrap is explicit and minimal. Reference example: `compare-to/springboot4-rest-example/`.
+Spring's model relies on auto-configuration and bootstrap reflection. Vidocq Runtime replaces it with an explicit extension SPI and compile-time code generation. API mapping: `@RestController` becomes `@Path`, `@Autowired` becomes `@Inject` (CDI 4.1 Lite), Spring Data JPA becomes Jakarta Data 1.0 (Mansart). No direct equivalent to `@SpringBootApplication` — Vidocq Runtime bootstrap is explicit and minimal. Reference example: `bench-http-cdi-rest/apps/spring-boot/` in link:{repo-benchmarks}[vidocq-benchmarks].
 
 == Drill deeper
 

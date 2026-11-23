@@ -23,8 +23,12 @@ flowchart TB
     subgraph REST["Jakarta REST / Servlet"]
         CASSINI[Cassini<br/>Jakarta REST 4.0]
         FOY[Foy<br/>Jakarta Servlet 6.1]
-        PEANO[Peano<br/>Jakarta EL 6.0 - in development]
-        IBARRA[Ibarra<br/>Jakarta Pages 4.0 - in development]
+        PEANO["Peano<br/>Jakarta EL 6.0 - new in 0.4.0"]
+        IBARRA["Ibarra<br/>Jakarta Pages 4.0 - new in 0.4.0"]
+        BODONI["Bodoni<br/>Jakarta Standard Tag Library 3.0 - new in 0.4.0"]
+    end
+    subgraph Security["Security"]
+        KERCKHOFFS["Kerckhoffs<br/>Jakarta Security 4.0 - preview, new in 0.4.0"]
     end
     subgraph Serialization["Serialization"]
         CHAMPOLLION[Champollion<br/>JSON-P 2.1 + JSON-B 3.0]
@@ -34,30 +38,35 @@ flowchart TB
     end
     subgraph Persistence["Persistence &amp; validation"]
         MANSART[Mansart<br/>Jakarta Data 1.0 + Transactions]
-        NOETHER[Noether<br/>Jakarta Persistence 3.2 - in development]
-        ERASMUS[Erasmus<br/>Jakarta Validation 3.1 - in development]
+        NOETHER["Noether<br/>Jakarta Persistence 3.2 - preview, new in 0.4.0"]
+        ERASMUS[Erasmus<br/>Jakarta Validation 3.1 - not released yet]
     end
     subgraph Messaging["Messaging"]
-        TASSIS[Tassis<br/>Jakarta Messaging 3.1 - in development]
+        TASSIS[Tassis<br/>Jakarta Messaging 3.1 - not released yet]
     end
     subgraph MicroProfile["MicroProfile"]
         RAVEL[Ravel<br/>Config 3.1]
         KNOCK[Knock<br/>Health 4.0]
         DIRAC[Dirac<br/>Metrics 5.1]
         HEISENBERG[Heisenberg<br/>Fault Tolerance 4.1]
-        CERVANTES[Cervantes<br/>JWT 2.1]
+        CERVANTES[Cervantes<br/>JWT 2.2]
         CYRANO[Cyrano<br/>Rest Client 4.0]
-        HUMBOLDT[Humboldt<br/>Telemetry 2.1]
-        GRIMM[Grimm<br/>OpenAPI 4.1]
+        HUMBOLDT[Humboldt<br/>Telemetry 2.2]
+        GRIMM[Grimm<br/>OpenAPI 4.2]
     end
     subgraph Transport["HTTP transport"]
-        CHAPPE[Chappe<br/>HTTP/1.1 + H2 + H3]
+        CHAPPE[Chappe<br/>HTTP/1.1 + HTTP/2]
     end
 
     VIDOCQ --> CASSINI
     VIDOCQ --> FOY
+    VIDOCQ --> PEANO
+    VIDOCQ --> IBARRA
+    VIDOCQ --> BODONI
+    VIDOCQ --> KERCKHOFFS
     VIDOCQ --> VAUBAN
     VIDOCQ --> MANSART
+    VIDOCQ --> NOETHER
     VIDOCQ --> RAVEL
     VIDOCQ --> KNOCK
     VIDOCQ --> DIRAC
@@ -77,14 +86,19 @@ flowchart TB
     FOY --> CHAPPE
     FOY --> VAUBAN
     MANSART --> VAUBAN
-    ERASMUS -.-> VAUBAN
-    IBARRA -.-> FOY
-    IBARRA -.-> PEANO
-    NOETHER -.-> MANSART
+    IBARRA --> FOY
+    IBARRA --> PEANO
+    BODONI -.-> IBARRA
+    BODONI -.-> PEANO
+    KERCKHOFFS --> FOY
+    KERCKHOFFS -.-> VAUBAN
+    NOETHER --> MANSART
     NOETHER -.-> VAUBAN
+    ERASMUS -.-> VAUBAN
+    TASSIS -.-> VAUBAN
 ....
 
-Each module is an independent project, released separately, with its own life-cycle. Vidocq Runtime assembles them through a Quarkus-inspired extension SPI.
+All the modules but Erasmus and Tassis live in one repository, `Vidocq/vidocq`, and are released together under one version. Vidocq Runtime assembles them through a Quarkus-inspired extension SPI. A dotted arrow is an integration that is optional, or that the Vidocq Runtime extension assembles.
 
 == Why a new runtime?
 
@@ -100,87 +114,95 @@ Three reasons:
 
 [cols="1,3,2",options="header"]
 |===
-| Component | Role | Repository
+| Component | Role | Sources
 
 | xref:vidocq::index.adoc[Vidocq Runtime]
 | MicroProfile application server, extension orchestrator
-| {repo-vidocq}
+| link:{repo-vidocq}[Vidocq/vidocq]
 
 | xref:vauban::index.adoc[Vauban]
 | CDI 4.1 Lite container, build-time, native Java Modules
-| {repo-vauban}
+| link:{repo-vauban}[vauban]
 
 | xref:cassini::index.adoc[Cassini]
 | Jakarta REST 4.0 / JAX-RS implementation
-| {repo-cassini}
+| link:{repo-cassini}[cassini]
 
 | xref:champollion::index.adoc[Champollion]
 | Jakarta JSON-P 2.1 + JSON-B 3.0 implementation
-| {repo-champollion}
+| link:{repo-champollion}[champollion]
 
 | xref:chappe::index.adoc[Chappe]
-| HTTP/1.1 + HTTP/2 server (HTTP/3 in progress), virtual threads, zero dependency
-| {repo-chappe}
+| HTTP/1.1 + HTTP/2 server with WebSocket (HTTP/3 planned), virtual threads, zero dependency
+| link:{repo-chappe}[chappe]
 
 | xref:foy::index.adoc[Foy]
 | Jakarta Servlet 6.1 implementation
-| {repo-foy}
+| link:{repo-foy}[foy]
 
 | xref:peano::index.adoc[Peano]
-| Jakarta Expression Language 6.0 implementation *(in development, not released yet)*
-| {repo-peano}
+| Jakarta Expression Language 6.0 implementation *(new in 0.4.0)*
+| link:{repo-peano}[peano]
 
 | xref:ibarra::index.adoc[Ibarra]
-| Jakarta Pages 4.0 (JSP) implementation, pages precompiled at build time *(in development, not released yet)*
-| {repo-ibarra}
+| Jakarta Pages 4.0 (JSP) implementation, pages precompiled at build time *(new in 0.4.0)*
+| link:{repo-ibarra}[ibarra]
+
+| xref:bodoni::index.adoc[Bodoni]
+| Jakarta Standard Tag Library 3.0 (JSTL) implementation *(new in 0.4.0)*
+| link:{repo-bodoni}[bodoni]
 
 | xref:mansart::index.adoc[Mansart]
 | Jakarta Data 1.0, Jakarta Transactions and the JDBC pool
-| {repo-mansart}
+| link:{repo-mansart}[mansart]
 
 | xref:noether::index.adoc[Noether]
-| Jakarta Persistence 3.2 implementation, extracted from Mansart *(in development, not released yet)*
-| {repo-noether}
+| Jakarta Persistence 3.2 implementation, extracted from Mansart *(preview, new in 0.4.0)*
+| link:{repo-noether}[noether]
+
+| xref:kerckhoffs::index.adoc[Kerckhoffs]
+| Jakarta Security 4.0 implementation *(preview, new in 0.4.0)*
+| link:{repo-kerckhoffs}[kerckhoffs]
 
 | xref:erasmus::index.adoc[Erasmus]
-| Jakarta Validation 3.1 implementation *(in development, not released yet)*
-| {repo-erasmus}
+| Jakarta Validation 3.1 implementation *(not released yet)*
+| link:{repo-erasmus}[Vidocq/erasmus]
 
 | xref:tassis::index.adoc[Tassis]
-| Jakarta Messaging 3.1 provider with its own in-memory broker, open to the network over AMQP 1.0 *(in development, not released yet)*
-| {repo-tassis}
+| Jakarta Messaging 3.1 provider with its own in-memory broker, open to the network over AMQP 1.0 *(not released yet)*
+| link:{repo-tassis}[Vidocq/tassis]
 
 | xref:ravel::index.adoc[Ravel]
 | MicroProfile Config 3.1 implementation
-| {repo-ravel}
+| link:{repo-ravel}[ravel]
 
 | xref:knock::index.adoc[Knock]
 | MicroProfile Health 4.0 implementation
-| {repo-knock}
+| link:{repo-knock}[knock]
 
 | xref:dirac::index.adoc[Dirac]
 | MicroProfile Metrics 5.1 implementation
-| {repo-dirac}
+| link:{repo-dirac}[dirac]
 
 | xref:heisenberg::index.adoc[Heisenberg]
 | MicroProfile Fault Tolerance 4.1 implementation
-| {repo-heisenberg}
+| link:{repo-heisenberg}[heisenberg]
 
 | xref:cervantes::index.adoc[Cervantes]
-| MicroProfile JWT 2.1 implementation
-| {repo-cervantes}
+| MicroProfile JWT 2.2 implementation
+| link:{repo-cervantes}[cervantes]
 
 | xref:cyrano::index.adoc[Cyrano]
 | MicroProfile Rest Client 4.0 implementation
-| {repo-cyrano}
+| link:{repo-cyrano}[cyrano]
 
 | xref:humboldt::index.adoc[Humboldt]
-| MicroProfile Telemetry 2.1 implementation
-| {repo-humboldt}
+| MicroProfile Telemetry 2.2 implementation
+| link:{repo-humboldt}[humboldt]
 
 | xref:grimm::index.adoc[Grimm]
-| MicroProfile OpenAPI 4.1 implementation
-| {repo-grimm}
+| MicroProfile OpenAPI 4.2 implementation
+| link:{repo-grimm}[grimm]
 |===
 
 == Cross-cutting pages
@@ -194,32 +216,37 @@ Three reasons:
 
 [CAUTION]
 ====
-The suite is released as **0.2.x on Maven Central** — an **alpha**: APIs may still change and production use is not recommended yet. Bug reports from early adopters are very welcome on https://codefloe.com/Vidocq[Codefloe].
+The suite is released on **Maven Central** as an **alpha**: APIs may still change and production use is not recommended yet. Bug reports from early adopters are very welcome on https://codefloe.com/Vidocq[Codefloe].
 ====
 
 The documentation you are reading is versioned: the default pages describe the
-**0.2.0 release**, and the `dev` version of each component (version selector in
-the sidebar) tracks the current `0.3.0-SNAPSHOT` development line.
+**latest release**, and the `dev` version of each component (version selector in
+the sidebar) follows `main`, the development line.
 
 What works today:
 
-* Chappe — HTTP/1.1, HTTP/2, virtual threads, RFC 9110/9112/9113 conformance.
+* Chappe — HTTP/1.1, HTTP/2, WebSocket (RFC 6455), virtual threads, RFC 9110/9112/9113 conformance.
 * Vauban — build-time CDI 4.1 Lite, official CDI Lite TCK **774/774**.
-* Cassini — Jakarta REST 4.0, official TCK at **2538 tests green**.
-* Champollion — JSON-P 2.1 (**178/179**) + JSON-B 3.0 (**289/295**), APT generation.
-* Foy — Servlet 6.1, ~95 % of the official TCK `api.*` packages (web fragments pending).
-* Vidocq Runtime — orchestrator and CLI; the assembled runtime passes **1868 official MicroProfile 7.1 TCK tests** across all eight component specs (Config, Health, Metrics, Fault Tolerance, JWT, Rest Client, Telemetry, OpenAPI), with Jakarta Core Profile 11 certification in preparation.
+* Cassini — Jakarta REST 4.0, official TCK green on every test that applies to the Core Profile (xref:cassini::tck.adoc[TCK status]).
+* Champollion — JSON-P 2.1 (**179/179**) + JSON-B 3.0 (**290/295**, the 5 others are disabled in the TCK itself), APT generation.
+* Foy — Servlet 6.1, official TCK **1707 passing of 1714 run** (the 7 skipped are HTTP/2 server push); Jakarta WebSocket 2.2 server, programmatic API.
+* Peano — Jakarta Expression Language 6.0, official TCK **361/361** (new in 0.4.0).
+* Ibarra — Jakarta Pages 4.0, pages precompiled at build time, on Foy and Peano, official TCK **682/682** (new in 0.4.0).
+* Bodoni — Jakarta Standard Tag Library 3.0; the official Tags tests pass **541/541** on Ibarra, Foy and Peano, a compatibility measurement, not a certification (new in 0.4.0).
+* Vidocq Runtime — orchestrator and CLI; the assembled runtime passes **1888 official MicroProfile TCK tests** across all eight component specs (Config, Health, Metrics, Fault Tolerance, JWT, Rest Client, Telemetry, OpenAPI) — the seven of the MicroProfile 7.2 platform, OpenAPI and Telemetry on its release-candidate TCKs, plus Metrics; its Jakarta EE Core Profile 11 compatibility request is filed and accepted.
 * MicroProfile bricks — Config (Ravel), Health (Knock), Metrics (Dirac), Fault Tolerance (Heisenberg), JWT (Cervantes), Rest Client (Cyrano), Telemetry (Humboldt), OpenAPI (Grimm), each wired into Vidocq Runtime through an extension and covered by its own TCK page.
+
+In preview (released, not complete or not certified):
+
+* Noether — Jakarta Persistence 3.2, extracted from Mansart (Mansart keeps Jakarta Data 1.0, which already ships); new in 0.4.0.
+* Kerckhoffs — Jakarta Security 4.0: identity stores, BASIC and FORM authentication, `@RememberMe`, authorization of web resources; new in 0.4.0.
 
 Work in progress:
 
-* Noether — Jakarta Persistence 3.2, extracted from Mansart (Mansart keeps Jakarta Data 1.0, which already ships).
-* Peano — Jakarta Expression Language 6.0 (official TCK 361/361, first release upcoming).
-* Ibarra — Jakarta Pages 4.0, pages precompiled at build time, on Foy and Peano.
-* Tassis — Jakarta Messaging 3.1 with an in-memory broker, in the JVM or over AMQP 1.0 (official TCK 903/903 of the applicable tests, first release upcoming).
-* Erasmus — Jakarta Validation 3.1 (engine and built-in constraints working, first release upcoming).
-* WebSocket — Chappe + Foy.
-* HTTP/3 / QUIC — Chappe.
+* Tassis — Jakarta Messaging 3.1 with an in-memory broker, in the JVM or over AMQP 1.0 (official TCK 903/903 of the applicable tests, not released yet).
+* Erasmus — Jakarta Validation 3.1 (engine and built-in constraints working, not released yet).
+* Jakarta WebSocket 2.2 — annotated endpoints and the official TCK, on Foy.
+* HTTP/3 / QUIC — Chappe, planned.
 
 Full per-module breakdown: xref:roadmap.adoc[Consolidated roadmap].
 

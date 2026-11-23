@@ -7,7 +7,21 @@ Each component keeps its own What's new page. Since the 0.3.0 release the ecosys
 [#dev]
 == Since 0.4.0-RC2 (development line)
 
-Nothing documented yet. The What's new page of a component on its `dev` line lists what landed after 0.4.0-RC2: xref:dev@vidocq::whats-new.adoc[Vidocq Runtime], xref:dev@vauban::whats-new.adoc[Vauban], xref:dev@cassini::whats-new.adoc[Cassini] and the other components. The entries land there first, with the [.tag-new]#NEW# badge on the section they point to.
+The What's new page of a component on its `dev` line lists what landed after 0.4.0-RC2: xref:dev@vidocq::whats-new.adoc[Vidocq Runtime], xref:dev@vauban::whats-new.adoc[Vauban], xref:dev@cassini::whats-new.adoc[Cassini] and the other components. The entries land there first, with the [.tag-new]#NEW# badge on the section they point to.
+
+=== Component by component
+
+* xref:dev@vidocq::whats-new.adoc[Vidocq Runtime] — extensions for Jakarta Persistence (Noether), Jakarta Standard Tag Library (Bodoni), Jakarta WebSocket (Foy) and, as a preview, Jakarta Security (Kerckhoffs); build compatible extensions frozen at build; hot swap of method bodies under `vidocq dev`; an application without `vidocq-runtime-parent`, `vidocq pom convert` and `vidocq pom upgrade`; the pools answer JNDI names; a jlink image with one layer.
+* xref:dev@vauban::whats-new.adoc[Vauban] — the freeze of build compatible extensions, client proxies of synthetic beans generated at build, about 280 fewer classes loaded at start, CDI conformance fixes.
+* xref:dev@cassini::whats-new.adoc[Cassini] — Jakarta REST as a Servlet (`cassini-servlet`), filter and sub-resource locator conformance fixes, `rx()` and TLS on the client.
+* xref:dev@foy::whats-new.adoc[Foy] — hooks for Jakarta Authentication and Authorization runtimes, `CurrentRequest`, a `web.xml` servlet that is a bean is injected, the static resources of a jlink image.
+* xref:dev@mansart::whats-new.adoc[Mansart] — a two-phase commit that reaches every resource, the transaction timeout applied, a compacted recovery journal, pooled XA connections; *Jakarta Data no longer quotes table and column names*, which breaks an H2 schema created with quoted lower-case names.
+* xref:dev@champollion::whats-new.adoc[Champollion] — generic and qualified JSON-B adapters as container beans, the same generated files at every build.
+* xref:dev@ravel::whats-new.adoc[Ravel] and xref:dev@cervantes::whats-new.adoc[Cervantes] — the configuration checked at start by a `Startup` observer, in a packaged application too; Cervantes refuses a cleartext remote JWKS location.
+* xref:dev@dirac::whats-new.adoc[Dirac] — metrics on inherited methods and on interceptor bindings, inherited gauges.
+* xref:dev@heisenberg::whats-new.adoc[Heisenberg] — definition errors reported at compile time, the interceptor priority applied at start.
+* xref:dev@chappe::whats-new.adoc[Chappe], xref:dev@grimm::whats-new.adoc[Grimm], xref:dev@humboldt::whats-new.adoc[Humboldt], xref:dev@knock::whats-new.adoc[Knock], xref:dev@peano::whats-new.adoc[Peano] and xref:dev@ibarra::whats-new.adoc[Ibarra] — fixes.
+* xref:dev@noether::whats-new.adoc[Noether], xref:dev@bodoni::index.adoc[Bodoni] and xref:dev@kerckhoffs::index.adoc[Kerckhoffs] — released for the first time.
 
 [#rc2]
 == Added in 0.4.0-RC2 (since 0.4.0-RC1)
@@ -65,7 +79,7 @@ The 0.4.0-RC1 entries of each component are the second section of its What's new
 
 == Components not released yet
 
-xref:erasmus::index.adoc[Erasmus], xref:noether::index.adoc[Noether] and xref:tassis::index.adoc[Tassis] are not released yet: their documentation follows `main`. Where each stands is on the xref:roadmap.adoc[Consolidated roadmap].
+xref:bodoni::index.adoc[Bodoni], xref:noether::index.adoc[Noether] and xref:kerckhoffs::index.adoc[Kerckhoffs] are released for the first time with 0.4.0; xref:erasmus::index.adoc[Erasmus] and xref:tassis::index.adoc[Tassis] are not released yet. Until a component's first release, its documentation follows `main`. Where each stands is on the xref:roadmap.adoc[Consolidated roadmap].
 
 == How these lists are maintained
 
