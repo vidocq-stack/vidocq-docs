@@ -35,8 +35,8 @@
 // A release candidate replaces the earlier ones of its train: their docs line leaves the playbooks and
 // their What's new entries are kept in the cumulative pages (scripts/cumulate-whats-new.js).
 //
-// Manual follow-ups it will remind you about: cli-version (vidocq only, when
-// the CLI ships a new release) and checking the deploy run.
+// Manual follow-ups it will remind you about: the ecosystem What's new page of
+// content/home, which no script writes, and checking the deploy run.
 'use strict';
 const fs = require('fs');
 const os = require('os');
@@ -46,6 +46,7 @@ const {
   parseSources, applyRetention, versionedRepos, devStartPaths, versionOf, semverKey, retired: retiredBy, repoDir,
   defaultWorkspace,
 } = require('./playbook-sources');
+const { stripNewBadges } = require('./new-badges');
 
 const ROOT = path.resolve(__dirname, '..');
 const args = process.argv.slice(2);
@@ -176,7 +177,7 @@ function bumpRoot(docRoot) {
       if (e.isDirectory()) stripNew(p);
       else if (e.name.endsWith('.adoc')) {
         const t = fs.readFileSync(p, 'utf8');
-        const t2 = t.replace(/ ?\[\.tag-new\]#NEW# ?/g, '');
+        const t2 = stripNewBadges(t);
         if (t2 !== t) { fs.writeFileSync(p, t2); dirty = true; }
       }
     }
@@ -229,7 +230,7 @@ try {
         if (e.isDirectory()) stripSelf(p);
         else if (e.name.endsWith('.adoc')) {
           const t = fs.readFileSync(p, 'utf8');
-          const t2 = t.replace(/ ?\[\.tag-new\]#NEW# ?/g, '');
+          const t2 = stripNewBadges(t);
           if (t2 !== t) fs.writeFileSync(p, t2);
         }
       }
@@ -296,6 +297,6 @@ if (failures.length) { console.log('FAILURES:'); failures.forEach((f) => console
 console.log(`Done${DRY ? ' (dry-run, nothing written)' : ''}. Reminders:
   - git push (vidocq-docs) to trigger the site deploy, then check the run.${BUMP_BRANCH ? `
   - open the pull request of ${BUMP_BRANCH} in each repository whose main takes pull requests only (the monorepo).` : ''}
-  - vidocq only: bump cli-version in vidocq-runtime/docs/en/antora.yml (main + docs/${VERSION}) if the CLI shipped a new version.
+  - content/home/modules/ROOT/pages/whats-new.adoc is written by hand: add the ${VERSION} section and repin its links (a line that left the window no longer resolves).
   - releases older than the ${KEEP}-version window left the playbook but their docs/* branches remain — re-add one to republish it.`);
 process.exit(failures.length ? 1 : 0);

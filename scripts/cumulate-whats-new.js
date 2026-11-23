@@ -24,6 +24,7 @@ const os = require('os');
 const path = require('path');
 const { execSync } = require('child_process');
 const { parseSources, versionedRepos, devStartPaths, versionOf, repoDir, defaultWorkspace } = require('./playbook-sources');
+const { stripNewBadges } = require('./new-badges');
 
 const ROOT = path.resolve(__dirname, '..');
 const args = process.argv.slice(2);
@@ -43,7 +44,6 @@ if (!FROM || !TO || !BASE) {
 
 const sh = (cmd, cwd) => execSync(cmd, { cwd, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] });
 const anchor = (v) => (/-RC(\d+)$/.exec(v) ? 'rc' + /-RC(\d+)$/.exec(v)[1] : 'final');
-const NEW_BADGE = / ?\[\.tag-new\]#NEW# ?/g;
 const PLACEHOLDER = /^_Nothing documented yet/m;
 const MARK = '// cumulative what\'s new';
 
@@ -83,9 +83,9 @@ function cumulate(fromText, toText) {
 
   let older;
   if (fromText.includes(MARK)) {
-    older = sectionsOf(fromBody).map((s) => ({ ...s, text: s.text.replace(NEW_BADGE, ' ').replace(/ +—/g, ' —') }));
+    older = sectionsOf(fromBody).map((s) => ({ ...s, text: stripNewBadges(s.text) }));
   } else {
-    const body = PLACEHOLDER.test(fromBody) ? '' : pinAttrs(demote(fromBody), BASE, FROM).replace(NEW_BADGE, ' ').replace(/ +—/g, ' —');
+    const body = PLACEHOLDER.test(fromBody) ? '' : stripNewBadges(pinAttrs(demote(fromBody), BASE, FROM));
     older = [{
       id: anchor(FROM),
       text: `[#${anchor(FROM)}]\n== Brought by ${FROM} (since ${BASE})\n\n` + (body || `_Nothing new in this component in ${FROM}._`),
