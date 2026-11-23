@@ -47,7 +47,7 @@ That one command wrote everything the next steps need:
 ----
 # mansart-pool: settings written by the Vidocq CLI, yours to edit
 # The PostgreSQL dev service sets vidocq.pool.url, .username and .password under vidocq dev, vidocq test and
-# mvn test. Everywhere else (vidocq run, the packaged application), the pool needs them: uncomment them, or
+# mvn test. Everywhere else (vidocq start, the packaged application), the pool needs them: uncomment them, or
 # set them with `vidocq config set`, which uncomments the line in place.
 #vidocq.pool.url=jdbc:postgresql://localhost:5432/todo
 #vidocq.pool.username=todo
