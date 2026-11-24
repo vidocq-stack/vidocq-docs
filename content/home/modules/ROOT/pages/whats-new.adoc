@@ -1,27 +1,32 @@
 = What's new across the Vidocq ecosystem
-:description: What changed across the Vidocq components since the 0.3.0 release, release candidate by release candidate, and where each component lists it.
+:description: What changed across the Vidocq components from the 0.3.0 release to 0.4.0, release by release, and where each component lists it.
 
 [.lead]
-Each component keeps its own What's new page. Since the 0.3.0 release the ecosystem has shipped two release candidates, 0.4.0-RC1 (2026-10-26) and 0.4.0-RC2, and the page of a component on the 0.4.0-RC2 line keeps both, newest first. The 0.4.0-RC1 documentation line is no longer published: nothing it listed was dropped. This page is the entry point: it says what is new across the components, release candidate by release candidate, then where each one lists it.
+Each component keeps its own What's new page. After the 0.3.0 release the ecosystem shipped two release candidates, 0.4.0-RC1 (2026-10-26) and 0.4.0-RC2, then 0.4.0 (2026-11-24). The page of a component on the 0.4.0 line keeps all three, newest first. The release candidate lines are no longer published: nothing they listed was dropped. This page is the entry point: it says what is new across the components, release by release, then where each one lists it.
 
 [#dev]
-== Since 0.4.0-RC2 (development line)
+== Since 0.4.0 (development line)
 
-The What's new page of a component on its `dev` line lists what landed after 0.4.0-RC2: xref:dev@vidocq::whats-new.adoc[Vidocq Runtime], xref:dev@vauban::whats-new.adoc[Vauban], xref:dev@cassini::whats-new.adoc[Cassini] and the other components. The entries land there first, with the [.tag-new]#NEW# badge on the section they point to.
+What lands after 0.4.0 is listed first on the What's new page of each component's `dev` line, for example xref:dev@vidocq::whats-new.adoc[Vidocq Runtime] or xref:dev@vauban::whats-new.adoc[Vauban], with the [.tag-new]#NEW# badge on the section it points to.
+
+[#final]
+== Added in 0.4.0 (since 0.4.0-RC2)
+
+The first section of each component's What's new page on the 0.4.0 line lists what landed after 0.4.0-RC2.
 
 === Component by component
 
-* xref:dev@vidocq::whats-new.adoc[Vidocq Runtime] — extensions for Jakarta Persistence (Noether), Jakarta Standard Tag Library (Bodoni), Jakarta WebSocket (Foy) and, as a preview, Jakarta Security (Kerckhoffs); build compatible extensions frozen at build; hot swap of method bodies under `vidocq dev`; an application without `vidocq-runtime-parent`, `vidocq pom convert` and `vidocq pom upgrade`; the pools answer JNDI names; a jlink image with one layer.
-* xref:dev@vauban::whats-new.adoc[Vauban] — the freeze of build compatible extensions, client proxies of synthetic beans generated at build, about 280 fewer classes loaded at start, CDI conformance fixes.
-* xref:dev@cassini::whats-new.adoc[Cassini] — Jakarta REST as a Servlet (`cassini-servlet`), filter and sub-resource locator conformance fixes, `rx()` and TLS on the client.
-* xref:dev@foy::whats-new.adoc[Foy] — hooks for Jakarta Authentication and Authorization runtimes, `CurrentRequest`, a `web.xml` servlet that is a bean is injected, the static resources of a jlink image.
-* xref:dev@mansart::whats-new.adoc[Mansart] — a two-phase commit that reaches every resource, the transaction timeout applied, a compacted recovery journal, pooled XA connections; *Jakarta Data no longer quotes table and column names*, which breaks an H2 schema created with quoted lower-case names.
-* xref:dev@champollion::whats-new.adoc[Champollion] — generic and qualified JSON-B adapters as container beans, the same generated files at every build.
-* xref:dev@ravel::whats-new.adoc[Ravel] and xref:dev@cervantes::whats-new.adoc[Cervantes] — the configuration checked at start by a `Startup` observer, in a packaged application too; Cervantes refuses a cleartext remote JWKS location.
-* xref:dev@dirac::whats-new.adoc[Dirac] — metrics on inherited methods and on interceptor bindings, inherited gauges.
-* xref:dev@heisenberg::whats-new.adoc[Heisenberg] — definition errors reported at compile time, the interceptor priority applied at start.
-* xref:dev@chappe::whats-new.adoc[Chappe], xref:dev@grimm::whats-new.adoc[Grimm], xref:dev@humboldt::whats-new.adoc[Humboldt], xref:dev@knock::whats-new.adoc[Knock], xref:dev@peano::whats-new.adoc[Peano] and xref:dev@ibarra::whats-new.adoc[Ibarra] — fixes.
-* xref:dev@noether::whats-new.adoc[Noether], xref:dev@bodoni::index.adoc[Bodoni] and xref:dev@kerckhoffs::index.adoc[Kerckhoffs] — released for the first time.
+* xref:0.4.0@vidocq::whats-new.adoc#final[Vidocq Runtime] — extensions for Jakarta Persistence (Noether), Jakarta Standard Tag Library (Bodoni), Jakarta WebSocket (Foy) and, as a preview, Jakarta Security (Kerckhoffs); build compatible extensions frozen at build; hot swap of method bodies under `vidocq dev`; an application without `vidocq-runtime-parent`, `vidocq pom convert` and `vidocq pom upgrade`; the pools answer JNDI names; a jlink image with one layer.
+* xref:0.4.0@vauban::whats-new.adoc#final[Vauban] — the freeze of build compatible extensions, client proxies of synthetic beans generated at build, about 280 fewer classes loaded at start, CDI conformance fixes.
+* xref:0.4.0@cassini::whats-new.adoc#final[Cassini] — Jakarta REST as a Servlet (`cassini-servlet`), filter and sub-resource locator conformance fixes, `rx()` and TLS on the client.
+* xref:0.4.0@foy::whats-new.adoc#final[Foy] — hooks for Jakarta Authentication and Authorization runtimes, `CurrentRequest`, a `web.xml` servlet that is a bean is injected, the static resources of a jlink image.
+* xref:0.4.0@mansart::whats-new.adoc#final[Mansart] — a two-phase commit that reaches every resource, the transaction timeout applied, a compacted recovery journal, pooled XA connections; *Jakarta Data no longer quotes table and column names*, which breaks an H2 schema created with quoted lower-case names.
+* xref:0.4.0@champollion::whats-new.adoc#final[Champollion] — generic and qualified JSON-B adapters as container beans, the same generated files at every build.
+* xref:0.4.0@ravel::whats-new.adoc#final[Ravel] and xref:0.4.0@cervantes::whats-new.adoc#final[Cervantes] — the configuration checked at start by a `Startup` observer, in a packaged application too; Cervantes refuses a cleartext remote JWKS location.
+* xref:0.4.0@dirac::whats-new.adoc#final[Dirac] — metrics on inherited methods and on interceptor bindings, inherited gauges.
+* xref:0.4.0@heisenberg::whats-new.adoc#final[Heisenberg] — definition errors reported at compile time, the interceptor priority applied at start.
+* xref:0.4.0@chappe::whats-new.adoc#final[Chappe], xref:0.4.0@grimm::whats-new.adoc#final[Grimm], xref:0.4.0@humboldt::whats-new.adoc#final[Humboldt], xref:0.4.0@knock::whats-new.adoc#final[Knock], xref:0.4.0@peano::whats-new.adoc#final[Peano] and xref:0.4.0@ibarra::whats-new.adoc#final[Ibarra] — fixes.
+* xref:0.4.0@noether::whats-new.adoc[Noether], xref:0.4.0@bodoni::index.adoc[Bodoni] and xref:0.4.0@kerckhoffs::index.adoc[Kerckhoffs] — released for the first time.
 
 [#rc2]
 == Added in 0.4.0-RC2 (since 0.4.0-RC1)
@@ -34,15 +39,15 @@ Most of the work since RC1 follows one rule: Vidocq generates at build time what
 * **A clear message at run time** — a package the runtime cannot reach, and the build could not see, fails with the package and the `opens` line to add; under `vidocq dev` the line is written and the application reloads.
 * **Or no directive at all** — `vidocq create --open-module` creates an `open module`.
 
-Read: xref:0.4.0-RC2@vidocq::java-modules.adoc[Java modules in a Vidocq application].
+Read: xref:0.4.0@vidocq::java-modules.adoc[Java modules in a Vidocq application].
 
 === Less reflection in an application
 
-* **JSON-B bindings generated at build time** — Champollion generates the binding of the records and final classes a REST resource exchanges, with no annotation, so JSON-B maps them without reflection. xref:0.4.0-RC2@champollion::reference.adoc#rest-bindings[Champollion].
-* **Interceptor methods called by generated code** — Vauban calls `@AroundInvoke`, `@AroundConstruct` and lifecycle interceptor methods through the provider generated in their package: a package-private interceptor needs no `opens`. xref:0.4.0-RC2@vauban::internals.adoc#components-provider[Vauban].
-* **Repositories from a dependency jar** — a library's `@Repository` interfaces are implemented at build time, like the application's, by `vidocq:generate`. xref:0.4.0-RC2@mansart::usage.adoc#dependency-repositories[Mansart], xref:0.4.0-RC2@vidocq::whats-new.adoc#rc2[Vidocq].
+* **JSON-B bindings generated at build time** — Champollion generates the binding of the records and final classes a REST resource exchanges, with no annotation, so JSON-B maps them without reflection. xref:0.4.0@champollion::reference.adoc#rest-bindings[Champollion].
+* **Interceptor methods called by generated code** — Vauban calls `@AroundInvoke`, `@AroundConstruct` and lifecycle interceptor methods through the provider generated in their package: a package-private interceptor needs no `opens`. xref:0.4.0@vauban::internals.adoc#components-provider[Vauban].
+* **Repositories from a dependency jar** — a library's `@Repository` interfaces are implemented at build time, like the application's, by `vidocq:generate`. xref:0.4.0@mansart::usage.adoc#dependency-repositories[Mansart], xref:0.4.0@vidocq::whats-new.adoc#rc2[Vidocq].
 * **Run-time generation is announced** — when Vauban, Cassini, Cyrano or Mansart must generate a class or serve a repository at run time instead of at build time, they say so in a framed warning at start-up.
-* **What is generated, brick by brick** — each component's _Internals_ page now has a section, _Generated code and reflective fallback_, with the same table everywhere: what is generated, by which tool and when, what uses it at run time, what runs when it is missing, and how to tell which path ran. Start from xref:0.4.0-RC2@vidocq::internals.adoc#generated-code[Vidocq's], which lists every codegen bundle and links to each brick's.
+* **What is generated, brick by brick** — each component's _Internals_ page now has a section, _Generated code and reflective fallback_, with the same table everywhere: what is generated, by which tool and when, what uses it at run time, what runs when it is missing, and how to tell which path ran. Start from xref:0.4.0@vidocq::internals.adoc#generated-code[Vidocq's], which lists every codegen bundle and links to each brick's.
 
 === The CLI does the setup
 
@@ -50,7 +55,7 @@ Read: xref:0.4.0-RC2@vidocq::java-modules.adoc[Java modules in a Vidocq applicat
 * **Docker from macOS and Windows** — `vidocq build docker` links the runtime image inside a Linux JDK stage of the Dockerfile and builds the image when Docker answers.
 * **Quieter builds** — the "created in the last round" warnings are gone, Mansart's generated sources included.
 
-Full list: xref:0.4.0-RC2@vidocq::whats-new.adoc#rc2[What's new in Vidocq Runtime].
+Full list: xref:0.4.0@vidocq::whats-new.adoc#rc2[What's new in Vidocq Runtime].
 
 === SNAPSHOTs on our own repositories
 
@@ -58,24 +63,24 @@ Full list: xref:0.4.0-RC2@vidocq::whats-new.adoc#rc2[What's new in Vidocq Runtim
 
 === Component by component
 
-* xref:0.4.0-RC2@vidocq::whats-new.adoc#rc2[Vidocq Runtime] — the items above, plus JDBC spans with Telemetry, `--help` on every command, `vidocq test` reading the application's configuration, and the dev-service fixes.
-* xref:0.4.0-RC2@vauban::whats-new.adoc#rc2[Vauban] — dependency beans validated at build time, generation before javac's last round, generated interceptor invokers, overloaded `@Inject` constructors, run-time generation announced, dependency classes read without being initialised.
-* xref:0.4.0-RC2@champollion::whats-new.adoc#rc2[Champollion] — JSON-B bindings for REST types, an access error that names the `opens` to add, JSON-B and Protobuf conformance fixes, a cheaper JSON-P pipeline.
-* xref:0.4.0-RC2@mansart::whats-new.adoc#rc2[Mansart] — repositories from a library, Weld and Open Liberty, Jakarta Data conformance fixes (MANSART-010 to -023), a build error for a method no query derives from.
-* xref:0.4.0-RC2@cassini::whats-new.adoc#rc2[Cassini] — a lighter request path, `@PreMatching` filters run once, run-time adapters announced, Jakarta REST conformance and client fixes.
-* xref:0.4.0-RC2@cyrano::whats-new.adoc#rc2[Cyrano] — run-time clients announced, more interfaces served at build time, exceptions unchanged through interceptors.
-* xref:0.4.0-RC2@grimm::whats-new.adoc#rc2[Grimm] — the processor works under Maven, `@OpenAPIDefinition` read on Vidocq, the runtime's own endpoints left out, static-file fixes.
-* xref:0.4.0-RC2@humboldt::whats-new.adoc#rc2[Humboldt] — OpenTelemetry 1.67.0 (GHSA-ccrj-gw8r-854m), exporters default to OTLP, `http.route` is the template, no SDK test library in an application.
-* xref:0.4.0-RC2@heisenberg::whats-new.adoc#rc2[Heisenberg] — annotations read at compile time, `@Timeout` keeps the caller's context, policies resolved once.
-* xref:0.4.0-RC2@cervantes::whats-new.adoc#rc2[Cervantes] — the token stays out of `toString`.
-* xref:0.4.0-RC2@chappe::whats-new.adoc#rc2[Chappe] and xref:0.4.0-RC2@dirac::whats-new.adoc#rc2[Dirac] — performance and build-time extension fixes.
-* xref:0.4.0-RC2@peano::whats-new.adoc[Peano] and xref:0.4.0-RC2@ibarra::whats-new.adoc[Ibarra] — released in 0.4.0-RC1; small fixes since.
-* xref:0.4.0-RC2@knock::whats-new.adoc#rc2[Knock], xref:0.4.0-RC2@ravel::whats-new.adoc#rc2[Ravel] and xref:0.4.0-RC2@foy::whats-new.adoc#rc2[Foy] — the _Generated code and reflective fallback_ section of their _Internals_ page.
+* xref:0.4.0@vidocq::whats-new.adoc#rc2[Vidocq Runtime] — the items above, plus JDBC spans with Telemetry, `--help` on every command, `vidocq test` reading the application's configuration, and the dev-service fixes.
+* xref:0.4.0@vauban::whats-new.adoc#rc2[Vauban] — dependency beans validated at build time, generation before javac's last round, generated interceptor invokers, overloaded `@Inject` constructors, run-time generation announced, dependency classes read without being initialised.
+* xref:0.4.0@champollion::whats-new.adoc#rc2[Champollion] — JSON-B bindings for REST types, an access error that names the `opens` to add, JSON-B and Protobuf conformance fixes, a cheaper JSON-P pipeline.
+* xref:0.4.0@mansart::whats-new.adoc#rc2[Mansart] — repositories from a library, Weld and Open Liberty, Jakarta Data conformance fixes (MANSART-010 to -023), a build error for a method no query derives from.
+* xref:0.4.0@cassini::whats-new.adoc#rc2[Cassini] — a lighter request path, `@PreMatching` filters run once, run-time adapters announced, Jakarta REST conformance and client fixes.
+* xref:0.4.0@cyrano::whats-new.adoc#rc2[Cyrano] — run-time clients announced, more interfaces served at build time, exceptions unchanged through interceptors.
+* xref:0.4.0@grimm::whats-new.adoc#rc2[Grimm] — the processor works under Maven, `@OpenAPIDefinition` read on Vidocq, the runtime's own endpoints left out, static-file fixes.
+* xref:0.4.0@humboldt::whats-new.adoc#rc2[Humboldt] — OpenTelemetry 1.67.0 (GHSA-ccrj-gw8r-854m), exporters default to OTLP, `http.route` is the template, no SDK test library in an application.
+* xref:0.4.0@heisenberg::whats-new.adoc#rc2[Heisenberg] — annotations read at compile time, `@Timeout` keeps the caller's context, policies resolved once.
+* xref:0.4.0@cervantes::whats-new.adoc#rc2[Cervantes] — the token stays out of `toString`.
+* xref:0.4.0@chappe::whats-new.adoc#rc2[Chappe] and xref:0.4.0@dirac::whats-new.adoc#rc2[Dirac] — performance and build-time extension fixes.
+* xref:0.4.0@peano::whats-new.adoc[Peano] and xref:0.4.0@ibarra::whats-new.adoc[Ibarra] — released in 0.4.0-RC1; small fixes since.
+* xref:0.4.0@knock::whats-new.adoc#rc2[Knock], xref:0.4.0@ravel::whats-new.adoc#rc2[Ravel] and xref:0.4.0@foy::whats-new.adoc#rc2[Foy] — the _Generated code and reflective fallback_ section of their _Internals_ page.
 
 [#rc1]
 == Brought by 0.4.0-RC1 (since 0.3.0)
 
-The 0.4.0-RC1 entries of each component are the second section of its What's new page on the 0.4.0-RC2 line: xref:0.4.0-RC2@vidocq::whats-new.adoc#rc1[Vidocq Runtime], xref:0.4.0-RC2@vauban::whats-new.adoc#rc1[Vauban], xref:0.4.0-RC2@chappe::whats-new.adoc#rc1[Chappe], xref:0.4.0-RC2@foy::whats-new.adoc#rc1[Foy], xref:0.4.0-RC2@cassini::whats-new.adoc#rc1[Cassini], xref:0.4.0-RC2@champollion::whats-new.adoc#rc1[Champollion], xref:0.4.0-RC2@mansart::whats-new.adoc#rc1[Mansart], xref:0.4.0-RC2@ravel::whats-new.adoc#rc1[Ravel], xref:0.4.0-RC2@knock::whats-new.adoc#rc1[Knock], xref:0.4.0-RC2@dirac::whats-new.adoc#rc1[Dirac], xref:0.4.0-RC2@heisenberg::whats-new.adoc#rc1[Heisenberg], xref:0.4.0-RC2@cervantes::whats-new.adoc#rc1[Cervantes], xref:0.4.0-RC2@cyrano::whats-new.adoc#rc1[Cyrano], xref:0.4.0-RC2@humboldt::whats-new.adoc#rc1[Humboldt] and xref:0.4.0-RC2@grimm::whats-new.adoc#rc1[Grimm]. Peano and Ibarra were released for the first time in 0.4.0-RC1: their xref:0.4.0-RC2@peano::whats-new.adoc[Peano] and xref:0.4.0-RC2@ibarra::whats-new.adoc[Ibarra] pages list what changed since.
+The 0.4.0-RC1 entries of each component are the third section of its What's new page on the 0.4.0 line: xref:0.4.0@vidocq::whats-new.adoc#rc1[Vidocq Runtime], xref:0.4.0@vauban::whats-new.adoc#rc1[Vauban], xref:0.4.0@chappe::whats-new.adoc#rc1[Chappe], xref:0.4.0@foy::whats-new.adoc#rc1[Foy], xref:0.4.0@cassini::whats-new.adoc#rc1[Cassini], xref:0.4.0@champollion::whats-new.adoc#rc1[Champollion], xref:0.4.0@mansart::whats-new.adoc#rc1[Mansart], xref:0.4.0@ravel::whats-new.adoc#rc1[Ravel], xref:0.4.0@knock::whats-new.adoc#rc1[Knock], xref:0.4.0@dirac::whats-new.adoc#rc1[Dirac], xref:0.4.0@heisenberg::whats-new.adoc#rc1[Heisenberg], xref:0.4.0@cervantes::whats-new.adoc#rc1[Cervantes], xref:0.4.0@cyrano::whats-new.adoc#rc1[Cyrano], xref:0.4.0@humboldt::whats-new.adoc#rc1[Humboldt] and xref:0.4.0@grimm::whats-new.adoc#rc1[Grimm]. Peano and Ibarra were released for the first time in 0.4.0-RC1: their xref:0.4.0@peano::whats-new.adoc[Peano] and xref:0.4.0@ibarra::whats-new.adoc[Ibarra] pages list what changed since.
 
 == Components not released yet
 
@@ -83,6 +88,6 @@ xref:bodoni::index.adoc[Bodoni], xref:noether::index.adoc[Noether] and xref:kerc
 
 == How these lists are maintained
 
-This page is versionless, so a link from here to a component resolves against that component's latest **final** release unless it says otherwise. The links are therefore pinned: `0.4.0-RC2@` for the release candidate line, `dev@` for the development line.
+This page is versionless, so a link from here to a component resolves against that component's latest **final** release unless it says otherwise. The links are therefore pinned: `0.4.0@` for the 0.4.0 line, `dev@` for the development line.
 
-When a release candidate replaces the previous one, the release cut keeps the entries of the retired line: the What's new page of each component on the new line becomes cumulative (`scripts/cumulate-whats-new.js`), and the [.tag-new]#NEW# badges are stripped from the pages they were flagging on `main`. The cut does not touch this page: it is updated by hand when a component starts or stops having something to announce.
+When a release replaces a release candidate of its train, the release cut keeps the entries of the retired line: the What's new page of each component on the new line becomes cumulative (`scripts/cumulate-whats-new.js`), and the [.tag-new]#NEW# badges are stripped from the pages they were flagging on `main`. The cut does not touch this page: it is updated by hand when a component starts or stops having something to announce.
