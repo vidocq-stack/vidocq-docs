@@ -31,19 +31,15 @@ antora:
 content:
   sources:
     - url: https://codefloe.com/Vidocq/vidocq.git
-      branches: [docs/0.4.0-RC2, docs/0.3.0]
+      branches: [docs/0.3.0]
       start_paths: [docs/en]
     # The released docs of the bricks: their former repositories were deleted after the move into the monorepo,
     # and each docs-archive/<version> branch of Vidocq/vidocq holds <brick>/docs/en of every brick's docs/<version>.
     - url: https://codefloe.com/Vidocq/vidocq.git
-      branches: [docs-archive/0.4.0-RC2, docs-archive/0.3.0]
+      branches: [docs-archive/0.3.0]
       start_paths: [vauban/docs/en, ravel/docs/en, cassini/docs/en, champollion/docs/en, chappe/docs/en, foy/docs/en,
                     mansart/docs/en, knock/docs/en, humboldt/docs/en, grimm/docs/en, dirac/docs/en, heisenberg/docs/en,
                     cervantes/docs/en, cyrano/docs/en]
-    # ibarra and peano were first released with 0.4.0-RC1.
-    - url: https://codefloe.com/Vidocq/vidocq.git
-      branches: [docs-archive/0.4.0-RC2]
-      start_paths: [ibarra/docs/en, peano/docs/en]
     # erasmus has never been released: dev docs only.
     - url: https://codefloe.com/Vidocq/erasmus.git
       branches: [main]
@@ -54,7 +50,7 @@ content:
     # Every component but erasmus and tassis lives in the monorepo since 2026-11-19: its dev docs (main) come from
     # its folder there; its released docs come from the docs-archive branches above.
     - url: https://codefloe.com/Vidocq/vidocq.git
-      branches: [main]
+      branches: [main, docs/0.4.0]
       start_paths:
         - vidocq-runtime/docs/en
         - vidocq-components/vidocq-components-transport/chappe/docs/en
@@ -82,7 +78,7 @@ content:
     # tutorials is versioned like the bricks: HEAD (dev) + the release branches
     # of THIS repo (content/tutorials only differs between them).
     - url: .
-      branches: [HEAD, docs/0.4.0-RC2, docs/0.3.0]
+      branches: [HEAD, docs/0.4.0, docs/0.3.0]
       start_paths: [content/tutorials]
 
 ui:
