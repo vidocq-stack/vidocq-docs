@@ -15,9 +15,40 @@ These tutorials walk you through building real applications with Vidocq, one ste
 | The same application extended with persistence: a Jakarta Data repository (Mansart) over a pooled datasource, transactions and a Flyway migration, with PostgreSQL started for you in dev mode and in tests.
 |===
 
-[NOTE]
-====
-Tutorials are *learning-oriented*: they take you somewhere, in order. If you are
-looking for the reference material instead, each component of the sidebar has its
-own documentation — start with the xref:{page-component-version}@vidocq::index.adoc[Vidocq Runtime] pages.
-====
+== Health checks
+
+Add the runtime extension in your application directory:
+
+[source,bash]
+----
+vidocq extension add knock-health
+vidocq start
+----
+
+Request `/health` in another terminal. An application with no custom checks responds with `{"status":"UP","checks":[]}`.
+See xref:your-first-app.adoc#step-7-add-extensions-as-you-grow[the worked example] or xref:{page-component-version}@knock::getting-started.adoc[use Knock standalone].
+
+== PostgreSQL
+
+To connect a REST application to PostgreSQL, follow xref:rest-and-database.adoc[the database tutorial].
+It provisions PostgreSQL in a container for development and tests, creates a table with Flyway, and verifies the result with a request to `/products`.
+
+== JWT authentication
+
+Add `cervantes-jwt` with `vidocq extension add`, then follow xref:{page-component-version}@cervantes::usage.adoc[JWT configuration and roles].
+
+[#change-port]
+== Change the HTTP port
+
+From the application directory, set the port and start the application:
+
+[source,bash]
+----
+vidocq config set vidocq.http.port 9090
+vidocq start
+----
+
+For the tutorial application, `curl http://localhost:9090/hello` now returns `Hello from Vidocq!`.
+Stop the application and set the property back to `8080` to continue the tutorial.
+
+For application settings of your own, see xref:{page-component-version}@ravel::getting-started.adoc[MicroProfile Config].

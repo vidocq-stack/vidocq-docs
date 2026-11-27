@@ -1,4 +1,5 @@
-= REST + database
+= Connect REST to PostgreSQL
+:keywords: PostgreSQL, database, Jakarta Data
 :description: Add persistence to a Vidocq application — a Jakarta Data repository (Mansart) over a pooled datasource, transactions, Flyway migrations, and PostgreSQL started for you in dev mode and tests.
 
 [.lead]
