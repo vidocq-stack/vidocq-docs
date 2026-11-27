@@ -1,16 +1,12 @@
-= Vidocq
-:description: A suite of Jakarta EE / MicroProfile runtimes, Java 25, native Java Modules, minimal dependencies.
-
-[.text-center]
-image::vidocq-logo.png[Vidocq,360,role=home-logo]
+= Vidocq documentation
+:description: Build a REST service with Vidocq, add a feature, or use a Jakarta EE or MicroProfile component in your own application.
 
 [.lead]
-Vidocq is a suite of Jakarta EE and MicroProfile runtimes written in pure Java 25, native Java Modules, built on static code generation (Class-File API + APT) and virtual threads.
+Build Java 25 applications with Jakarta EE and MicroProfile. Start with a running REST service or choose a guide for the application you already have.
 
-[TIP]
-====
-**New here?** The xref:tutorials::your-first-app.adoc[Your first Vidocq application] tutorial takes you from installing the CLI to a running REST service in minutes. Prefer the condensed version? See the xref:vidocq::getting-started.adoc[runtime getting-started guide].
-====
+* xref:tutorials::your-first-app.adoc[Build your first REST API] — install the CLI and get a response from `/hello`.
+* xref:tutorials::index.adoc[Add a feature] — configure the HTTP port, add health checks, connect PostgreSQL or secure an endpoint.
+* <<the-components,Use a component standalone>> — find the specification you need and open its component guide.
 
 == The ecosystem at a glance
 

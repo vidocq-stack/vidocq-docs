@@ -16,7 +16,8 @@ antora:
   extensions:
     # Client-side full-text search: static Lunr index generated at build time,
     # no external service involved.
-    - '@antora/lunr-extension'
+    - require: '@antora/lunr-extension'
+      index_by_heading: true
 
 # Antora only supports http(s) or filesystem paths -- not ssh://.
 # Sources are PUBLIC repos on Codefloe (Vidocq org): Antora clones them over
@@ -92,6 +93,7 @@ asciidoc:
     # `kroki-fetch-diagram: true` downloads the SVGs at build time -> no runtime
     # dependency on kroki; the served site stays 100% static.
     - asciidoctor-kroki
+    - ./scripts/reader-navigation.js
   attributes:
     experimental: ''
     idprefix: ''

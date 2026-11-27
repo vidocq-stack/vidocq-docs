@@ -96,3 +96,18 @@ After the three fixes:
   (`/_<product>/version`).
 - **Always log the pulled jar content** during the build (`unzip -p ... build.properties`):
   turns a 1h debug into a 30s debug.
+
+## DOCS-20261127-01 — First application and search on the published site
+
+On 2026-11-27 the 0.4.0 tutorial introduction described snapshots while its installer selected Maven Central.
+The runtime quickstart required a global Maven executable after listing it as optional.
+Open the two getting-started pages with only JDK 25 installed to reproduce.
+The guides maintained separate installation and build instructions.
+Fixed on the development and 0.4.0 documentation lines by sharing the runtime's versioned first-service instructions.
+
+## DOCS-20261127-02 — Navigation and search on narrow screens
+
+On 2026-11-27 the first tutorial occupied 1,037 CSS pixels at a viewport width of 390.
+The navigation preceded the article, the grid expanded to fit code, and pages omitted their main heading.
+On the home page with 0.4.0 selected, searching for health returned 0.3.0 first because the index had no active version filter.
+Fixed in the shared UI with a collapsible mobile menu, wrapping content, local navigation and a version facet.

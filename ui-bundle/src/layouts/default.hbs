@@ -6,9 +6,13 @@
       {{> header}}
       <main>
         <aside class="nav">
-          {{> nav}}
+          <details class="docs-navigation" open>
+            <summary>Documentation menu</summary>
+            {{> nav}}
+          </details>
         </aside>
         <article class="doc">
+          <h1>{{{page.title}}}</h1>
           {{{page.contents}}}
         </article>
       </main>

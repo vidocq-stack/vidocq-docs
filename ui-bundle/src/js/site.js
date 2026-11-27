@@ -60,6 +60,13 @@
     try { map = JSON.parse(sel.getAttribute('data-site-versions') || '{}'); } catch (e) { /* ignore */ }
     var contextSwitch = sel.hasAttribute('data-context-switch');
 
+    var scope = document.querySelector('#search-field [data-facet-filter]');
+    function updateSearchVersion() {
+      if (!scope) return;
+      scope.dataset.facetFilter = 'version:' + sel.value;
+      scope.nextElementSibling.textContent = sel.options[sel.selectedIndex].textContent + ' only';
+    }
+
     if (contextSwitch) {
       var pref = null;
       try { pref = localStorage.getItem(STORAGE_VERSION); } catch (e) { /* ignore */ }
@@ -70,7 +77,9 @@
       sel.addEventListener('change', function () {
         try { localStorage.setItem(STORAGE_VERSION, this.value); } catch (e) { /* ignore */ }
         rewriteVersionedLinks(map, this.value);
+        updateSearchVersion();
       });
+      updateSearchVersion();
     } else {
       // Remember the version being browsed so versionless pages follow it.
       try { localStorage.setItem(STORAGE_VERSION, sel.value); } catch (e) { /* ignore */ }
@@ -87,6 +96,12 @@
   // rendered as a closed <details> by default; without this pass the visitor
   // would land on a page whose parent group is folded.
   function setupNavAccordion() {
+    var menu = document.querySelector('.docs-navigation');
+    if (!menu) return;
+    var mobile = window.matchMedia('(max-width: 800px)');
+    function fitMenu() { menu.open = !mobile.matches; }
+    fitMenu();
+    mobile.addEventListener('change', fitMenu);
     var current = document.querySelector('.nav .is-current-page');
     if (!current) return;
     var d = current.closest('details.nav-group-details');
@@ -95,7 +110,7 @@
       d = d.parentNode && d.parentNode.closest('details.nav-group-details');
     }
     // Bring the current page into view inside the scrollable sidebar.
-    if (typeof current.scrollIntoView === 'function') {
+    if (!mobile.matches && typeof current.scrollIntoView === 'function') {
       current.scrollIntoView({ block: 'nearest', behavior: 'auto' });
     }
   }

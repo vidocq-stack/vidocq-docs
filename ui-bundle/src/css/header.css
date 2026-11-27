@@ -175,3 +175,53 @@
   border-color: color-mix(in srgb, var(--brand-blue-600) 30%, transparent);
   color: var(--header-link-hover);
 }
+
+#search-field.search-box {
+  display: grid;
+  align-content: center;
+}
+
+.search-scope {
+  display: flex;
+  align-items: center;
+  gap: .25rem;
+  font-size: .7rem;
+}
+
+.search-scope input {
+  margin: 0;
+}
+
+@media (max-width: 800px) {
+  .navbar-inner {
+    padding-inline: .65rem;
+    gap: .5rem;
+  }
+
+  .navbar-tools {
+    gap: .4rem;
+    min-width: 0;
+  }
+
+  .navbar-section, .navbar-title {
+    display: none;
+  }
+
+  .search-box {
+    min-width: 0;
+  }
+
+  .search-box input[type="search"] {
+    max-width: 100%;
+    width: 10rem;
+  }
+
+  #search-field .search-result-dropdown-menu {
+    position: fixed;
+    top: var(--header-height);
+    inset-inline: .5rem;
+    width: auto;
+    min-width: 0;
+    max-width: none;
+  }
+}

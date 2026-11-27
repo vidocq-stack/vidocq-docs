@@ -19,7 +19,7 @@
 
 @media (max-width: 800px) {
   .body main {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
     padding: 1.5rem 1rem 2rem;
     gap: 1.5rem;
   }
@@ -64,4 +64,57 @@
 .doc article > .dlist,
 .doc .sect1 > .sectionbody {
   max-width: var(--content-max);
+}
+
+.docs-navigation > summary {
+  display: none;
+}
+
+.doc :is(h2, h3, h4, [id]) {
+  scroll-margin-top: calc(var(--header-height) + 1rem);
+}
+
+.doc .toc {
+  border-inline-start: 2px solid var(--c-rule);
+  padding-inline-start: 1rem;
+  margin-block: 1rem;
+}
+
+.doc #toctitle {
+  font-weight: 600;
+}
+
+.doc .toc ul {
+  margin-block: .4rem;
+}
+
+.doc .imageblock.module-logo img {
+  max-height: 6rem;
+  width: auto;
+}
+
+
+@media (max-width: 800px) {
+  .docs-navigation > summary {
+    display: list-item;
+    cursor: pointer;
+  }
+
+  .doc {
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+
+  .doc table.tableblock {
+    display: block;
+    overflow-x: auto;
+  }
+
+  .doc :is(p, li, td) code {
+    white-space: normal;
+  }
+
+  .doc pre code {
+    white-space: pre;
+  }
 }

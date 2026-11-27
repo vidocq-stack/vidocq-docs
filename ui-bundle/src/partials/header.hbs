@@ -18,8 +18,16 @@
       </div>
       {{/if}}
       {{#if env.SITE_SEARCH_PROVIDER}}
-      <div class="search-box">
+      <div class="search-box" id="search-field">
         <input id="search-input" type="search" placeholder="{{i18n 'search'}}" aria-label="{{i18n 'search'}}" autocomplete="off">
+        {{#each (version-options)}}
+          {{#if selected}}
+          <label class="search-scope" title="Clear to search all versions">
+            <input type="checkbox" data-facet-filter="version:{{version}}" checked>
+            <span>{{label}} only</span>
+          </label>
+          {{/if}}
+        {{/each}}
       </div>
       {{/if}}
       <button type="button" class="theme-toggle" aria-label="{{i18n 'toggle-theme'}}" title="{{i18n 'toggle-theme'}}">☼ ☾</button>

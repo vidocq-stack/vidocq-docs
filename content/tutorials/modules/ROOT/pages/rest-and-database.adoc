@@ -1,4 +1,5 @@
-= REST + database
+= Connect REST to PostgreSQL
+:keywords: PostgreSQL, database, Jakarta Data
 :description: Add persistence to a Vidocq application — a Jakarta Data repository (Mansart) over a pooled datasource, transactions, Flyway migrations, and PostgreSQL started for you in dev mode and tests.
 
 [.lead]
@@ -13,28 +14,28 @@ This tutorial continues from xref:your-first-app.adoc[Your first Vidocq applicat
 
 == Prerequisites
 
-* The `todo` project from xref:your-first-app.adoc[the first tutorial] (or any project created with `vidocq create -x cassini-rest`).
+* The `todo` project from xref:your-first-app.adoc[the first tutorial] (or any project created with `vidocq create -x rest-cassini`).
 * **Docker**: dev mode and the tests start PostgreSQL in a container (Testcontainers).
 
 == Step 1 — Add the extensions
 
 [source,bash]
 ----
-vidocq extension add mansart-data mansart-transactions flyway-migration
+vidocq extension add data-mansart transactions-mansart migration-flyway
 ----
 
 [source]
 ----
-  mansart-pool added too: mansart-data needs it
-✔ Added mansart-pool  (io.vidocq.runtime.extensions.jakartaee.web:vidocq-runtime-mansart-pool-extension)
-✔ Added mansart-data  (io.vidocq.runtime.extensions.jakartaee.web:vidocq-runtime-mansart-data-extension)
-✔ Added mansart-transactions  (io.vidocq.runtime.extensions.jakartaee.web:vidocq-runtime-mansart-transactions-extension)
-✔ Added flyway-migration  (io.vidocq.runtime.extensions.essentials:vidocq-runtime-flyway-migration-extension)
+  pool-mansart added too: data-mansart needs it
+✔ Added pool-mansart  (io.vidocq.runtime.extensions.jakartaee.web:vidocq-runtime-mansart-pool-extension)
+✔ Added data-mansart  (io.vidocq.runtime.extensions.jakartaee.web:vidocq-runtime-mansart-data-extension)
+✔ Added transactions-mansart  (io.vidocq.runtime.extensions.jakartaee.web:vidocq-runtime-mansart-transactions-extension)
+✔ Added migration-flyway  (io.vidocq.runtime.extensions.essentials:vidocq-runtime-flyway-migration-extension)
 ✔ Added org.postgresql:postgresql  (the JDBC driver of the vidocq-runtime-devservice-postgres dev service)
 ✔ Wired vidocq-runtime-devservice-postgres  (on vidocq-runtime-maven-plugin, in test scope with vidocq-runtime-devservices-junit)
-✔ Created src/main/resources/db/migration  (where flyway-migration reads its files; opened in module-info.java)
-✔ module-info.java updated  (requires/opens for mansart-pool, mansart-data, mansart-transactions, flyway-migration)
-✔ vidocq.properties completed  (the settings of mansart-pool, mansart-data, mansart-transactions, flyway-migration, to review: src/main/resources/vidocq.properties)
+✔ Created src/main/resources/db/migration  (where migration-flyway reads its files; opened in module-info.java)
+✔ module-info.java updated  (requires/opens for pool-mansart, data-mansart, transactions-mansart, migration-flyway)
+✔ vidocq.properties completed  (the settings of pool-mansart, data-mansart, transactions-mansart, migration-flyway, to review: src/main/resources/vidocq.properties)
 ----
 
 That one command wrote everything the next steps need:
@@ -45,7 +46,7 @@ That one command wrote everything the next steps need:
 +
 [source,properties]
 ----
-# mansart-pool: settings written by the Vidocq CLI, yours to edit
+# pool-mansart: settings written by the Vidocq CLI, yours to edit
 # The PostgreSQL dev service sets vidocq.pool.url, .username and .password under vidocq dev, vidocq test and
 # mvn test. Everywhere else (vidocq start, the packaged application), the pool needs them: uncomment them, or
 # set them with `vidocq config set`, which uncomments the line in place.

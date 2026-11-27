@@ -10,7 +10,8 @@ urls:
 
 antora:
   extensions:
-    - '@antora/lunr-extension'
+    - require: '@antora/lunr-extension'
+      index_by_heading: true
 
 # Local build: sources are the sibling clones of the workspace
 # (/Users/.../vidocq/<repo>, vidocq-docs being one of them). Antora reads the
@@ -79,6 +80,7 @@ ui:
 asciidoc:
   extensions:
     - asciidoctor-kroki
+    - ./scripts/reader-navigation.js
   attributes:
     experimental: ''
     idprefix: ''
